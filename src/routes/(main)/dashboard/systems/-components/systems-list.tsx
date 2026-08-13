@@ -1,0 +1,131 @@
+import { Link } from "@tanstack/react-router";
+
+import { CircleAlert, Layers, ListTodo, Plus } from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { Spinner } from "@/components/ui/spinner";
+import { useAuth } from "@/lib/auth/auth-provider";
+import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { formatUpdatedAt } from "@/lib/templates/format";
+import { getCategoryLabel } from "@/lib/templates/options";
+import { useMyTemplatesQuery } from "@/query/templates";
+import type { PurposeTemplate } from "@/types/template";
+
+import { LocalOnlyNote } from "./local-only-note";
+
+export function SystemsList() {
+  const { user, isReady } = useAuth();
+  const query = useMyTemplatesQuery(isReady && Boolean(user));
+  const drafts = query.data?.filter((item) => item.status === "draft").length ?? 0;
+  const published = query.data?.filter((item) => item.status === "published").length ?? 0;
+
+  return (
+    <div className="@container/main flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-1.5">
+          <h1 className="text-3xl tracking-tight">My systems</h1>
+          <p className="max-w-xl text-muted-foreground text-sm">
+            Write the library someone would use to prepare. They will fork their own copy in the app.
+          </p>
+          <LocalOnlyNote />
+        </div>
+        <Button nativeButton={false} render={<Link to="/dashboard/systems/new" />}>
+          <Plus data-icon="inline-start" />
+          New system
+        </Button>
+      </div>
+
+      {query.isPending ? (
+        <div className="flex min-h-72 items-center justify-center">
+          <Spinner className="size-6" />
+          <span className="sr-only">Loading your systems</span>
+        </div>
+      ) : null}
+
+      {query.isError ? (
+        <Alert variant="destructive">
+          <CircleAlert />
+          <AlertTitle>Could not load your systems</AlertTitle>
+          <AlertDescription className="flex flex-col gap-3">
+            <p>{getFunctionsErrorMessage(query.error)}</p>
+            <Button variant="outline" size="sm" className="w-fit" onClick={() => void query.refetch()}>
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {query.isSuccess && query.data.length === 0 ? (
+        <Empty className="min-h-80 border border-dashed">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <ListTodo />
+            </EmptyMedia>
+            <EmptyTitle>Start with one purpose</EmptyTitle>
+            <EmptyDescription>
+              Name the goal, write why you are the person to teach it, then build the task library.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button nativeButton={false} render={<Link to="/dashboard/systems/new" />}>
+              Create a system
+            </Button>
+          </EmptyContent>
+        </Empty>
+      ) : null}
+
+      {query.isSuccess && query.data.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-2 text-muted-foreground text-xs">
+            <span>
+              {query.data.length} {query.data.length === 1 ? "system" : "systems"}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>{drafts} draft</span>
+            <span aria-hidden="true">·</span>
+            <span>{published} published</span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {query.data.map((template) => (
+              <SystemCard key={template.id} template={template} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function SystemCard({ template }: { template: PurposeTemplate }) {
+  return (
+    <Link
+      to="/dashboard/systems/$templateId"
+      params={{ templateId: template.id }}
+      className="group block rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+    >
+      <Card className="h-full transition-colors group-hover:bg-muted/40">
+        <CardHeader className="gap-3">
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant="outline">{getCategoryLabel(template.category)}</Badge>
+            <Badge variant={template.status === "published" ? "default" : "secondary"}>{template.status}</Badge>
+          </div>
+          <div className="space-y-1.5">
+            <CardTitle className="line-clamp-2 text-lg">{template.title || "Untitled system"}</CardTitle>
+            <CardDescription className="line-clamp-2">{template.purpose || "No purpose written yet."}</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="flex items-center justify-between gap-3 text-muted-foreground text-xs">
+          <span className="inline-flex items-center gap-1.5">
+            <Layers className="size-3.5" />
+            {template.sectionCount} sections · {template.taskCount} tasks
+          </span>
+          <span>{formatUpdatedAt(template.updatedAt)}</span>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}

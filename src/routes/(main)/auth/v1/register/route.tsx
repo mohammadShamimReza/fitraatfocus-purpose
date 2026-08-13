@@ -1,0 +1,54 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { Command } from "lucide-react";
+
+import { FirebaseConfigAlert } from "../../-components/firebase-config-alert";
+import { GoogleSignInButton } from "../../-components/google-sign-in-button";
+import { RedirectIfSignedIn } from "../../-components/redirect-if-signed-in";
+import { RegisterForm } from "../../-components/register-form";
+
+export const Route = createFileRoute("/(main)/auth/v1/register")({
+  component: RegisterV1,
+});
+
+function RegisterV1() {
+  return (
+    <RedirectIfSignedIn>
+      <div className="flex h-dvh">
+        <div className="flex w-full items-center justify-center bg-background p-8 lg:w-2/3">
+          <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
+            <div className="space-y-4 text-center">
+              <div className="font-medium tracking-tight">Register</div>
+              <div className="mx-auto max-w-xl text-muted-foreground">
+                Create a creator account with the same Firebase project as the Fitraat Focus app.
+              </div>
+            </div>
+            <div className="space-y-4">
+              <FirebaseConfigAlert />
+              <RegisterForm />
+              <GoogleSignInButton />
+              <p className="text-center text-muted-foreground text-xs">
+                Already have an account?{" "}
+                <Link to="/auth/v1/login" className="text-primary">
+                  Login
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="hidden bg-primary lg:block lg:w-1/3">
+          <div className="flex h-full flex-col items-center justify-center p-12 text-center">
+            <div className="space-y-6">
+              <Command className="mx-auto size-12 text-primary-foreground" />
+              <div className="space-y-2">
+                <h1 className="font-light text-5xl text-primary-foreground">Publish a system</h1>
+                <p className="text-primary-foreground/80 text-xl">Share the work that got you there.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </RedirectIfSignedIn>
+  );
+}
