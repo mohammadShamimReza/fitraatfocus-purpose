@@ -1,5 +1,5 @@
 import { getUserAvatar, getUserDisplayName } from "@/lib/auth/user-display";
-import { FunctionsApiError } from "@/lib/functions/client";
+import { FunctionsApiError } from "@/lib/functions/errors";
 import { readLocalTemplates, upsertLocalTemplate } from "@/lib/templates/local-store";
 import type { CreatorProfile, UpdateProfileInput } from "@/types/profile";
 import type { CatalogCreator } from "@/types/template";

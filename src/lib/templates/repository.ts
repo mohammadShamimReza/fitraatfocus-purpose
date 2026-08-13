@@ -1,5 +1,5 @@
 import { getUserDisplayName } from "@/lib/auth/user-display";
-import { FunctionsApiError } from "@/lib/functions/client";
+import { FunctionsApiError } from "@/lib/functions/errors";
 import { toCatalogCreator } from "@/lib/profiles/repository";
 import type {
   CatalogTemplate,

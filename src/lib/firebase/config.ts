@@ -29,3 +29,11 @@ export function isFirebaseConfigured(config: FirebaseWebConfig = getFirebaseWebC
 export function getFunctionsBaseUrl(): string {
   return import.meta.env.VITE_FUNCTIONS_URL?.trim().replace(/\/$/, "") ?? "";
 }
+
+export function isFunctionsApiEnabled(): boolean {
+  return Boolean(getFunctionsBaseUrl());
+}
+
+export function getFunctionsRegion(): string {
+  return import.meta.env.VITE_FUNCTIONS_REGION?.trim() ?? "";
+}

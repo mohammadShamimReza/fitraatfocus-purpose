@@ -43,7 +43,8 @@
       "!**/src/routeTree.gen.ts",
       "!**/src/styles/styles.css",
       "!src/components/ui",
-      "!src/components/calendar"
+      "!src/components/calendar",
+      "!functions"
     ]
   },
   "overrides": [
