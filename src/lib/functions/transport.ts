@@ -5,7 +5,7 @@ import { functionPaths } from "./paths";
 import { unwrapData } from "./unwrap";
 
 /**
- * HTTP is the active Cloud Functions transport (`VITE_FUNCTIONS_URL`).
+ * HTTP is the active Cloud Functions transport (emulator in `npm run dev`, production in builds).
  * Callable names stay here if a later endpoint needs `httpsCallable`.
  */
 export const functionsTransport = {

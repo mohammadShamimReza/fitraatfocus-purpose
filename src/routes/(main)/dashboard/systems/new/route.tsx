@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 
 import { CreateSystemForm } from "../-components/create-system-form";
-import { LocalOnlyNote } from "../-components/local-only-note";
 
 export const Route = createFileRoute("/(main)/dashboard/systems/new")({
   component: NewSystemPage,
@@ -31,7 +30,6 @@ function NewSystemPage() {
         <div className="space-y-1.5">
           <h1 className="text-3xl tracking-tight">{t("newSystem.title")}</h1>
           <p className="text-muted-foreground text-sm">{t("newSystem.lead")}</p>
-          <LocalOnlyNote />
         </div>
       </div>
       <CreateSystemForm />

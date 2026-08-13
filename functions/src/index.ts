@@ -8,7 +8,7 @@ setGlobalOptions({
   maxInstances: 10,
 });
 
-export const api = onRequest(
+export const studio = onRequest(
   {
     cors: true,
     invoker: "public",

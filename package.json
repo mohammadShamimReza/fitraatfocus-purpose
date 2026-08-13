@@ -18,7 +18,8 @@
     "generate:presets": "ts-node -P tsconfig.scripts.json src/scripts/generate-theme-presets.ts",
     "functions:install": "npm --prefix functions install",
     "functions:build": "npm --prefix functions run build",
-    "emulators": "npm --prefix functions run build && firebase emulators:start --only functions,firestore,auth"
+    "functions:deploy": "firebase deploy --only functions",
+    "emulators": "npm --prefix functions run build && firebase emulators:start --only functions,firestore"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [

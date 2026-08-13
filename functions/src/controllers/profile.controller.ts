@@ -8,7 +8,12 @@ import { updateProfileSchema } from "../validators/profile.validator";
 
 export const getMine = asyncHandler(async (req: Request, res: Response) => {
   const { user } = req as AuthedRequest;
-  const data = await profileService.getOrCreateMyProfile(user.uid, user.name || user.email || "Creator", user.picture);
+  const data = await profileService.getOrCreateMyProfile(
+    user.uid,
+    user.name || user.email || "User",
+    user.picture,
+    user.email,
+  );
   sendData(res, data);
 });
 

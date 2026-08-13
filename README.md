@@ -13,7 +13,7 @@ The UI is built on a [TanStack Start](https://tanstack.com/start) admin dashboar
 - Mark a system **draft** or **published**
 - Switch theme and layout from the dashboard header
 
-Systems are stored in `localStorage` until `VITE_FUNCTIONS_URL` is set. With that URL, the studio talks to the Firebase HTTP function in `functions/` (Firestore via the Admin SDK).
+Systems and creator profiles are stored in Firestore through the Firebase HTTP function in `functions/`. Local `npm run dev` talks to the Functions emulator; production builds talk to the deployed `studio` function.
 
 ## Screens
 
@@ -31,7 +31,7 @@ Dashboard routes require a signed-in session. Unauthenticated visits are sent to
 ## Tech stack
 
 - **App**: TanStack Start, TanStack Router, React 19, TypeScript
-- **Data**: TanStack Query; local repository or Firebase Functions HTTP API
+- **Data**: TanStack Query and Firebase Functions HTTP API
 - **Auth**: Firebase Authentication (Google)
 - **Backend**: Firebase Cloud Functions (Express, MVC) and Firestore
 - **UI**: Tailwind CSS v4, shadcn/ui, React Hook Form, Zod
@@ -78,15 +78,15 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 | `npm run generate-routes` | Regenerate the TanStack Router tree |
 | `npm run functions:install` | Install Cloud Functions dependencies |
 | `npm run functions:build` | Compile `functions/src` to `functions/lib` |
-| `npm run emulators` | Run Auth, Firestore, and Functions emulators |
+| `npm run emulators` | Run Firestore and Functions emulators (Auth stays production, like the app) |
 
 ## Cloud Functions
 
-The API lives in `functions/` as a single HTTPS function named `api`. Layout is MVC:
+The API lives in `functions/` as a single HTTPS function named `studio` (not `api`, which the Fitraat Focus app already deploys). Layout is MVC:
 
 ```text
 functions/src
-├── index.ts              # export const api = onRequest(...)
+├── index.ts              # export const studio = onRequest(...)
 ├── app.ts                # Express app
 ├── config/               # Admin SDK and collection names
 ├── routes/               # URL wiring
@@ -100,13 +100,17 @@ functions/src
 
 Client Firestore access is denied in `firestore.rules`. The Admin SDK in Functions is the only writer.
 
-Local emulator URL (match `.firebaserc` project id):
+Firebase targeting matches the Fitraat Focus app:
 
-```bash
-VITE_FUNCTIONS_URL=http://127.0.0.1:5001/fitraat-focus/us-central1/api
-```
+- `npm run dev` → `http://127.0.0.1:5001/fitraat-focus/us-central1/studio`
+- production build → `https://us-central1-fitraat-focus.cloudfunctions.net/studio`
+- Google / email sign-in always uses **production** Auth (do not start the Auth emulator, or production ID tokens return 401)
 
-Then `GET /health` should return `{ "data": { "ok": true } }`. Leave `VITE_FUNCTIONS_URL` empty to keep using `localStorage`.
+Run `npm run emulators` (or `npm --prefix functions run serve`) alongside the Vite server. `GET /health` should return `{ "data": { "ok": true } }`.
+
+Set `VITE_FUNCTIONS_URL` only if you need to override the auto target.
+
+This repo's `firebase.json` deploys **functions only** (codebase `studio`). Do not add Firestore rules here — production rules live in the Fitraat Focus app. Deploy with `npm run functions:deploy`.
 
 ## Environment
 
@@ -119,11 +123,10 @@ VITE_FIREBASE_PROJECT_ID=
 VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
-VITE_FUNCTIONS_URL=
 VITE_FUNCTIONS_REGION=us-central1
 ```
 
-If Firebase is missing, login shows a configuration alert. Leave `VITE_FUNCTIONS_URL` empty for `localStorage`; set it to the emulator or deployed function URL to persist in Firestore.
+If Firebase is missing, login shows a configuration alert. Leave `VITE_FUNCTIONS_URL` unset unless you need a manual override.
 
 ## Project layout
 
@@ -136,8 +139,8 @@ src
 ├── lib
 │   ├── auth                    # Firebase session, guards, display name
 │   ├── firebase                # Client SDK and env config
-│   ├── functions               # HTTP client (remote when VITE_FUNCTIONS_URL is set)
-│   └── templates               # Local store fallback
+│   ├── functions               # HTTP client for Cloud Functions
+│   └── templates               # Category labels and formatting
 ├── navigation                  # Dashboard sidebar
 ├── query                       # TanStack Query hooks for systems
 ├── routes
@@ -162,7 +165,7 @@ A **system** (`PurposeTemplate`) has:
 - **Sections**: ordered groups with a title and description
 - **Tasks**: title, notes, priority (`low` / `medium` / `high`), tags, estimated minutes, assigned section
 
-Published systems are stored in Firestore (`templates`, `profiles`) when Functions are enabled. Otherwise local data is stored under `fitraat.studio.templates.<uid>`.
+Systems and profiles are stored in Firestore (`templates`, `profiles`). The browser does not keep a product data copy.
 
 ## Contributing
 

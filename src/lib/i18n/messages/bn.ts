@@ -64,7 +64,6 @@ export const bn: Record<MessageKey, string> = {
 
   "systems.title": "আমার সিস্টেম",
   "systems.lead": "লাইব্রেরি লিখুন। ক্যাটালগে প্রকাশ করুন। কতজন ডাউনলোড করেছে তা দেখুন।",
-  "systems.localNote": "এখন এই ডিভাইসে সংরক্ষিত। পরে ক্লাউড সিঙ্ক আসবে।",
   "systems.loading": "আপনার সিস্টেম লোড হচ্ছে",
   "systems.loadError": "সিস্টেম লোড করা যায়নি",
   "systems.emptyTitle": "একটি উদ্দেশ্য দিয়ে শুরু করুন",
@@ -114,7 +113,7 @@ export const bn: Record<MessageKey, string> = {
   "editor.publish": "প্রকাশ করুন",
   "editor.publishing": "প্রকাশ হচ্ছে…",
   "editor.published": "প্রকাশিত",
-  "editor.publishedToast": "এই ডিভাইসে সিস্টেমটি প্রকাশিত হিসেবে চিহ্নিত।",
+  "editor.publishedToast": "সিস্টেমটি এখন ক্যাটালগে প্রকাশিত।",
   "editor.publishError": "প্রকাশ করা যায়নি",
   "editor.library": "লাইব্রেরি",
   "editor.details": "বিস্তারিত",

@@ -8,7 +8,7 @@ export function buildFunctionsUrl(path: string, searchParams?: FunctionsSearchPa
   const baseUrl = getFunctionsBaseUrl();
 
   if (!baseUrl) {
-    throw new FunctionsApiError("Functions URL is not configured. Add VITE_FUNCTIONS_URL to your .env file.", 503);
+    throw new FunctionsApiError("Functions URL is not configured.", 503);
   }
 
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;

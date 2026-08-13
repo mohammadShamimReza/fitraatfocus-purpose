@@ -16,8 +16,6 @@ import { formatCount, formatUpdatedAt } from "@/lib/templates/format";
 import { useMyTemplatesQuery } from "@/query/templates";
 import type { PurposeTemplate } from "@/types/template";
 
-import { LocalOnlyNote } from "./local-only-note";
-
 export function SystemsList() {
   const { user, isReady } = useAuth();
   const { t, locale } = useI18n();
@@ -32,7 +30,6 @@ export function SystemsList() {
         <div className="space-y-1.5">
           <h1 className="text-3xl tracking-tight">{t("systems.title")}</h1>
           <p className="max-w-xl text-muted-foreground text-sm">{t("systems.lead")}</p>
-          <LocalOnlyNote />
         </div>
         <Button nativeButton={false} render={<Link to="/dashboard/systems/new" />}>
           <Plus data-icon="inline-start" />

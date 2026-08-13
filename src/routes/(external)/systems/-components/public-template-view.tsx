@@ -54,7 +54,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
       await download.mutateAsync();
       toast.add({
         title: "Downloaded",
-        description: "This system is marked as downloaded for your account on this device.",
+        description: "This system is marked as downloaded for your account.",
       });
     } catch (error) {
       toast.add({

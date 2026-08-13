@@ -44,7 +44,10 @@ export async function optionalAuth(req: Request, _res: Response, next: NextFunct
       req.user = user;
     }
     next();
-  } catch {
+  } catch (error) {
+    if (process.env.FUNCTIONS_EMULATOR === "true") {
+      console.error("[auth] verifyIdToken failed", error);
+    }
     next(unauthorized("Invalid or expired sign-in token."));
   }
 }

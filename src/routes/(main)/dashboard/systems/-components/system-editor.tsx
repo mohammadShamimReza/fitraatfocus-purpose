@@ -21,7 +21,6 @@ import type { TemplateStatus } from "@/types/template";
 import { EditorMetadataForm } from "./editor-metadata-form";
 import { EditorSections } from "./editor-sections";
 import { EditorTasks } from "./editor-tasks";
-import { LocalOnlyNote } from "./local-only-note";
 import { OwnerInsights } from "./owner-insights";
 
 function getPublishLabel(status: TemplateStatus, isPending: boolean, t: TranslateFn): string {
@@ -161,7 +160,6 @@ export function SystemEditor({ templateId }: { templateId: string }) {
                 <ListTodo className="size-3.5" />
                 {t("systems.tasksCount", { count: template.taskCount })}
               </span>
-              <LocalOnlyNote />
             </div>
           </div>
           {canEdit ? (

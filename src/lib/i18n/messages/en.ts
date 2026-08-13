@@ -62,7 +62,6 @@ export const en = {
 
   "systems.title": "My systems",
   "systems.lead": "Write the library. Publish it to the catalog. Track how many people download it.",
-  "systems.localNote": "Saved on this device for now. Cloud sync comes later.",
   "systems.loading": "Loading your systems",
   "systems.loadError": "Could not load your systems",
   "systems.emptyTitle": "Start with one purpose",
@@ -112,7 +111,7 @@ export const en = {
   "editor.publish": "Publish",
   "editor.publishing": "Publishing…",
   "editor.published": "Published",
-  "editor.publishedToast": "This system is marked published on this device.",
+  "editor.publishedToast": "This system is now published in the catalog.",
   "editor.publishError": "Could not publish",
   "editor.library": "Library",
   "editor.details": "Details",

@@ -21,6 +21,7 @@ import {
   withCounts,
 } from "../models/template.model";
 import { getCatalogCreator, getOrCreateMyProfile } from "./profile.service";
+import { ensurePurposeTrack } from "./purpose-track.service";
 
 const templates = db.collection(collections.templates);
 
@@ -125,7 +126,12 @@ export async function getPublicTemplate(templateId: string): Promise<PublicTempl
 }
 
 export async function createTemplate(user: AuthUser, input: CreateTemplateInput): Promise<PurposeTemplate> {
-  const profile = await getOrCreateMyProfile(user.uid, user.name || user.email || "Creator", user.picture);
+  const profile = await getOrCreateMyProfile(
+    user.uid,
+    user.name || user.email || "User",
+    user.picture,
+    user.email,
+  );
   const createdAt = nowIso();
   const template = await saveTemplate({
     id: newId(),
@@ -179,16 +185,17 @@ export async function downloadTemplate(uid: string, templateId: string): Promise
   }
 
   if (current.downloaderUids.includes(uid)) {
+    await ensurePurposeTrack(uid, current);
     return toSummary(current);
   }
 
-  return toSummary(
-    await saveTemplate({
-      ...current,
-      downloaderUids: [...current.downloaderUids, uid],
-      downloadCount: current.downloadCount + 1,
-    }),
-  );
+  const next = await saveTemplate({
+    ...current,
+    downloaderUids: [...current.downloaderUids, uid],
+    downloadCount: current.downloadCount + 1,
+  });
+  await ensurePurposeTrack(uid, next);
+  return toSummary(next);
 }
 
 export async function createSection(uid: string, templateId: string, input: CreateSectionInput): Promise<TemplateSection> {
@@ -243,7 +250,7 @@ export async function createTask(uid: string, templateId: string, input: CreateT
     tags: input.tags ?? [],
     sectionId: input.sectionId,
     order: current.tasks.filter((item) => item.sectionId === input.sectionId).length,
-    estimatedMinutes: input.estimatedMinutes,
+    ...(typeof input.estimatedMinutes === "number" ? { estimatedMinutes: input.estimatedMinutes } : {}),
   };
   await saveTemplate({ ...current, tasks: [...current.tasks, task] });
   return task;
