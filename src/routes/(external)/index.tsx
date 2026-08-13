@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { LandingApp } from "./-components/landing-app";
 import { LandingCatalog } from "./-components/landing-catalog";
 import { LandingFaq } from "./-components/landing-faq";
 import { LandingGetApp } from "./-components/landing-get-app";
@@ -18,6 +19,7 @@ function LandingPage() {
       <LandingProblem />
       <LandingLoop />
       <LandingCatalog />
+      <LandingApp />
       <LandingFaq />
       <LandingGetApp />
     </>

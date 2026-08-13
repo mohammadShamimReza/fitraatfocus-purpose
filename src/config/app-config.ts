@@ -17,6 +17,6 @@ export const APP_CONFIG = {
   meta: {
     title: "Fitraat Focus — Purpose System Studio",
     description:
-      "Fitraat Focus is a 5-step deep-work app for students and professionals. Browse purpose-driven systems here, then take a copy into the app.",
+      "Browse purpose-driven systems written by named creators. Take a copy into the Fitraat Focus app when you are ready to run the work.",
   },
 };

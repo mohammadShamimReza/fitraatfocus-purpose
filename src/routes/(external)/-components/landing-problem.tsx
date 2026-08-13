@@ -1,31 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import type { MessageKey } from "@/lib/i18n/messages/en";
+import { cn } from "@/lib/utils";
+
+import { landingCardClass, LandingKicker, LandingReveal } from "./landing-reveal";
 
 export function LandingProblem() {
   const { t } = useI18n();
 
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 sm:px-6">
-      <div className="max-w-2xl space-y-1.5">
-        <p className="font-medium text-muted-foreground text-sm">{t("landing.problem.kicker")}</p>
-        <h2 className="text-2xl tracking-tight sm:text-3xl">
+    <section className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20">
+      <LandingReveal className="max-w-2xl space-y-3">
+        <LandingKicker>{t("landing.problem.kicker")}</LandingKicker>
+        <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">
           {t("landing.problem.title")}
-          <span className="block text-muted-foreground">{t("landing.problem.titleAccent")}</span>
+          <span className="mt-1 block text-muted-foreground">{t("landing.problem.titleAccent")}</span>
         </h2>
-        <p className="text-muted-foreground text-sm leading-relaxed">{t("landing.problem.body")}</p>
-      </div>
+        <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
+          {t("landing.problem.body")}
+        </p>
+      </LandingReveal>
       <div className="grid gap-3 sm:grid-cols-2">
         {PROBLEMS.map((item, index) => (
-          <Card key={item.title} className="shadow-xs">
-            <CardHeader className="gap-2">
-              <p className="text-muted-foreground text-xs">{String(index + 1).padStart(2, "0")}</p>
-              <CardTitle className="text-base">{t(item.title)}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm leading-relaxed">{t(item.body)}</p>
-            </CardContent>
-          </Card>
+          <LandingReveal key={item.title} delayMs={index * 80}>
+            <Card className={cn("h-full shadow-none", landingCardClass)}>
+              <CardHeader className="gap-2">
+                <p className="font-medium text-muted-foreground text-xs tabular-nums">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <CardTitle className="text-base">{t(item.title)}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm leading-relaxed">{t(item.body)}</p>
+              </CardContent>
+            </Card>
+          </LandingReveal>
         ))}
       </div>
     </section>

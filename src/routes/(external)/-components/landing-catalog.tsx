@@ -8,6 +8,7 @@ import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { usePublicTemplatesQuery } from "@/query/templates";
 
+import { LandingKicker, LandingReveal } from "./landing-reveal";
 import { TemplateCard } from "./template-card";
 
 export function LandingCatalog() {
@@ -15,11 +16,17 @@ export function LandingCatalog() {
   const query = usePublicTemplatesQuery(true);
 
   return (
-    <section id="systems" className="mx-auto flex w-full max-w-6xl scroll-mt-20 flex-col gap-6 px-4 pb-8 sm:px-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl tracking-tight">{t("landing.catalog.title")}</h2>
-        <p className="max-w-xl text-muted-foreground text-sm">{t("landing.catalog.body")}</p>
-      </div>
+    <section
+      id="systems"
+      className="mx-auto flex w-full max-w-6xl scroll-mt-20 flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20"
+    >
+      <LandingReveal className="max-w-2xl space-y-3">
+        <LandingKicker>{t("landing.catalog.kicker")}</LandingKicker>
+        <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">{t("landing.catalog.title")}</h2>
+        <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
+          {t("landing.catalog.body")}
+        </p>
+      </LandingReveal>
 
       {query.isPending ? (
         <div className="flex min-h-64 items-center justify-center">
@@ -55,8 +62,10 @@ export function LandingCatalog() {
 
       {query.isSuccess && query.data.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {query.data.map((template) => (
-            <TemplateCard key={template.id} template={template} />
+          {query.data.map((template, index) => (
+            <LandingReveal key={template.id} delayMs={index * 60}>
+              <TemplateCard template={template} />
+            </LandingReveal>
           ))}
         </div>
       ) : null}

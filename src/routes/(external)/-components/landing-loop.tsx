@@ -1,58 +1,46 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import type { MessageKey } from "@/lib/i18n/messages/en";
+import { cn } from "@/lib/utils";
+
+import { landingCardClass, LandingKicker, LandingReveal } from "./landing-reveal";
 
 export function LandingLoop() {
   const { t } = useI18n();
 
   return (
-    <section id="how" className="mx-auto flex w-full max-w-6xl scroll-mt-20 flex-col gap-8 px-4 pb-16 sm:px-6">
-      <div className="max-w-2xl space-y-1.5">
-        <p className="font-medium text-muted-foreground text-sm">{t("landing.loop.kicker")}</p>
-        <h2 className="text-2xl tracking-tight sm:text-3xl">{t("landing.loop.title")}</h2>
-        <p className="text-muted-foreground text-sm leading-relaxed">{t("landing.loop.body")}</p>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {STEPS.map((step) => (
-          <Card key={step.number} className="shadow-xs">
-            <CardHeader className="gap-2">
-              <p className="text-muted-foreground text-xs">{step.number}</p>
-              <CardTitle className="text-base">{t(step.title)}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm leading-relaxed">{t(step.body)}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="font-medium text-sm">{t("landing.loop.pillarsTitle")}</h3>
-        <ul className="flex flex-wrap gap-2">
-          {PILLARS.map((pillar) => (
-            <li key={pillar} className="rounded-lg border bg-card px-3 py-1.5 text-muted-foreground text-sm">
-              {t(pillar)}
-            </li>
+    <section id="how" className="scroll-mt-20 border-y bg-muted/35">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20">
+        <LandingReveal className="max-w-2xl space-y-3">
+          <LandingKicker>{t("landing.system.kicker")}</LandingKicker>
+          <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">{t("landing.system.title")}</h2>
+          <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
+            {t("landing.system.body")}
+          </p>
+        </LandingReveal>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {PARTS.map((part, index) => (
+            <LandingReveal key={part.number} delayMs={index * 80}>
+              <Card className={cn("h-full shadow-none", landingCardClass)}>
+                <CardHeader className="gap-2">
+                  <p className="font-medium text-muted-foreground text-xs tabular-nums">{part.number}</p>
+                  <CardTitle className="text-base">{t(part.title)}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{t(part.body)}</p>
+                </CardContent>
+              </Card>
+            </LandingReveal>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );
 }
 
-const STEPS: { number: string; title: MessageKey; body: MessageKey }[] = [
-  { number: "01", title: "landing.loop.prepare", body: "landing.loop.prepareBody" },
-  { number: "02", title: "landing.loop.activate", body: "landing.loop.activateBody" },
-  { number: "03", title: "landing.loop.focus", body: "landing.loop.focusBody" },
-  { number: "04", title: "landing.loop.close", body: "landing.loop.closeBody" },
-  { number: "05", title: "landing.loop.reflect", body: "landing.loop.reflectBody" },
-];
-
-const PILLARS: MessageKey[] = [
-  "landing.loop.pillar.time",
-  "landing.loop.pillar.space",
-  "landing.loop.pillar.energy",
-  "landing.loop.pillar.resources",
-  "landing.loop.pillar.intention",
+const PARTS: { number: string; title: MessageKey; body: MessageKey }[] = [
+  { number: "01", title: "landing.system.1.title", body: "landing.system.1.body" },
+  { number: "02", title: "landing.system.2.title", body: "landing.system.2.body" },
+  { number: "03", title: "landing.system.3.title", body: "landing.system.3.body" },
+  { number: "04", title: "landing.system.4.title", body: "landing.system.4.body" },
 ];

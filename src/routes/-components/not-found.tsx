@@ -9,7 +9,7 @@ export function NotFound() {
       <FitraatMark className="mb-2 size-8 text-foreground" />
       <h1 className="font-semibold text-2xl">Page not found.</h1>
       <p className="text-muted-foreground">The page you are looking for could not be found.</p>
-      <Button nativeButton={false} variant="outline" render={<Link to="/dashboard/default" replace />}>
+      <Button nativeButton={false} variant="outline" render={<Link to="/" replace />}>
         Go back home
       </Button>
     </div>

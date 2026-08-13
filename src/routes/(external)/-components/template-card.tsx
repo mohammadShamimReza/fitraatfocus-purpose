@@ -14,7 +14,7 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
   const expertise = template.creator.expertise.slice(0, 2);
 
   return (
-    <Card className="h-full">
+    <Card className="h-full shadow-none transition-[transform,box-shadow] duration-300 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-sm">
       <CardHeader className="gap-3">
         <div className="flex items-center justify-between gap-2">
           <Badge variant="outline">{getCategoryLabel(template.category)}</Badge>
@@ -28,7 +28,7 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
             <Link
               to="/systems/$templateId"
               params={{ templateId: template.id }}
-              className="rounded-sm outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="rounded-sm outline-none transition-colors hover:underline group-hover/card:underline focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {template.title}
             </Link>
