@@ -6,8 +6,12 @@ import {
   createTemplate,
   deleteSection,
   deleteTask,
+  downloadTemplate,
+  getPublicTemplate,
   getTemplate,
   listMyTemplates,
+  listPublicTemplates,
+  listTemplatesByCreator,
   publishTemplate,
   updateSection,
   updateTask,
@@ -24,11 +28,27 @@ import type {
 
 import { queryKeys } from "./keys";
 
+export function usePublicTemplatesQuery(enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.templates.public(),
+    queryFn: listPublicTemplates,
+    enabled,
+  });
+}
+
 export function useMyTemplatesQuery(enabled: boolean) {
   return useQuery({
     queryKey: queryKeys.templates.mine(),
     queryFn: listMyTemplates,
     enabled,
+  });
+}
+
+export function useCreatorTemplatesQuery(creatorId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: [...queryKeys.templates.public(), "creator", creatorId],
+    queryFn: () => listTemplatesByCreator(creatorId),
+    enabled: enabled && Boolean(creatorId),
   });
 }
 
@@ -40,14 +60,24 @@ export function useTemplateQuery(templateId: string, enabled: boolean) {
   });
 }
 
+export function usePublicTemplateQuery(templateId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.templates.publicDetail(templateId),
+    queryFn: () => getPublicTemplate(templateId),
+    enabled: enabled && Boolean(templateId),
+  });
+}
+
 function useInvalidateTemplates(templateId?: string) {
   const queryClient = useQueryClient();
 
   return async () => {
+    await queryClient.invalidateQueries({ queryKey: queryKeys.templates.public() });
     await queryClient.invalidateQueries({ queryKey: queryKeys.templates.mine() });
 
     if (templateId) {
       await queryClient.invalidateQueries({ queryKey: queryKeys.templates.detail(templateId) });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.templates.publicDetail(templateId) });
     }
   };
 }
@@ -75,6 +105,15 @@ export function usePublishTemplateMutation(templateId: string) {
 
   return useMutation({
     mutationFn: () => publishTemplate(templateId),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useDownloadTemplateMutation(templateId: string) {
+  const invalidate = useInvalidateTemplates(templateId);
+
+  return useMutation({
+    mutationFn: () => downloadTemplate(templateId),
     onSuccess: () => invalidate(),
   });
 }

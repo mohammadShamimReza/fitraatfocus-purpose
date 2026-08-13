@@ -1,6 +1,6 @@
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 
-import { LogOut } from "lucide-react";
+import { CircleUser, LayoutGrid, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,13 +10,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
-import { getAuthErrorMessage } from "@/lib/auth/auth-errors";
+import { getAuthErrorKey } from "@/lib/auth/auth-errors";
 import { useAuth } from "@/lib/auth/auth-provider";
+import { LANDING_PATH } from "@/lib/auth/post-auth-path";
 import { getUserAvatar, getUserDisplayName, getUserEmail } from "@/lib/auth/user-display";
+import { useI18n } from "@/lib/i18n/i18n-provider";
 import { getInitials } from "@/lib/utils";
 
 export function AccountMenu() {
   const { user, signOut } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const name = getUserDisplayName(user);
   const email = getUserEmail(user);
@@ -25,14 +28,18 @@ export function AccountMenu() {
   const onSignOut = async () => {
     try {
       await signOut();
-      await navigate({ to: "/auth/v1/login", replace: true });
+      await navigate({ href: LANDING_PATH, replace: true });
     } catch (error) {
       toast.add({
-        title: "Could not sign out",
-        description: getAuthErrorMessage(error),
+        title: t("auth.signOutFailed"),
+        description: t(getAuthErrorKey(error)),
       });
     }
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <DropdownMenu>
@@ -45,13 +52,21 @@ export function AccountMenu() {
           <span className="truncate font-semibold">{name}</span>
           {email ? <span className="truncate text-muted-foreground text-xs">{email}</span> : null}
         </div>
+        <DropdownMenuItem render={<Link to="/" />}>
+          <LayoutGrid />
+          {t("nav.catalog")}
+        </DropdownMenuItem>
+        <DropdownMenuItem render={<Link to="/dashboard/profile" />}>
+          <CircleUser />
+          {t("nav.profile")}
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             void onSignOut();
           }}
         >
           <LogOut />
-          Log out
+          {t("nav.logOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

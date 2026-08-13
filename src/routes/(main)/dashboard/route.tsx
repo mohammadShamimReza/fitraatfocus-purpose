@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { RequireAuth } from "@/lib/auth/require-auth";
@@ -61,6 +62,7 @@ function DashboardLayout() {
               </div>
               <div className="flex items-center gap-2">
                 <LayoutControls />
+                <LocaleSwitcher />
                 <ThemeSwitcher />
                 <AccountMenu />
               </div>

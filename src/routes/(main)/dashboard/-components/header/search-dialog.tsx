@@ -15,6 +15,8 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import { useI18n } from "@/lib/i18n/i18n-provider";
+import { navItemTitle } from "@/lib/i18n/labels";
 import type { AppPath, NavMainItem } from "@/navigation/sidebar/sidebar-items";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 
@@ -79,6 +81,13 @@ export function SearchDialog() {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const navigate = useNavigate();
+  const { t } = useI18n();
+
+  const localizeItem = (item: SearchItem): SearchItem => ({
+    ...item,
+    group: item.group === "Studio" ? t("nav.studio") : item.group,
+    label: navItemTitle(t, item.id, item.label),
+  });
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -107,7 +116,7 @@ export function SearchDialog() {
   };
 
   const renderGroups = (items: SearchItem[]) =>
-    groupBy(items).map(({ group, items: groupItems }, index) => (
+    groupBy(items.map(localizeItem)).map(({ group, items: groupItems }, index) => (
       <React.Fragment key={group}>
         {index > 0 && <CommandSeparator />}
         <CommandGroup heading={group}>
@@ -136,16 +145,16 @@ export function SearchDialog() {
         className="px-0! font-normal text-muted-foreground hover:no-underline"
       >
         <Search data-icon="inline-start" />
-        Search
+        {t("search.label")}
         <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-medium text-[10px]">
           <span className="text-xs">⌘</span>J
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={handleOpenChange}>
         <Command>
-          <CommandInput placeholder="Search systems…" value={query} onValueChange={setQuery} />
+          <CommandInput placeholder={t("search.placeholder")} value={query} onValueChange={setQuery} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{t("search.empty")}</CommandEmpty>
             {query ? renderGroups(searchItems) : renderGroups(recommendations)}
           </CommandList>
         </Command>

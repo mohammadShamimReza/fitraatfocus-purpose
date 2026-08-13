@@ -9,8 +9,6 @@ type AuthContextValue = {
   isReady: boolean;
   isConfigured: boolean;
   signInWithGoogle: () => Promise<void>;
-  signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   getIdToken: () => Promise<string>;
 };
@@ -68,16 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await firebaseAuth.signInWithPopup(getFirebaseAuth(), getGoogleAuthProvider());
   }, []);
 
-  const signInWithEmail = useCallback(async (email: string, password: string) => {
-    const { getFirebaseAuth, firebaseAuth } = await loadAuth();
-    await firebaseAuth.signInWithEmailAndPassword(getFirebaseAuth(), email, password);
-  }, []);
-
-  const signUpWithEmail = useCallback(async (email: string, password: string) => {
-    const { getFirebaseAuth, firebaseAuth } = await loadAuth();
-    await firebaseAuth.createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
-  }, []);
-
   const signOut = useCallback(async () => {
     const { getFirebaseAuth, firebaseAuth } = await loadAuth();
     await firebaseAuth.signOut(getFirebaseAuth());
@@ -100,12 +88,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isReady,
       isConfigured,
       signInWithGoogle,
-      signInWithEmail,
-      signUpWithEmail,
       signOut,
       getIdToken,
     }),
-    [user, isReady, isConfigured, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, getIdToken],
+    [user, isReady, isConfigured, signInWithGoogle, signOut, getIdToken],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;

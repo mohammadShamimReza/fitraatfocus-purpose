@@ -1,137 +1,133 @@
-# TanStack Start Admin Template with TypeScript & Shadcn UI
+# Fitraat Focus — Purpose System Studio
 
-**Studio Admin** - Includes multiple dashboards, authentication layouts, customizable theme presets, and more.
+Creator studio for **Fitraat Focus**. Authors write purpose-driven todo systems (libraries of sections and tasks). People in the Fitraat Focus app fork their own copy and use it.
 
-<img src="https://github.com/arhamkhnz/tanstack-shadcn-admin-dashboard/blob/main/media/dashboard.png?version=5" alt="Dashboard Screenshot">
+The UI is built on a [TanStack Start](https://tanstack.com/start) admin dashboard (shadcn/ui, Tailwind CSS v4). The product surface today is the studio: sign in, create systems, and edit the library.
 
-Most admin templates I found, free or paid, felt cluttered, outdated, or too rigid. I built this as a cleaner alternative with features often missing in others, such as theme toggling and layout controls, while keeping the design modern, minimal, and flexible.
+## What you can do
 
-> **View demo:** [studio admin](https://next-shadcn-admin-dashboard.vercel.app)
+- Sign in with **Google** or **email and password** (same Firebase project as the Fitraat Focus app)
+- Create a system with a title, purpose, story, description, and category (exam, career, study, craft, health, other)
+- Organize the library into **sections** and **tasks**
+- Set task priority, tags, notes, and estimated minutes
+- Mark a system **draft** or **published**
+- Switch theme and layout from the dashboard header
 
-> [!NOTE]
-> Looking for the Next.js version? Check out [arhamkhnz/next-shadcn-admin-dashboard](https://github.com/arhamkhnz/next-shadcn-admin-dashboard).
->
-> Looking for the Next.js Base UI version? Check out [arhamkhnz/next-shadcn-admin-dashboard-baseui](https://github.com/arhamkhnz/next-shadcn-admin-dashboard-baseui).
->
-> Looking for the Next.js React Aria version? Check out [arhamkhnz/next-shadcn-admin-dashboard-aria](https://github.com/arhamkhnz/next-shadcn-admin-dashboard-aria).
-
-> [!TIP]
-> I’m also working on Nuxt.js and Svelte versions of this dashboard. They’ll be live soon.
-
-## Features
-
-- Built with TanStack Start, React 19, TypeScript, Tailwind CSS v4, and Shadcn UI  
-- Responsive and mobile-friendly  
-- Customizable theme presets (light/dark modes with color schemes like Tangerine, Brutalist, and more)  
-- Flexible layouts (collapsible sidebar, variable content widths)  
-- Authentication flows and screens  
-- Prebuilt dashboards (Default, CRM, Finance, Analytics, Productivity) plus legacy variants  
-- Role-Based Access Control (RBAC) with config-driven UI and multi-tenant support *(planned)*  
-
-> [!NOTE]
-> The default dashboard uses the **shadcn neutral** theme.  
-> It also includes additional color presets inspired by [Tweakcn](https://tweakcn.com):  
->
-> - Tangerine  
-> - Neo Brutalism  
-> - Soft Pop  
->
-> You can create more presets by following the same structure as the existing ones.
-
-## Tech Stack
-
-- **Framework**: TanStack Start, React 19, TypeScript, Tailwind CSS v4  
-- **UI Components**: Shadcn UI  
-- **Validation**: Zod  
-- **Forms & State Management**: React Hook Form, Zustand  
-- **Tables & Data Handling**: TanStack Table  
-- **Tooling & DX**: Vite, Nitro, Biome, Husky  
+Systems are stored **on this device** in `localStorage`, keyed by signed-in user. Cloud sync is not wired yet; `VITE_FUNCTIONS_URL` is reserved for a later API.
 
 ## Screens
 
-### Available
-- Default Dashboard  
-- CRM Dashboard  
-- Finance Dashboard  
-- Analytics Dashboard  
-- Productivity Dashboard  
-- E-commerce Dashboard  
-- Academy Dashboard  
-- Logistics Dashboard  
-- Infrastructure Dashboard  
-- File Manager  
-- Patient Monitoring  
-- Profile  
-- Email Page  
-- Chat Page  
-- Calendar Page  
-- Kanban Board
-- Invoice Page
-- Users Management
-- Roles Management
-- Authentication (4 screens)
-- Legacy: Default v1, CRM v1, Finance v1, Analytics v1
+| Path | Purpose |
+| --- | --- |
+| `/` | Redirects to the systems list |
+| `/auth/v1/login` | Sign in |
+| `/auth/v1/register` | Create an account |
+| `/dashboard/systems` | List your systems |
+| `/dashboard/systems/new` | Create a system |
+| `/dashboard/systems/$templateId` | Edit metadata, sections, and tasks |
 
-### Planned
-- I've added all the planned screens. Feel free to open an issue for requesting something specific.
+Dashboard routes require a signed-in session. Unauthenticated visits are sent to login.
 
-## Colocation File System Architecture
+## Tech stack
 
-This project follows a **colocation-based architecture** each feature keeps its own pages, components, and logic inside its route folder.  
-Shared UI, hooks, and configuration live at the top level, making the codebase modular, scalable, and easier to maintain as the app grows.
+- **App**: TanStack Start, TanStack Router, React 19, TypeScript
+- **Data**: TanStack Query, local template repository
+- **Auth**: Firebase Authentication
+- **UI**: Tailwind CSS v4, shadcn/ui, React Hook Form, Zod
+- **Tooling**: Vite, Nitro, Biome, Husky
 
-For a full breakdown of the routing structure, see the [TanStack Router File-Based Routing documentation](https://tanstack.com/router/latest/docs/framework/react/routing/file-based-routing).
+## Getting started
 
-## Getting Started
+### Prerequisites
 
-You can run this project locally, or deploy it instantly with Vercel.
+- Node.js 20+
+- npm
+- Firebase web credentials for the shared Fitraat Focus project
 
-### Deploy with Vercel
+### Install and run
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Farhamkhnz%2Ftanstack-shadcn-admin-dashboard)
-
-_Deploy your own copy with one click._
-
-### Run locally
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/arhamkhnz/tanstack-shadcn-admin-dashboard.git
-   ```
-   
-2. **Navigate into the project**
-   ```bash
-    cd tanstack-shadcn-admin-dashboard
-   ```
-   
-3. **Install dependencies**
-   ```bash
-    npm install
-   ```
-
-4. **Start the development server**
-   ```bash
-    npm run dev
-   ```
-
-Your app will be running at [http://localhost:3000](http://localhost:3000)
-
-### Formatting and Linting
-
-Format, lint, and organize imports
 ```bash
-npx @biomejs/biome check --write
+git clone https://github.com/mohammadShamimReza/fitraatfocustodotemplate.git
+cd fitraatfocustodotemplate
+npm install
+cp .env.example .env
 ```
-> For more information on available rules, fixes, and CLI options, refer to the [Biome documentation](https://biomejs.dev/).
 
----
+Fill in `.env` (see [Environment](#environment)), then:
 
-> [!IMPORTANT]  
-> This project is updated frequently. If you’re working from a fork or an older clone, pull the latest changes before syncing. Some updates may include breaking changes.
+```bash
+npm run dev
+```
 
----
+The app runs at [http://localhost:3000](http://localhost:3000).
 
-Contributions are welcome. Feel free to open issues, feature requests, or start a discussion.
+### Scripts
 
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Development server on port 3000 |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | Lint with Biome |
+| `npm run format` | Format with Biome |
+| `npm run check` | Lint, format, and organize imports |
+| `npm run check:fix` | Apply Biome fixes |
+| `npm run generate-routes` | Regenerate the TanStack Router tree |
 
-**Happy Vibe Coding!**
+## Environment
+
+Copy `.env.example` to `.env`. Values are read on the client (`VITE_` prefix).
+
+```bash
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FUNCTIONS_URL=
+```
+
+If Firebase is missing, login shows a configuration alert. `VITE_FUNCTIONS_URL` is optional until cloud persistence is enabled.
+
+## Project layout
+
+Feature code stays next to the route that owns it. Folders prefixed with `-` (for example `-components`) are excluded from route generation.
+
+```text
+src
+├── config                  # App name and meta
+├── lib
+│   ├── auth                # Firebase session, guards, display name
+│   ├── firebase            # Client SDK and env config
+│   ├── functions           # HTTP client for a future backend
+│   └── templates           # Local store and repository
+├── navigation              # Dashboard sidebar
+├── query                   # TanStack Query hooks for systems
+├── routes
+│   ├── (external)          # Public entry (redirects into studio)
+│   └── (main)
+│       ├── auth            # Login and register
+│       └── dashboard
+│           └── systems     # List, create, and editor
+└── types/template.ts       # System, section, and task types
+```
+
+`src/routeTree.gen.ts` is generated. Do not edit it by hand.
+
+## Data model (current)
+
+A **system** (`PurposeTemplate`) has:
+
+- Identity: title, purpose, story, description, category, tags
+- Ownership: creator uid and display name
+- Status: `draft` or `published`
+- Visibility: `public`, `unlisted`, or `private`
+- **Sections**: ordered groups with a title and description
+- **Tasks**: title, notes, priority (`low` / `medium` / `high`), tags, estimated minutes, assigned section
+
+Local data is stored under `fitraat.studio.templates.<uid>`. Clearing site data or switching browsers removes those systems.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for layout conventions and the contribution flow. Follow [AGENTS.md](AGENTS.md) when working in this repo with coding agents.

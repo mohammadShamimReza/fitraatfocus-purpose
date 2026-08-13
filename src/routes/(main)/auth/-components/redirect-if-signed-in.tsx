@@ -1,19 +1,23 @@
 import { type ReactNode, useEffect } from "react";
 
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/lib/auth/auth-provider";
+import { getPostAuthPath } from "@/lib/auth/post-auth-path";
 
 export function RedirectIfSignedIn({ children }: { children: ReactNode }) {
   const { user, isReady } = useAuth();
   const navigate = useNavigate();
+  const postAuthPath = useRouterState({
+    select: (state) => getPostAuthPath(state.location.search),
+  });
 
   useEffect(() => {
     if (isReady && user) {
-      void navigate({ to: "/dashboard/systems", replace: true });
+      void navigate({ href: postAuthPath, replace: true });
     }
-  }, [isReady, navigate, user]);
+  }, [isReady, navigate, postAuthPath, user]);
 
   if (!isReady) {
     return (

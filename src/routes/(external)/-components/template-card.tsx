@@ -1,0 +1,64 @@
+import { Link } from "@tanstack/react-router";
+
+import { Download, Layers } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getExpertiseLabel } from "@/lib/profiles/options";
+import { formatCount } from "@/lib/templates/format";
+import { getCategoryLabel } from "@/lib/templates/options";
+import { getInitials } from "@/lib/utils";
+import type { CatalogTemplate } from "@/types/template";
+
+export function TemplateCard({ template }: { template: CatalogTemplate }) {
+  const expertise = template.creator.expertise.slice(0, 2);
+
+  return (
+    <Card className="h-full">
+      <CardHeader className="gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <Badge variant="outline">{getCategoryLabel(template.category)}</Badge>
+          <span className="inline-flex items-center gap-1 text-muted-foreground text-xs">
+            <Download className="size-3" />
+            {formatCount(template.downloadCount)}
+          </span>
+        </div>
+        <div className="space-y-1.5">
+          <CardTitle className="text-lg">
+            <Link
+              to="/systems/$templateId"
+              params={{ templateId: template.id }}
+              className="rounded-sm outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {template.title}
+            </Link>
+          </CardTitle>
+          <CardDescription className="line-clamp-2">{template.purpose}</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3 text-muted-foreground text-xs">
+          <span className="inline-flex items-center gap-1.5">
+            <Layers className="size-3.5" />
+            {template.sectionCount} sections · {template.taskCount} tasks
+          </span>
+        </div>
+        <Link
+          to="/creators/$creatorId"
+          params={{ creatorId: template.creator.uid }}
+          className="flex items-center gap-2 rounded-lg outline-none hover:bg-muted/50 focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <span className="flex size-7 items-center justify-center rounded-full bg-muted font-medium text-[10px]">
+            {getInitials(template.creator.displayName)}
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate font-medium text-foreground text-sm">{template.creator.displayName}</span>
+            <span className="block truncate text-muted-foreground text-xs">
+              {template.creator.headline || expertise.map(getExpertiseLabel).join(" · ") || "Creator"}
+            </span>
+          </span>
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}

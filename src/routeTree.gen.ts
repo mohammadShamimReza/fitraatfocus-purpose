@@ -9,11 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as externalRouteRouteImport } from './routes/(external)/route'
 import { Route as externalIndexRouteImport } from './routes/(external)/index'
 import { Route as mainChatRouteRouteImport } from './routes/(main)/chat/route'
 import { Route as mainDashboardRouteRouteImport } from './routes/(main)/dashboard/route'
 import { Route as mainMailRouteRouteImport } from './routes/(main)/mail/route'
 import { Route as mainUnauthorizedRouteImport } from './routes/(main)/unauthorized'
+import { Route as externalCreatorsCreatorIdRouteImport } from './routes/(external)/creators/$creatorId'
+import { Route as externalSystemsTemplateIdRouteImport } from './routes/(external)/systems/$templateId'
 import { Route as mainAuthV2RouteRouteImport } from './routes/(main)/auth/v2/route'
 import { Route as mainDashboardIndexRouteImport } from './routes/(main)/dashboard/index'
 import { Route as mainDashboardSplatRouteImport } from './routes/(main)/dashboard/$'
@@ -50,10 +53,14 @@ import { Route as mainDashboardSystemsIndexRouteImport } from './routes/(main)/d
 import { Route as mainDashboardSystemsTemplateIdRouteImport } from './routes/(main)/dashboard/systems/$templateId'
 import { Route as mainDashboardSystemsNewRouteRouteImport } from './routes/(main)/dashboard/systems/new/route'
 
-const externalIndexRoute = externalIndexRouteImport.update({
-  id: '/(external)/',
-  path: '/',
+const externalRouteRoute = externalRouteRouteImport.update({
+  id: '/(external)',
   getParentRoute: () => rootRouteImport,
+} as any)
+const externalIndexRoute = externalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => externalRouteRoute,
 } as any)
 const mainChatRouteRoute = mainChatRouteRouteImport.update({
   id: '/(main)/chat',
@@ -75,6 +82,18 @@ const mainUnauthorizedRoute = mainUnauthorizedRouteImport.update({
   path: '/unauthorized',
   getParentRoute: () => rootRouteImport,
 } as any)
+const externalCreatorsCreatorIdRoute =
+  externalCreatorsCreatorIdRouteImport.update({
+    id: '/creators/$creatorId',
+    path: '/creators/$creatorId',
+    getParentRoute: () => externalRouteRoute,
+  } as any)
+const externalSystemsTemplateIdRoute =
+  externalSystemsTemplateIdRouteImport.update({
+    id: '/systems/$templateId',
+    path: '/systems/$templateId',
+    getParentRoute: () => externalRouteRoute,
+  } as any)
 const mainAuthV2RouteRoute = mainAuthV2RouteRouteImport.update({
   id: '/(main)/auth/v2',
   path: '/auth/v2',
@@ -301,6 +320,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
+  '/creators/$creatorId': typeof externalCreatorsCreatorIdRoute
+  '/systems/$templateId': typeof externalSystemsTemplateIdRoute
   '/dashboard/$': typeof mainDashboardSplatRoute
   '/dashboard/': typeof mainDashboardIndexRoute
   '/auth/v1/login': typeof mainAuthV1LoginRouteRoute
@@ -342,6 +363,8 @@ export interface FileRoutesByTo {
   '/dashboard/roles': typeof mainDashboardRolesRouteRoute
   '/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/dashboard/users': typeof mainDashboardUsersRouteRoute
+  '/creators/$creatorId': typeof externalCreatorsCreatorIdRoute
+  '/systems/$templateId': typeof externalSystemsTemplateIdRoute
   '/dashboard/$': typeof mainDashboardSplatRoute
   '/dashboard': typeof mainDashboardIndexRoute
   '/auth/v1/login': typeof mainAuthV1LoginRouteRoute
@@ -358,6 +381,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/(external)': typeof externalRouteRouteWithChildren
   '/(main)/chat': typeof mainChatRouteRoute
   '/(main)/dashboard': typeof mainDashboardRouteRouteWithChildren
   '/(main)/mail': typeof mainMailRouteRoute
@@ -385,6 +409,8 @@ export interface FileRoutesById {
   '/(main)/dashboard/roles': typeof mainDashboardRolesRouteRoute
   '/(main)/dashboard/tasks': typeof mainDashboardTasksRouteRoute
   '/(main)/dashboard/users': typeof mainDashboardUsersRouteRoute
+  '/(external)/creators/$creatorId': typeof externalCreatorsCreatorIdRoute
+  '/(external)/systems/$templateId': typeof externalSystemsTemplateIdRoute
   '/(main)/dashboard/$': typeof mainDashboardSplatRoute
   '/(main)/dashboard/': typeof mainDashboardIndexRoute
   '/(main)/auth/v1/login': typeof mainAuthV1LoginRouteRoute
@@ -429,6 +455,8 @@ export interface FileRouteTypes {
     | '/dashboard/roles'
     | '/dashboard/tasks'
     | '/dashboard/users'
+    | '/creators/$creatorId'
+    | '/systems/$templateId'
     | '/dashboard/$'
     | '/dashboard/'
     | '/auth/v1/login'
@@ -470,6 +498,8 @@ export interface FileRouteTypes {
     | '/dashboard/roles'
     | '/dashboard/tasks'
     | '/dashboard/users'
+    | '/creators/$creatorId'
+    | '/systems/$templateId'
     | '/dashboard/$'
     | '/dashboard'
     | '/auth/v1/login'
@@ -485,6 +515,7 @@ export interface FileRouteTypes {
     | '/dashboard/systems'
   id:
     | '__root__'
+    | '/(external)'
     | '/(main)/chat'
     | '/(main)/dashboard'
     | '/(main)/mail'
@@ -512,6 +543,8 @@ export interface FileRouteTypes {
     | '/(main)/dashboard/roles'
     | '/(main)/dashboard/tasks'
     | '/(main)/dashboard/users'
+    | '/(external)/creators/$creatorId'
+    | '/(external)/systems/$templateId'
     | '/(main)/dashboard/$'
     | '/(main)/dashboard/'
     | '/(main)/auth/v1/login'
@@ -528,11 +561,11 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  externalRouteRoute: typeof externalRouteRouteWithChildren
   mainChatRouteRoute: typeof mainChatRouteRoute
   mainDashboardRouteRoute: typeof mainDashboardRouteRouteWithChildren
   mainMailRouteRoute: typeof mainMailRouteRoute
   mainUnauthorizedRoute: typeof mainUnauthorizedRoute
-  externalIndexRoute: typeof externalIndexRoute
   mainAuthV2RouteRoute: typeof mainAuthV2RouteRouteWithChildren
   mainAuthV1LoginRouteRoute: typeof mainAuthV1LoginRouteRoute
   mainAuthV1RegisterRouteRoute: typeof mainAuthV1RegisterRouteRoute
@@ -540,12 +573,19 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/(external)': {
+      id: '/(external)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof externalRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(external)/': {
       id: '/(external)/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof externalIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof externalRouteRoute
     }
     '/(main)/chat': {
       id: '/(main)/chat'
@@ -574,6 +614,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/unauthorized'
       preLoaderRoute: typeof mainUnauthorizedRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/(external)/creators/$creatorId': {
+      id: '/(external)/creators/$creatorId'
+      path: '/creators/$creatorId'
+      fullPath: '/creators/$creatorId'
+      preLoaderRoute: typeof externalCreatorsCreatorIdRouteImport
+      parentRoute: typeof externalRouteRoute
+    }
+    '/(external)/systems/$templateId': {
+      id: '/(external)/systems/$templateId'
+      path: '/systems/$templateId'
+      fullPath: '/systems/$templateId'
+      preLoaderRoute: typeof externalSystemsTemplateIdRouteImport
+      parentRoute: typeof externalRouteRoute
     }
     '/(main)/auth/v2': {
       id: '/(main)/auth/v2'
@@ -823,6 +877,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface externalRouteRouteChildren {
+  externalIndexRoute: typeof externalIndexRoute
+  externalCreatorsCreatorIdRoute: typeof externalCreatorsCreatorIdRoute
+  externalSystemsTemplateIdRoute: typeof externalSystemsTemplateIdRoute
+}
+
+const externalRouteRouteChildren: externalRouteRouteChildren = {
+  externalIndexRoute: externalIndexRoute,
+  externalCreatorsCreatorIdRoute: externalCreatorsCreatorIdRoute,
+  externalSystemsTemplateIdRoute: externalSystemsTemplateIdRoute,
+}
+
+const externalRouteRouteWithChildren = externalRouteRoute._addFileChildren(
+  externalRouteRouteChildren,
+)
+
 interface mainDashboardRouteRouteChildren {
   mainDashboardAcademyRouteRoute: typeof mainDashboardAcademyRouteRoute
   mainDashboardAnalyticsRouteRoute: typeof mainDashboardAnalyticsRouteRoute
@@ -911,11 +981,11 @@ const mainAuthV2RouteRouteWithChildren = mainAuthV2RouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  externalRouteRoute: externalRouteRouteWithChildren,
   mainChatRouteRoute: mainChatRouteRoute,
   mainDashboardRouteRoute: mainDashboardRouteRouteWithChildren,
   mainMailRouteRoute: mainMailRouteRoute,
   mainUnauthorizedRoute: mainUnauthorizedRoute,
-  externalIndexRoute: externalIndexRoute,
   mainAuthV2RouteRoute: mainAuthV2RouteRouteWithChildren,
   mainAuthV1LoginRouteRoute: mainAuthV1LoginRouteRoute,
   mainAuthV1RegisterRouteRoute: mainAuthV1RegisterRouteRoute,

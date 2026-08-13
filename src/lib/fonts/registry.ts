@@ -4,13 +4,42 @@ type FontDefinition = {
   fallback: "monospace" | "sans-serif" | "serif";
   stylesheet: string;
   variationSettings?: string;
+  companions?: readonly string[];
 };
 
+type GoogleFontFace = {
+  family: string;
+  axes?: string;
+};
+
+function googleFonts(faces: GoogleFontFace[]): string {
+  const params = faces
+    .map((face) => `family=${face.family.replaceAll(" ", "+")}:${face.axes ?? "wght@400..700"}`)
+    .join("&");
+
+  return `https://fonts.googleapis.com/css2?${params}&display=swap`;
+}
+
 function googleFont(family: string, axes = "wght@400..700"): string {
-  return `https://fonts.googleapis.com/css2?family=${family.replaceAll(" ", "+")}:${axes}&display=swap`;
+  return googleFonts([{ family, axes }]);
+}
+
+export function fontCssFamily(font: Pick<FontDefinition, "companions" | "fallback" | "family">): string {
+  const names = [font.family, ...(font.companions ?? [])];
+  return `${names.map((name) => `"${name}"`).join(", ")}, ${font.fallback}`;
 }
 
 export const fontRegistry = {
+  fitraat: {
+    label: "Fitraat",
+    family: "Plus Jakarta Sans",
+    companions: ["Hind Siliguri", "Kohinoor Bangla", "Nirmala UI"],
+    fallback: "sans-serif",
+    stylesheet: googleFonts([
+      { family: "Plus Jakarta Sans" },
+      { family: "Hind Siliguri", axes: "wght@400;500;600;700" },
+    ]),
+  },
   geist: {
     label: "Geist",
     family: "Geist",
@@ -142,7 +171,8 @@ export const fontBootRegistry = Object.fromEntries(
         fallback: font.fallback,
         stylesheet: font.stylesheet,
         variationSettings: "variationSettings" in font ? font.variationSettings : undefined,
+        companions: "companions" in font ? font.companions : undefined,
       },
     ];
   }),
-) as Record<FontKey, Pick<FontDefinition, "fallback" | "family" | "stylesheet" | "variationSettings">>;
+) as Record<FontKey, Pick<FontDefinition, "companions" | "fallback" | "family" | "stylesheet" | "variationSettings">>;

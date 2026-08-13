@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Clock, Plus, Trash2 } from "lucide-react";
@@ -15,17 +15,24 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
-import { getPriorityLabel, TASK_PRIORITY_ITEMS } from "@/lib/templates/options";
+import { useI18n } from "@/lib/i18n/i18n-provider";
+import { priorityLabel, prioritySelectItems } from "@/lib/i18n/labels";
+import type { TranslateFn } from "@/lib/i18n/translate";
 import { useCreateTaskMutation, useDeleteTaskMutation } from "@/query/templates";
 import type { TaskPriority, TemplateSection, TemplateTask } from "@/types/template";
 
-const formSchema = z.object({
-  title: z.string().trim().min(2, { message: "Name the task." }),
-  notes: z.string().trim(),
-  priority: z.enum(["low", "medium", "high"]),
-  tags: z.string().trim(),
-  estimatedMinutes: z.string().trim(),
-});
+function createFormSchema(t: TranslateFn) {
+  return z.object({
+    title: z
+      .string()
+      .trim()
+      .min(2, { message: t("tasks.nameError") }),
+    notes: z.string().trim(),
+    priority: z.enum(["low", "medium", "high"]),
+    tags: z.string().trim(),
+    estimatedMinutes: z.string().trim(),
+  });
+}
 
 function parseTags(value: string): string[] {
   return value
@@ -59,16 +66,21 @@ export function EditorTasks({
   templateId,
   section,
   tasks,
+  canEdit,
 }: {
   templateId: string;
   section: TemplateSection | null;
   tasks: TemplateTask[];
+  canEdit: boolean;
 }) {
+  const { t } = useI18n();
   const [isAdding, setIsAdding] = useState(false);
   const createTask = useCreateTaskMutation(templateId);
   const deleteTask = useDeleteTaskMutation(templateId);
+  const formSchema = useMemo(() => createFormSchema(t), [t]);
+  const priorityItems = prioritySelectItems(t);
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: (values, context, options) => zodResolver(formSchema)(values, context, options),
     defaultValues: {
       title: "",
       notes: "",
@@ -102,7 +114,7 @@ export function EditorTasks({
       setIsAdding(false);
     } catch (error) {
       toast.add({
-        title: "Could not add task",
+        title: t("tasks.addError"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -113,7 +125,7 @@ export function EditorTasks({
       await deleteTask.mutateAsync(taskId);
     } catch (error) {
       toast.add({
-        title: "Could not delete task",
+        title: t("tasks.deleteError"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -122,29 +134,31 @@ export function EditorTasks({
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2">
-        <CardTitle>{section ? section.title : "Tasks"}</CardTitle>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={!section}
-          onClick={() => setIsAdding((open) => !open)}
-          aria-expanded={isAdding}
-        >
-          <Plus data-icon="inline-start" />
-          {isAdding ? "Cancel" : "Add task"}
-        </Button>
+        <CardTitle>{section ? section.title : t("tasks.title")}</CardTitle>
+        {canEdit ? (
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!section}
+            onClick={() => setIsAdding((open) => !open)}
+            aria-expanded={isAdding}
+          >
+            <Plus data-icon="inline-start" />
+            {isAdding ? t("common.cancel") : t("tasks.add")}
+          </Button>
+        ) : null}
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {!section ? (
           <Empty className="min-h-56">
             <EmptyHeader>
-              <EmptyTitle>Select a section</EmptyTitle>
-              <EmptyDescription>Tasks live inside a section of the library.</EmptyDescription>
+              <EmptyTitle>{t("tasks.selectTitle")}</EmptyTitle>
+              <EmptyDescription>{t("tasks.selectBody")}</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : null}
 
-        {section && isAdding ? (
+        {section && canEdit && isAdding ? (
           <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="rounded-lg border bg-muted/30 p-3">
             <FieldGroup className="gap-3">
               <Controller
@@ -152,8 +166,8 @@ export function EditorTasks({
                 name="title"
                 render={({ field, fieldState }) => (
                   <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="task-title">Task</FieldLabel>
-                    <Input {...field} id="task-title" placeholder="Complete one timed mock paper" />
+                    <FieldLabel htmlFor="task-title">{t("tasks.task")}</FieldLabel>
+                    <Input {...field} id="task-title" placeholder={t("tasks.taskPlaceholder")} />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -163,8 +177,8 @@ export function EditorTasks({
                 name="notes"
                 render={({ field, fieldState }) => (
                   <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="task-notes">How to do it</FieldLabel>
-                    <Textarea {...field} id="task-notes" placeholder="The method, not just the title." />
+                    <FieldLabel htmlFor="task-notes">{t("tasks.how")}</FieldLabel>
+                    <Textarea {...field} id="task-notes" placeholder={t("tasks.howPlaceholder")} />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -175,18 +189,18 @@ export function EditorTasks({
                   name="priority"
                   render={({ field, fieldState }) => (
                     <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="task-priority">Priority</FieldLabel>
+                      <FieldLabel htmlFor="task-priority">{t("tasks.priority")}</FieldLabel>
                       <Select
                         value={field.value}
                         onValueChange={(value) => field.onChange(value as TaskPriority)}
-                        items={[...TASK_PRIORITY_ITEMS]}
+                        items={priorityItems}
                       >
                         <SelectTrigger id="task-priority" className="w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            {TASK_PRIORITY_ITEMS.map((item) => (
+                            {priorityItems.map((item) => (
                               <SelectItem key={item.value} value={item.value}>
                                 {item.label}
                               </SelectItem>
@@ -203,8 +217,8 @@ export function EditorTasks({
                   name="tags"
                   render={({ field, fieldState }) => (
                     <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="task-tags">Tags</FieldLabel>
-                      <Input {...field} id="task-tags" placeholder="math, mock" />
+                      <FieldLabel htmlFor="task-tags">{t("tasks.tags")}</FieldLabel>
+                      <Input {...field} id="task-tags" placeholder={t("tasks.tagsPlaceholder")} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -214,7 +228,7 @@ export function EditorTasks({
                   name="estimatedMinutes"
                   render={({ field, fieldState }) => (
                     <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="task-minutes">Minutes</FieldLabel>
+                      <FieldLabel htmlFor="task-minutes">{t("tasks.minutes")}</FieldLabel>
                       <Input {...field} id="task-minutes" inputMode="numeric" placeholder="90" />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
@@ -223,7 +237,7 @@ export function EditorTasks({
               </div>
               <div className="flex justify-end">
                 <Button type="submit" size="sm" disabled={createTask.isPending}>
-                  {createTask.isPending ? "Adding…" : "Add to library"}
+                  {createTask.isPending ? t("tasks.adding") : t("tasks.addLibrary")}
                 </Button>
               </div>
             </FieldGroup>
@@ -233,8 +247,8 @@ export function EditorTasks({
         {section && tasks.length === 0 && !isAdding ? (
           <Empty className="min-h-56">
             <EmptyHeader>
-              <EmptyTitle>No tasks in this section</EmptyTitle>
-              <EmptyDescription>Add the work someone would pick into a day.</EmptyDescription>
+              <EmptyTitle>{t("tasks.emptyTitle")}</EmptyTitle>
+              <EmptyDescription>{canEdit ? t("tasks.emptyEdit") : t("tasks.emptyView")}</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : null}
@@ -246,11 +260,11 @@ export function EditorTasks({
                 <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-sm">{task.title}</span>
-                    <Badge variant={getPriorityVariant(task.priority)}>{getPriorityLabel(task.priority)}</Badge>
+                    <Badge variant={getPriorityVariant(task.priority)}>{priorityLabel(t, task.priority)}</Badge>
                     {task.estimatedMinutes ? (
                       <span className="inline-flex items-center gap-1 text-muted-foreground text-xs">
                         <Clock className="size-3" />
-                        {task.estimatedMinutes} min
+                        {t("tasks.minutesValue", { count: task.estimatedMinutes })}
                       </span>
                     ) : null}
                   </div>
@@ -265,17 +279,19 @@ export function EditorTasks({
                     </div>
                   ) : null}
                 </div>
-                <Button
-                  size="icon-xs"
-                  variant="ghost"
-                  disabled={deleteTask.isPending}
-                  aria-label={`Delete ${task.title}`}
-                  onClick={() => {
-                    void onDelete(task.id);
-                  }}
-                >
-                  <Trash2 />
-                </Button>
+                {canEdit ? (
+                  <Button
+                    size="icon-xs"
+                    variant="ghost"
+                    disabled={deleteTask.isPending}
+                    aria-label={t("tasks.deleteAria", { title: task.title })}
+                    onClick={() => {
+                      void onDelete(task.id);
+                    }}
+                  >
+                    <Trash2 />
+                  </Button>
+                ) : null}
               </li>
             ))}
           </ul>

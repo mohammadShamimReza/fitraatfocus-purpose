@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 
-import { Command } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
+import { FitraatMark } from "@/components/brand/fitraat-mark";
 import {
   Sidebar,
   SidebarContent,
@@ -37,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton render={<Link to="/dashboard/systems" />}>
-              <Command />
+              <FitraatMark className="size-4" />
               <span className="font-semibold text-base">{APP_CONFIG.name}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

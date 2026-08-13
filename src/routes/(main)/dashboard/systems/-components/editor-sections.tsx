@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
@@ -13,14 +13,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { useI18n } from "@/lib/i18n/i18n-provider";
+import type { TranslateFn } from "@/lib/i18n/translate";
 import { cn } from "@/lib/utils";
 import { useCreateSectionMutation, useDeleteSectionMutation } from "@/query/templates";
 import type { TemplateSection, TemplateTask } from "@/types/template";
 
-const formSchema = z.object({
-  title: z.string().trim().min(2, { message: "Name the section." }),
-  description: z.string().trim(),
-});
+function createFormSchema(t: TranslateFn) {
+  return z.object({
+    title: z
+      .string()
+      .trim()
+      .min(2, { message: t("sections.nameError") }),
+    description: z.string().trim(),
+  });
+}
 
 export function EditorSections({
   templateId,
@@ -28,18 +35,22 @@ export function EditorSections({
   tasks,
   selectedSectionId,
   onSelectSection,
+  canEdit,
 }: {
   templateId: string;
   sections: TemplateSection[];
   tasks: TemplateTask[];
   selectedSectionId: string | null;
   onSelectSection: (sectionId: string) => void;
+  canEdit: boolean;
 }) {
+  const { t } = useI18n();
   const [isAdding, setIsAdding] = useState(false);
   const createSection = useCreateSectionMutation(templateId);
   const deleteSection = useDeleteSectionMutation(templateId);
+  const formSchema = useMemo(() => createFormSchema(t), [t]);
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: (values, context, options) => zodResolver(formSchema)(values, context, options),
     defaultValues: {
       title: "",
       description: "",
@@ -53,7 +64,7 @@ export function EditorSections({
       setIsAdding(false);
     } catch (error) {
       toast.add({
-        title: "Could not add section",
+        title: t("sections.addError"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -64,7 +75,7 @@ export function EditorSections({
       await deleteSection.mutateAsync(sectionId);
     } catch (error) {
       toast.add({
-        title: "Could not delete section",
+        title: t("sections.deleteError"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -73,14 +84,16 @@ export function EditorSections({
   return (
     <Card className="h-fit">
       <CardHeader className="flex-row items-center justify-between gap-2">
-        <CardTitle>Sections</CardTitle>
-        <Button size="sm" variant="outline" onClick={() => setIsAdding((open) => !open)} aria-expanded={isAdding}>
-          <Plus data-icon="inline-start" />
-          {isAdding ? "Cancel" : "Add"}
-        </Button>
+        <CardTitle>{t("sections.title")}</CardTitle>
+        {canEdit ? (
+          <Button size="sm" variant="outline" onClick={() => setIsAdding((open) => !open)} aria-expanded={isAdding}>
+            <Plus data-icon="inline-start" />
+            {isAdding ? t("common.cancel") : t("common.add")}
+          </Button>
+        ) : null}
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        {isAdding ? (
+        {canEdit && isAdding ? (
           <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="rounded-lg border bg-muted/30 p-3">
             <FieldGroup className="gap-3">
               <Controller
@@ -88,8 +101,8 @@ export function EditorSections({
                 name="title"
                 render={({ field, fieldState }) => (
                   <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="section-title">Section title</FieldLabel>
-                    <Input {...field} id="section-title" placeholder="Math fundamentals" />
+                    <FieldLabel htmlFor="section-title">{t("sections.sectionTitle")}</FieldLabel>
+                    <Input {...field} id="section-title" placeholder={t("sections.placeholder")} />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -99,14 +112,14 @@ export function EditorSections({
                 name="description"
                 render={({ field, fieldState }) => (
                   <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="section-description">Description</FieldLabel>
-                    <Textarea {...field} id="section-description" placeholder="Optional" />
+                    <FieldLabel htmlFor="section-description">{t("sections.description")}</FieldLabel>
+                    <Textarea {...field} id="section-description" placeholder={t("sections.optional")} />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
               <Button type="submit" size="sm" disabled={createSection.isPending}>
-                {createSection.isPending ? "Adding…" : "Add section"}
+                {createSection.isPending ? t("sections.adding") : t("sections.add")}
               </Button>
             </FieldGroup>
           </form>
@@ -115,8 +128,8 @@ export function EditorSections({
         {sections.length === 0 && !isAdding ? (
           <Empty className="py-8">
             <EmptyHeader>
-              <EmptyTitle>No sections yet</EmptyTitle>
-              <EmptyDescription>Group the work before you add tasks.</EmptyDescription>
+              <EmptyTitle>{t("sections.emptyTitle")}</EmptyTitle>
+              <EmptyDescription>{canEdit ? t("sections.emptyEdit") : t("sections.emptyView")}</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : null}
@@ -148,18 +161,20 @@ export function EditorSections({
                       <div className="mt-0.5 line-clamp-2 text-muted-foreground text-xs">{section.description}</div>
                     ) : null}
                   </button>
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    className="mt-1"
-                    disabled={deleteSection.isPending}
-                    aria-label={`Delete ${section.title}`}
-                    onClick={() => {
-                      void onDelete(section.id);
-                    }}
-                  >
-                    <Trash2 />
-                  </Button>
+                  {canEdit ? (
+                    <Button
+                      size="icon-xs"
+                      variant="ghost"
+                      className="mt-1"
+                      disabled={deleteSection.isPending}
+                      aria-label={t("sections.deleteAria", { title: section.title })}
+                      onClick={() => {
+                        void onDelete(section.id);
+                      }}
+                    >
+                      <Trash2 />
+                    </Button>
+                  ) : null}
                 </div>
               </li>
             );

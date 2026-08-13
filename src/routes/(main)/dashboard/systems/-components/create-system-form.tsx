@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { useNavigate } from "@tanstack/react-router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,22 +14,41 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
-import { TEMPLATE_CATEGORY_ITEMS } from "@/lib/templates/options";
+import { useI18n } from "@/lib/i18n/i18n-provider";
+import { categorySelectItems } from "@/lib/i18n/labels";
+import type { TranslateFn } from "@/lib/i18n/translate";
 import { useCreateTemplateMutation } from "@/query/templates";
 
-const formSchema = z.object({
-  title: z.string().trim().min(2, { message: "Give the system a name." }),
-  purpose: z.string().trim().min(8, { message: "Describe the purpose in a sentence or two." }),
-  story: z.string().trim().min(8, { message: "Say why this system is credible." }),
-  description: z.string().trim().min(8, { message: "Add a short description of the library." }),
-  category: z.string().min(1, { message: "Choose a category." }),
-});
+function createFormSchema(t: TranslateFn) {
+  return z.object({
+    title: z
+      .string()
+      .trim()
+      .min(2, { message: t("newSystem.titleError") }),
+    purpose: z
+      .string()
+      .trim()
+      .min(8, { message: t("newSystem.purposeError") }),
+    story: z
+      .string()
+      .trim()
+      .min(8, { message: t("newSystem.storyError") }),
+    description: z
+      .string()
+      .trim()
+      .min(8, { message: t("newSystem.insideError") }),
+    category: z.string().min(1, { message: t("newSystem.categoryError") }),
+  });
+}
 
 export function CreateSystemForm() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const createTemplate = useCreateTemplateMutation();
+  const formSchema = useMemo(() => createFormSchema(t), [t]);
+  const categoryItems = categorySelectItems(t);
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: (values, context, options) => zodResolver(formSchema)(values, context, options),
     defaultValues: {
       title: "",
       purpose: "",
@@ -42,13 +63,13 @@ export function CreateSystemForm() {
       const created = await createTemplate.mutateAsync(data);
 
       if (!created?.id) {
-        throw new Error("The system could not be created.");
+        throw new Error(t("newSystem.createMissing"));
       }
 
       await navigate({ to: "/dashboard/systems/$templateId", params: { templateId: created.id } });
     } catch (error) {
       toast.add({
-        title: "Could not create the system",
+        title: t("newSystem.createError"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -64,9 +85,9 @@ export function CreateSystemForm() {
               name="title"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="system-title">Title</FieldLabel>
-                  <Input {...field} id="system-title" placeholder="Gaokao first-place study system" />
-                  <FieldDescription>The name people will see when they choose this library.</FieldDescription>
+                  <FieldLabel htmlFor="system-title">{t("newSystem.titleLabel")}</FieldLabel>
+                  <Input {...field} id="system-title" placeholder={t("newSystem.titlePlaceholder")} />
+                  <FieldDescription>{t("newSystem.titleHelp")}</FieldDescription>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -76,14 +97,14 @@ export function CreateSystemForm() {
               name="category"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="system-category">Category</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange} items={[...TEMPLATE_CATEGORY_ITEMS]}>
+                  <FieldLabel htmlFor="system-category">{t("newSystem.category")}</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange} items={categoryItems}>
                     <SelectTrigger id="system-category" className="w-full">
-                      <SelectValue placeholder="Choose a category" />
+                      <SelectValue placeholder={t("newSystem.categoryPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {TEMPLATE_CATEGORY_ITEMS.map((item) => (
+                        {categoryItems.map((item) => (
                           <SelectItem key={item.value} value={item.value}>
                             {item.label}
                           </SelectItem>
@@ -100,9 +121,9 @@ export function CreateSystemForm() {
               name="purpose"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="system-purpose">Purpose</FieldLabel>
-                  <Textarea {...field} id="system-purpose" placeholder="What this system is for, in plain language." />
-                  <FieldDescription>One clear outcome. Not a list of features.</FieldDescription>
+                  <FieldLabel htmlFor="system-purpose">{t("newSystem.purpose")}</FieldLabel>
+                  <Textarea {...field} id="system-purpose" placeholder={t("newSystem.purposePlaceholder")} />
+                  <FieldDescription>{t("newSystem.purposeHelp")}</FieldDescription>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -112,13 +133,9 @@ export function CreateSystemForm() {
               name="story"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="system-story">Story</FieldLabel>
-                  <Textarea
-                    {...field}
-                    id="system-story"
-                    placeholder="Why you are the person to write this. What you completed."
-                  />
-                  <FieldDescription>Credibility, not a biography.</FieldDescription>
+                  <FieldLabel htmlFor="system-story">{t("newSystem.story")}</FieldLabel>
+                  <Textarea {...field} id="system-story" placeholder={t("newSystem.storyPlaceholder")} />
+                  <FieldDescription>{t("newSystem.storyHelp")}</FieldDescription>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -128,12 +145,8 @@ export function CreateSystemForm() {
               name="description"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="system-description">What is inside</FieldLabel>
-                  <Textarea
-                    {...field}
-                    id="system-description"
-                    placeholder="The shape of the library: phases, subjects, or kinds of work."
-                  />
+                  <FieldLabel htmlFor="system-description">{t("newSystem.inside")}</FieldLabel>
+                  <Textarea {...field} id="system-description" placeholder={t("newSystem.insidePlaceholder")} />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -141,7 +154,7 @@ export function CreateSystemForm() {
           </FieldGroup>
           <div className="flex items-center justify-end gap-2 border-t pt-4">
             <Button type="submit" disabled={createTemplate.isPending}>
-              {createTemplate.isPending ? "Creating…" : "Continue to library"}
+              {createTemplate.isPending ? t("newSystem.creating") : t("newSystem.continue")}
             </Button>
           </div>
         </form>

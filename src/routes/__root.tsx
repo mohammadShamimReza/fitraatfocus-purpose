@@ -1,6 +1,6 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import { Toaster } from "@/components/ui/toast";
@@ -8,8 +8,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_CONFIG } from "@/config/app-config";
 import { AuthProvider } from "@/lib/auth/auth-provider";
 import { fontRegistry } from "@/lib/fonts/registry";
+import { type AppLocale, DEFAULT_LOCALE } from "@/lib/i18n/config";
+import { I18nProvider } from "@/lib/i18n/i18n-provider";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
+import { LocaleBootScript } from "@/scripts/locale-boot";
 import { ThemeBootScript } from "@/scripts/theme-boot";
+import { getInitialLocale } from "@/server/server-actions";
 import { PreferencesStoreProvider } from "@/stores/preferences/preferences-provider";
 
 import appCss from "../styles/styles.css?url";
@@ -17,6 +21,8 @@ import { NotFound } from "./-components/not-found";
 import { RootError } from "./-components/root-error";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: () => getInitialLocale(),
+  component: RootLayout,
   head: () => ({
     meta: [
       {
@@ -56,10 +62,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "manifest",
         href: "/manifest.json",
       },
+      {
+        rel: "icon",
+        href: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+      {
+        rel: "icon",
+        href: "/favicon.ico",
+        sizes: "32x32",
+      },
+      {
+        rel: "apple-touch-icon",
+        href: "/apple-touch-icon.png",
+      },
     ],
   }),
-  errorComponent: RootError,
-  notFoundComponent: NotFound,
+  errorComponent: RootErrorBoundary,
+  notFoundComponent: NotFoundBoundary,
   shellComponent: RootDocument,
 });
 
@@ -82,17 +102,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         {/* Applies theme and layout preferences on load to avoid flicker and unnecessary server rerenders. */}
         <ThemeBootScript />
+        <LocaleBootScript />
         <HeadContent />
       </head>
       <body className="min-h-screen antialiased">
-        <TooltipProvider>
-          <PreferencesStoreProvider initialValues={PREFERENCE_DEFAULTS}>
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </PreferencesStoreProvider>
-        </TooltipProvider>
+        {children}
         <TanStackDevtools
           config={{
             position: "bottom-right",
@@ -107,5 +121,46 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function AppProviders({ children, locale }: { children: React.ReactNode; locale?: AppLocale }) {
+  return (
+    <TooltipProvider>
+      <PreferencesStoreProvider initialValues={PREFERENCE_DEFAULTS}>
+        <I18nProvider initialLocale={locale ?? DEFAULT_LOCALE}>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </I18nProvider>
+      </PreferencesStoreProvider>
+    </TooltipProvider>
+  );
+}
+
+function RootErrorBoundary(props: React.ComponentProps<typeof RootError>) {
+  return (
+    <AppProviders>
+      <RootError {...props} />
+    </AppProviders>
+  );
+}
+
+function NotFoundBoundary() {
+  return (
+    <AppProviders>
+      <NotFound />
+    </AppProviders>
+  );
+}
+
+function RootLayout() {
+  const locale = Route.useLoaderData();
+
+  return (
+    <AppProviders locale={locale}>
+      <Outlet />
+    </AppProviders>
   );
 }

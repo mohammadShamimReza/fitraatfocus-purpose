@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, setCookie } from "@tanstack/react-start/server";
 
+import { DEFAULT_LOCALE, isAppLocale, LOCALE_STORAGE_KEY } from "@/lib/i18n/config";
 import {
   getPreferencePersistence,
   PREFERENCE_REGISTRY,
@@ -69,4 +70,13 @@ const getDashboardLayoutServer = createServerFn({ method: "GET" }).handler(() =>
 
 export async function getDashboardLayout() {
   return getDashboardLayoutServer();
+}
+
+const getInitialLocaleServer = createServerFn({ method: "GET" }).handler(() => {
+  const value = getCookie(LOCALE_STORAGE_KEY)?.trim() ?? "";
+  return isAppLocale(value) ? value : DEFAULT_LOCALE;
+});
+
+export function getInitialLocale() {
+  return getInitialLocaleServer();
 }

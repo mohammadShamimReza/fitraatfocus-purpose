@@ -70,8 +70,15 @@ export function ThemeBootScript() {
         root.classList.toggle("dark", resolvedMode === "dark");
         root.style.colorScheme = resolvedMode;
 
+        function fontCssFamily(font) {
+          var names = [font.family].concat(font.companions || []);
+          return names.map(function (name) {
+            return '"' + name + '"';
+          }).join(", ") + ", " + font.fallback;
+        }
+
         function applyFont(font) {
-          root.style.setProperty("--app-font-sans", '"' + font.family + '", ' + font.fallback);
+          root.style.setProperty("--app-font-sans", fontCssFamily(font));
           root.style.setProperty("--app-font-variation-settings", font.variationSettings || "normal");
         }
 

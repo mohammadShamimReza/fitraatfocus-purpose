@@ -42,6 +42,8 @@ export type PurposeTemplate = {
   sectionCount: number;
   taskCount: number;
   forkCount: number;
+  downloadCount: number;
+  downloaderUids: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -49,6 +51,22 @@ export type PurposeTemplate = {
 export type PurposeTemplateDetail = PurposeTemplate & {
   sections: TemplateSection[];
   tasks: TemplateTask[];
+};
+
+export type CatalogCreator = {
+  uid: string;
+  displayName: string;
+  headline: string;
+  expertise: string[];
+  avatarUrl: string;
+};
+
+export type CatalogTemplate = PurposeTemplate & {
+  creator: CatalogCreator;
+};
+
+export type PublicTemplateDetail = PurposeTemplateDetail & {
+  creator: CatalogCreator;
 };
 
 export type CreateTemplateInput = {

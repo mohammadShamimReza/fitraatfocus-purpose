@@ -1,4 +1,4 @@
-import { ListTodo, type LucideIcon, Plus } from "lucide-react";
+import { CircleUser, ListTodo, type LucideIcon, Plus } from "lucide-react";
 
 import type { FileRoutesByTo } from "@/routeTree.gen";
 
@@ -57,6 +57,12 @@ export const sidebarItems: NavGroup[] = [
         title: "New system",
         url: "/dashboard/systems/new",
         icon: Plus,
+      },
+      {
+        id: "profile",
+        title: "Profile",
+        url: "/dashboard/profile",
+        icon: CircleUser,
       },
     ],
   },

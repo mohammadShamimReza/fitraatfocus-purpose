@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,22 +12,41 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
-import { TEMPLATE_CATEGORY_ITEMS } from "@/lib/templates/options";
+import { useI18n } from "@/lib/i18n/i18n-provider";
+import { categoryLabel, categorySelectItems } from "@/lib/i18n/labels";
+import type { TranslateFn } from "@/lib/i18n/translate";
 import { useUpdateTemplateMutation } from "@/query/templates";
 import type { PurposeTemplate } from "@/types/template";
 
-const formSchema = z.object({
-  title: z.string().trim().min(2, { message: "Give the system a name." }),
-  purpose: z.string().trim().min(8, { message: "Describe the purpose in a sentence or two." }),
-  story: z.string().trim().min(8, { message: "Say why this system is credible." }),
-  description: z.string().trim().min(8, { message: "Add a short description of the library." }),
-  category: z.string().min(1, { message: "Choose a category." }),
-});
+function createFormSchema(t: TranslateFn) {
+  return z.object({
+    title: z
+      .string()
+      .trim()
+      .min(2, { message: t("newSystem.titleError") }),
+    purpose: z
+      .string()
+      .trim()
+      .min(8, { message: t("newSystem.purposeError") }),
+    story: z
+      .string()
+      .trim()
+      .min(8, { message: t("newSystem.storyError") }),
+    description: z
+      .string()
+      .trim()
+      .min(8, { message: t("newSystem.insideError") }),
+    category: z.string().min(1, { message: t("newSystem.categoryError") }),
+  });
+}
 
-export function EditorMetadataForm({ template }: { template: PurposeTemplate }) {
+export function EditorMetadataForm({ template, canEdit }: { template: PurposeTemplate; canEdit: boolean }) {
+  const { t } = useI18n();
   const updateTemplate = useUpdateTemplateMutation(template.id);
+  const formSchema = useMemo(() => createFormSchema(t), [t]);
+  const categoryItems = categorySelectItems(t);
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: (values, context, options) => zodResolver(formSchema)(values, context, options),
     values: {
       title: template.title,
       purpose: template.purpose,
@@ -39,22 +60,61 @@ export function EditorMetadataForm({ template }: { template: PurposeTemplate }) 
     try {
       await updateTemplate.mutateAsync(data);
       toast.add({
-        title: "Saved",
-        description: "System details were updated.",
+        title: t("editor.saved"),
+        description: t("editor.savedBody"),
       });
     } catch (error) {
       toast.add({
-        title: "Could not save",
+        title: t("editor.saveError"),
         description: getFunctionsErrorMessage(error),
       });
     }
   };
 
+  if (!canEdit) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("editor.purposeStory")}</CardTitle>
+          <CardDescription>{t("editor.purposeStoryHelp")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <h2 className="font-medium text-sm">{t("newSystem.titleLabel")}</h2>
+              <p className="text-sm leading-relaxed">{template.title || t("systems.untitled")}</p>
+            </div>
+            <div className="space-y-1.5">
+              <h2 className="font-medium text-sm">{t("newSystem.category")}</h2>
+              <p className="text-sm leading-relaxed">{categoryLabel(t, template.category)}</p>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="font-medium text-sm">{t("newSystem.purpose")}</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {template.purpose || t("systems.noPurpose")}
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="font-medium text-sm">{t("newSystem.story")}</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">{template.story || t("editor.noStory")}</p>
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="font-medium text-sm">{t("newSystem.inside")}</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {template.description || t("editor.noDescription")}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Purpose and story</CardTitle>
-        <CardDescription>This is what people read before they fork the library.</CardDescription>
+        <CardTitle>{t("editor.purposeStory")}</CardTitle>
+        <CardDescription>{t("editor.purposeStoryHelp")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -65,7 +125,7 @@ export function EditorMetadataForm({ template }: { template: PurposeTemplate }) 
                 name="title"
                 render={({ field, fieldState }) => (
                   <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="editor-title">Title</FieldLabel>
+                    <FieldLabel htmlFor="editor-title">{t("newSystem.titleLabel")}</FieldLabel>
                     <Input {...field} id="editor-title" />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -76,14 +136,14 @@ export function EditorMetadataForm({ template }: { template: PurposeTemplate }) 
                 name="category"
                 render={({ field, fieldState }) => (
                   <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="editor-category">Category</FieldLabel>
-                    <Select value={field.value} onValueChange={field.onChange} items={[...TEMPLATE_CATEGORY_ITEMS]}>
+                    <FieldLabel htmlFor="editor-category">{t("newSystem.category")}</FieldLabel>
+                    <Select value={field.value} onValueChange={field.onChange} items={categoryItems}>
                       <SelectTrigger id="editor-category" className="w-full">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {TEMPLATE_CATEGORY_ITEMS.map((item) => (
+                          {categoryItems.map((item) => (
                             <SelectItem key={item.value} value={item.value}>
                               {item.label}
                             </SelectItem>
@@ -101,9 +161,9 @@ export function EditorMetadataForm({ template }: { template: PurposeTemplate }) 
               name="purpose"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="editor-purpose">Purpose</FieldLabel>
+                  <FieldLabel htmlFor="editor-purpose">{t("newSystem.purpose")}</FieldLabel>
                   <Textarea {...field} id="editor-purpose" />
-                  <FieldDescription>The outcome this library is for.</FieldDescription>
+                  <FieldDescription>{t("editor.outcomeHelp")}</FieldDescription>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -113,7 +173,7 @@ export function EditorMetadataForm({ template }: { template: PurposeTemplate }) 
               name="story"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="editor-story">Story</FieldLabel>
+                  <FieldLabel htmlFor="editor-story">{t("newSystem.story")}</FieldLabel>
                   <Textarea {...field} id="editor-story" />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -124,7 +184,7 @@ export function EditorMetadataForm({ template }: { template: PurposeTemplate }) 
               name="description"
               render={({ field, fieldState }) => (
                 <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="editor-description">What is inside</FieldLabel>
+                  <FieldLabel htmlFor="editor-description">{t("newSystem.inside")}</FieldLabel>
                   <Textarea {...field} id="editor-description" />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -133,7 +193,7 @@ export function EditorMetadataForm({ template }: { template: PurposeTemplate }) 
           </FieldGroup>
           <div className="flex justify-end">
             <Button type="submit" disabled={updateTemplate.isPending}>
-              {updateTemplate.isPending ? "Saving…" : "Save details"}
+              {updateTemplate.isPending ? t("common.save") : t("editor.saveDetails")}
             </Button>
           </div>
         </form>
