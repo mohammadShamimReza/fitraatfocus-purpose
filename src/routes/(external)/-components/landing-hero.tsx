@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, BadgeCheck, Copy, Layers, Target } from "lucide-react";
 
 import { FitraatMark } from "@/components/brand/fitraat-mark";
+import { StudioGif } from "@/components/studio-gif";
 import { Button } from "@/components/ui/button";
 import { APP_LINKS } from "@/config/app-config";
 import { useAuth } from "@/lib/auth/auth-provider";
@@ -57,7 +58,7 @@ export function LandingHero() {
             </p>
           </div>
           <div className="landing-rise flex flex-wrap gap-2" style={{ animationDelay: "280ms" }}>
-            <Button size="lg" nativeButton={false} render={<Link to="/" hash="systems" />}>
+            <Button size="lg" nativeButton={false} render={<Link to="/systems" />}>
               {t("landing.hero.browse")}
             </Button>
             <Button size="lg" nativeButton={false} variant="outline" render={createLink}>
@@ -75,7 +76,7 @@ export function LandingHero() {
           </div>
         </div>
 
-        <div className="landing-rise hidden lg:block" style={{ animationDelay: "220ms" }}>
+        <div className="landing-rise" style={{ animationDelay: "220ms" }}>
           <HeroPreview />
         </div>
       </div>
@@ -118,6 +119,9 @@ function HeroPreview() {
             <span className="size-2 rounded-full bg-muted-foreground/15" />
           </div>
           <p className="font-medium text-muted-foreground text-xs">{t("landing.preview.live")}</p>
+        </div>
+        <div className="flex justify-center border-b bg-muted/20 px-5 py-4">
+          <StudioGif id="purpose-library" alt={t("gif.library")} size={140} />
         </div>
         <div className="space-y-4 p-5">
           {PREVIEW_ROWS.map((row, index) => (

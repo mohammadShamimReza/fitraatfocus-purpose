@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { Download, Layers } from "lucide-react";
 
+import { SystemCover } from "@/components/system-cover";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getExpertiseLabel } from "@/lib/profiles/options";
@@ -14,7 +15,8 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
   const expertise = template.creator.expertise.slice(0, 2);
 
   return (
-    <Card className="h-full shadow-none transition-[transform,box-shadow] duration-300 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-sm">
+    <Card className="h-full overflow-hidden shadow-none transition-[transform,box-shadow] duration-300 ease-out motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-sm">
+      <SystemCover src={template.imageUrl} alt="" className="rounded-t-xl" />
       <CardHeader className="gap-3">
         <div className="flex items-center justify-between gap-2">
           <Badge variant="outline">{getCategoryLabel(template.category)}</Badge>

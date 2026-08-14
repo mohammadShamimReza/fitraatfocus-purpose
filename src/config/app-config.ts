@@ -2,6 +2,7 @@ const currentYear = new Date().getFullYear();
 
 export const APP_LINKS = {
   site: "https://fitraatfocus.fitraat.com/",
+  studio: "https://studio.fitraatfocus.fitraat.com",
   webApp: "https://fitraat-focus.web.app",
   playStore: "https://play.google.com/store/apps/details?id=com.fitraatfocus",
   iPhoneGuide: "https://fitraatfocus.fitraat.com/#iphone",

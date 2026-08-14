@@ -12,6 +12,10 @@ export const bn: Record<MessageKey, string> = {
   "search.label": "খুঁজুন",
   "search.placeholder": "সিস্টেম খুঁজুন…",
   "search.empty": "কোনো ফলাফল নেই।",
+  "search.titlePlaceholder": "শিরোনাম দিয়ে খুঁজুন…",
+  "search.category": "বিভাগ",
+  "search.categoryAll": "সব বিভাগ",
+  "search.statusAll": "সব স্ট্যাটাস",
 
   "common.tryAgain": "আবার চেষ্টা করুন",
   "common.cancel": "বাতিল",
@@ -24,6 +28,13 @@ export const bn: Record<MessageKey, string> = {
 
   "status.draft": "খসড়া",
   "status.published": "প্রকাশিত",
+  "visibility.public": "সবার জন্য",
+  "visibility.private": "ব্যক্তিগত",
+  "visibility.help": "সবার জন্য হলে ক্যাটালগে দেখাবে। ব্যক্তিগত হলে শুধু আপনার অ্যাকাউন্ট ও Fitraat Focus অ্যাপে থাকবে।",
+  "visibility.saved": "দৃশ্যমানতা আপডেট হয়েছে",
+  "visibility.savedPublic": "সিস্টেমটি এখন সবার ক্যাটালগে আছে।",
+  "visibility.savedPrivate": "শুধু আপনি এটি দেখতে পারবেন, Fitraat Focus অ্যাপেও।",
+  "visibility.error": "দৃশ্যমানতা আপডেট করা যায়নি",
 
   "category.exam": "পরীক্ষা",
   "category.career": "ক্যারিয়ার",
@@ -63,7 +74,7 @@ export const bn: Record<MessageKey, string> = {
   "auth.firebaseHelp": ".env.example কপি করে .env তৈরি করুন এবং Fitraat Focus-এর Firebase মানগুলো দিন।",
 
   "systems.title": "আমার সিস্টেম",
-  "systems.lead": "লাইব্রেরি লিখুন। ক্যাটালগে প্রকাশ করুন। কতজন ডাউনলোড করেছে তা দেখুন।",
+  "systems.lead": "লাইব্রেরি লিখুন। Fitraat Focus অ্যাপের জন্য ব্যক্তিগত রাখুন, অথবা ক্যাটালগে সবার জন্য খুলুন।",
   "systems.loading": "আপনার সিস্টেম লোড হচ্ছে",
   "systems.loadError": "সিস্টেম লোড করা যায়নি",
   "systems.emptyTitle": "একটি উদ্দেশ্য দিয়ে শুরু করুন",
@@ -105,6 +116,18 @@ export const bn: Record<MessageKey, string> = {
   "newSystem.createError": "সিস্টেম তৈরি করা যায়নি",
   "newSystem.createMissing": "সিস্টেম তৈরি করা যায়নি।",
 
+  "cover.label": "কভার ছবি",
+  "cover.help": "ক্যাটালগ ও Fitraat Focus অ্যাপে দেখাবে। JPEG, PNG বা WebP, সর্বোচ্চ ১০ MB।",
+  "cover.alt": "সিস্টেম কভার",
+  "cover.add": "ছবি যোগ করুন",
+  "cover.replace": "ছবি বদলান",
+  "cover.remove": "ছবি সরান",
+  "cover.uploading": "আপলোড হচ্ছে…",
+  "cover.typeError": "JPEG, PNG বা WebP ছবি বেছে নিন।",
+  "cover.sizeError": "ছবি ১০ MB-এর নিচে রাখুন।",
+  "cover.uploadError": "ছবি আপলোড করা যায়নি",
+  "cover.removeError": "ছবি সরানো যায়নি",
+
   "editor.loading": "সিস্টেম লোড হচ্ছে",
   "editor.loadError": "এই সিস্টেম লোড করা যায়নি",
   "editor.notFound": "সিস্টেম পাওয়া যায়নি।",
@@ -113,8 +136,10 @@ export const bn: Record<MessageKey, string> = {
   "editor.publish": "প্রকাশ করুন",
   "editor.publishing": "প্রকাশ হচ্ছে…",
   "editor.published": "প্রকাশিত",
-  "editor.publishedToast": "সিস্টেমটি এখন ক্যাটালগে প্রকাশিত।",
+  "editor.publishedToast": "সিস্টেমটি এখন সবার ক্যাটালগে আছে।",
+  "editor.publishedPrivateToast": "সিস্টেমটি Fitraat Focus অ্যাপে ব্যবহারের জন্য তৈরি। ব্যক্তিগত থাকলে ক্যাটালগে দেখাবে না।",
   "editor.publishError": "প্রকাশ করা যায়নি",
+  "editor.visibility": "কে দেখতে পারবে",
   "editor.library": "লাইব্রেরি",
   "editor.details": "বিস্তারিত",
   "editor.purposeStory": "উদ্দেশ্য ও গল্প",
@@ -135,6 +160,7 @@ export const bn: Record<MessageKey, string> = {
   "insights.libraryHint": "বিভাগ ও কাজ",
   "insights.updated": "আপডেট",
   "insights.live": "ক্যাটালগে লাইভ",
+  "insights.privateLive": "অ্যাপে তৈরি, ক্যাটালগে নয়",
   "insights.draft": "এখনো খসড়া",
   "insights.libraryValue": "{sections} / {tasks}",
 
@@ -279,6 +305,25 @@ export const bn: Record<MessageKey, string> = {
   "landing.loop.reflect": "রিফ্লেক্ট",
   "landing.loop.reflectBody": "ফোকাস, শক্তি ও সন্তুষ্টি স্কোর করুন, যাতে পরের সেশন আরও ভালো হয়।",
 
+  "landing.showcase.title": "প্রকাশিত সিস্টেম কেমন দেখায়",
+  "landing.showcase.body":
+    "উদ্দেশ্য, নামধারী ক্রিয়েটর, সেকশন, আর শেষ করা যায় এমন টাস্ক। এই কার্ডগুলো ক্যাটালগের আকার দেখায়। লাইভ সিস্টেম খুলতে ও কপি নিতে ব্রাউজ করুন।",
+  "landing.sample.1.title": "বোর্ড পরীক্ষায় নব্বই দিন",
+  "landing.sample.1.purpose":
+    "কাছের পরীক্ষার লাইব্রেরি: কী পড়বেন, কী বাদ দেবেন, আর প্রতি সপ্তাহ কীভাবে শেষ করবেন — প্ল্যান আবার না গড়ে।",
+  "landing.sample.1.creator": "এন. রহমান",
+  "landing.sample.1.role": "পরীক্ষা কোচ",
+  "landing.sample.2.title": "আগে পোর্টফোলিও, তারপর সাক্ষাৎকার",
+  "landing.sample.2.purpose":
+    "যে কাজের পেছনে দাঁড়াতে পারেন তা শেষ করুন, তারপর সাক্ষাৎকারে যান একটি ক্রম নিয়ে — তাড়াহুড়ো নয়।",
+  "landing.sample.2.creator": "এ. করিম",
+  "landing.sample.2.role": "ক্যারিয়ার মেন্টর",
+  "landing.sample.3.title": "স্তূপ নয়, শেষ করে পড়ুন",
+  "landing.sample.3.purpose":
+    "বই শেষ করার পড়ার পদ্ধতি: ধরে রাখা, রিভিউ, আর সাপ্তাহিক ক্লোজ — যাতে না-পড়া স্তূপ না বাড়ে।",
+  "landing.sample.3.creator": "এস. আহমেদ",
+  "landing.sample.3.role": "অধ্যয়ন পদ্ধতি",
+
   "landing.catalog.title": "প্রকাশিত সিস্টেম",
   "landing.catalog.body":
     "একটি লাইব্রেরি খুলুন, উদ্দেশ্য পড়ুন, কে লিখেছে দেখুন। কপি নিতে বা নিজেরটি প্রকাশ করতেই সাইন ইন লাগে।",
@@ -286,6 +331,11 @@ export const bn: Record<MessageKey, string> = {
   "landing.catalog.error": "সিস্টেম লোড করা যায়নি",
   "landing.catalog.emptyTitle": "এখনো কোনো প্রকাশিত সিস্টেম নেই",
   "landing.catalog.emptyBody": "কোনো ক্রিয়েটর লাইব্রেরি প্রকাশ করলে এখানে দেখা যাবে।",
+  "catalog.back": "সব সিস্টেম",
+
+  "gif.library": "বিভাগগুলো একটি স্থির লাইব্রেরিতে জড়ো হচ্ছে",
+  "gif.plan": "একটি কাজ একটি দিনে স্থির হচ্ছে",
+  "gif.complete": "মনযোগের স্থির শিখা সম্পূর্ণতার চিহ্ন হয়ে উঠছে",
 
   "landing.faq.kicker": "প্রশ্নোত্তর",
   "landing.faq.title": "শুরুর আগে কিছু প্রশ্ন",

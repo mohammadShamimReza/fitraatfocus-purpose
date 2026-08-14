@@ -70,6 +70,21 @@ export function statusLabel(t: TranslateFn, value: string): string {
   return value;
 }
 
+export function visibilityLabel(t: TranslateFn, value: string): string {
+  if (value === "public") {
+    return t("visibility.public");
+  }
+
+  return t("visibility.private");
+}
+
+export function visibilitySelectItems(t: TranslateFn) {
+  return [
+    { value: "private", label: visibilityLabel(t, "private") },
+    { value: "public", label: visibilityLabel(t, "public") },
+  ];
+}
+
 export function navItemTitle(t: TranslateFn, id: string, fallback: string): string {
   switch (id) {
     case "systems":

@@ -83,7 +83,7 @@ export function NavUser() {
               </div>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem render={<Link to="/" />}>
+            <DropdownMenuItem render={<Link to="/systems" />}>
               <LayoutGrid />
               {t("nav.catalog")}
             </DropdownMenuItem>

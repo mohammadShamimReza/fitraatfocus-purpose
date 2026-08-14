@@ -13,6 +13,7 @@ import { Route as externalRouteRouteImport } from './routes/(external)/route'
 import { Route as externalIndexRouteImport } from './routes/(external)/index'
 import { Route as mainDashboardRouteRouteImport } from './routes/(main)/dashboard/route'
 import { Route as externalCreatorsCreatorIdRouteImport } from './routes/(external)/creators/$creatorId'
+import { Route as externalSystemsIndexRouteImport } from './routes/(external)/systems/index'
 import { Route as externalSystemsTemplateIdRouteImport } from './routes/(external)/systems/$templateId'
 import { Route as mainDashboardIndexRouteImport } from './routes/(main)/dashboard/index'
 import { Route as mainDashboardSplatRouteImport } from './routes/(main)/dashboard/$'
@@ -42,6 +43,11 @@ const externalCreatorsCreatorIdRoute =
     path: '/creators/$creatorId',
     getParentRoute: () => externalRouteRoute,
   } as any)
+const externalSystemsIndexRoute = externalSystemsIndexRouteImport.update({
+  id: '/systems/',
+  path: '/systems/',
+  getParentRoute: () => externalRouteRoute,
+} as any)
 const externalSystemsTemplateIdRoute =
   externalSystemsTemplateIdRouteImport.update({
     id: '/systems/$templateId',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/creators/$creatorId': typeof externalCreatorsCreatorIdRoute
   '/systems/$templateId': typeof externalSystemsTemplateIdRoute
   '/dashboard/$': typeof mainDashboardSplatRoute
+  '/systems/': typeof externalSystemsIndexRoute
   '/dashboard/': typeof mainDashboardIndexRoute
   '/auth/v1/login': typeof mainAuthV1LoginRouteRoute
   '/dashboard/systems/new': typeof mainDashboardSystemsNewRouteRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/creators/$creatorId': typeof externalCreatorsCreatorIdRoute
   '/systems/$templateId': typeof externalSystemsTemplateIdRoute
   '/dashboard/$': typeof mainDashboardSplatRoute
+  '/systems': typeof externalSystemsIndexRoute
   '/dashboard': typeof mainDashboardIndexRoute
   '/auth/v1/login': typeof mainAuthV1LoginRouteRoute
   '/dashboard/systems/new': typeof mainDashboardSystemsNewRouteRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/(external)/creators/$creatorId': typeof externalCreatorsCreatorIdRoute
   '/(external)/systems/$templateId': typeof externalSystemsTemplateIdRoute
   '/(main)/dashboard/$': typeof mainDashboardSplatRoute
+  '/(external)/systems/': typeof externalSystemsIndexRoute
   '/(main)/dashboard/': typeof mainDashboardIndexRoute
   '/(main)/auth/v1/login': typeof mainAuthV1LoginRouteRoute
   '/(main)/dashboard/systems/new': typeof mainDashboardSystemsNewRouteRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/creators/$creatorId'
     | '/systems/$templateId'
     | '/dashboard/$'
+    | '/systems/'
     | '/dashboard/'
     | '/auth/v1/login'
     | '/dashboard/systems/new'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/creators/$creatorId'
     | '/systems/$templateId'
     | '/dashboard/$'
+    | '/systems'
     | '/dashboard'
     | '/auth/v1/login'
     | '/dashboard/systems/new'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/(external)/creators/$creatorId'
     | '/(external)/systems/$templateId'
     | '/(main)/dashboard/$'
+    | '/(external)/systems/'
     | '/(main)/dashboard/'
     | '/(main)/auth/v1/login'
     | '/(main)/dashboard/systems/new'
@@ -204,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/creators/$creatorId'
       fullPath: '/creators/$creatorId'
       preLoaderRoute: typeof externalCreatorsCreatorIdRouteImport
+      parentRoute: typeof externalRouteRoute
+    }
+    '/(external)/systems/': {
+      id: '/(external)/systems/'
+      path: '/systems'
+      fullPath: '/systems/'
+      preLoaderRoute: typeof externalSystemsIndexRouteImport
       parentRoute: typeof externalRouteRoute
     }
     '/(external)/systems/$templateId': {
@@ -269,12 +288,14 @@ interface externalRouteRouteChildren {
   externalIndexRoute: typeof externalIndexRoute
   externalCreatorsCreatorIdRoute: typeof externalCreatorsCreatorIdRoute
   externalSystemsTemplateIdRoute: typeof externalSystemsTemplateIdRoute
+  externalSystemsIndexRoute: typeof externalSystemsIndexRoute
 }
 
 const externalRouteRouteChildren: externalRouteRouteChildren = {
   externalIndexRoute: externalIndexRoute,
   externalCreatorsCreatorIdRoute: externalCreatorsCreatorIdRoute,
   externalSystemsTemplateIdRoute: externalSystemsTemplateIdRoute,
+  externalSystemsIndexRoute: externalSystemsIndexRoute,
 }
 
 const externalRouteRouteWithChildren = externalRouteRoute._addFileChildren(

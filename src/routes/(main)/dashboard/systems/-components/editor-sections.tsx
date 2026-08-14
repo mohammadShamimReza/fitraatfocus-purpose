@@ -5,9 +5,10 @@ import { Plus, Trash2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { StudioGif } from "@/components/studio-gif";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -128,6 +129,9 @@ export function EditorSections({
         {sections.length === 0 && !isAdding ? (
           <Empty className="py-8">
             <EmptyHeader>
+              <EmptyMedia>
+                <StudioGif id="purpose-library" alt={t("gif.library")} size={120} />
+              </EmptyMedia>
               <EmptyTitle>{t("sections.emptyTitle")}</EmptyTitle>
               <EmptyDescription>{canEdit ? t("sections.emptyEdit") : t("sections.emptyView")}</EmptyDescription>
             </EmptyHeader>

@@ -23,6 +23,8 @@ export const updateTemplateSchema = z
     category: z.string().trim().min(1).optional(),
     tags: z.array(z.string().trim().min(1)).optional(),
     visibility: visibilitySchema.optional(),
+    imageUrl: z.string().trim().optional(),
+    storagePath: z.string().trim().optional(),
   })
   .refine((value) => Object.keys(value).length > 0, { message: "No fields to update." });
 

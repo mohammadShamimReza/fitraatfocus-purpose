@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -11,12 +11,22 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
+import { useAuth } from "@/lib/auth/auth-provider";
+import {
+  assertCoverFile,
+  coverExtension,
+  deleteStorageFile,
+  templateCoverPath,
+  uploadTemplateCover,
+} from "@/lib/firebase/storage";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categoryLabel, categorySelectItems } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";
 import { useUpdateTemplateMutation } from "@/query/templates";
 import type { PurposeTemplate } from "@/types/template";
+
+import { SystemCoverField } from "./system-cover-field";
 
 function createFormSchema(t: TranslateFn) {
   return z.object({
@@ -41,8 +51,10 @@ function createFormSchema(t: TranslateFn) {
 }
 
 export function EditorMetadataForm({ template, canEdit }: { template: PurposeTemplate; canEdit: boolean }) {
+  const { user } = useAuth();
   const { t } = useI18n();
   const updateTemplate = useUpdateTemplateMutation(template.id);
+  const [coverBusy, setCoverBusy] = useState(false);
   const formSchema = useMemo(() => createFormSchema(t), [t]);
   const categoryItems = categorySelectItems(t);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,6 +67,49 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
       category: template.category || "exam",
     },
   });
+
+  const onPickCover = async (file: File) => {
+    if (!user?.uid) {
+      return;
+    }
+
+    try {
+      assertCoverFile(file, { type: t("cover.typeError"), size: t("cover.sizeError") });
+      setCoverBusy(true);
+      const path = templateCoverPath(user.uid, template.id, coverExtension(file));
+      const imageUrl = await uploadTemplateCover(path, file);
+      const previousPath = template.storagePath;
+      await updateTemplate.mutateAsync({ imageUrl, storagePath: path });
+      if (previousPath && previousPath !== path) {
+        await deleteStorageFile(previousPath);
+      }
+    } catch (error) {
+      toast.add({
+        title: t("cover.uploadError"),
+        description: getFunctionsErrorMessage(error),
+      });
+    } finally {
+      setCoverBusy(false);
+    }
+  };
+
+  const onRemoveCover = async () => {
+    try {
+      setCoverBusy(true);
+      const previousPath = template.storagePath;
+      await updateTemplate.mutateAsync({ imageUrl: "", storagePath: "" });
+      if (previousPath) {
+        await deleteStorageFile(previousPath);
+      }
+    } catch (error) {
+      toast.add({
+        title: t("cover.removeError"),
+        description: getFunctionsErrorMessage(error),
+      });
+    } finally {
+      setCoverBusy(false);
+    }
+  };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -79,6 +134,7 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
           <CardDescription>{t("editor.purposeStoryHelp")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-5">
+          <SystemCoverField imageUrl={template.imageUrl} canEdit={false} />
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1.5">
               <h2 className="font-medium text-sm">{t("newSystem.titleLabel")}</h2>
@@ -119,6 +175,15 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
       <CardContent>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <FieldGroup>
+            <SystemCoverField
+              imageUrl={template.imageUrl}
+              canEdit
+              busy={coverBusy || updateTemplate.isPending}
+              onPick={(file) => {
+                void onPickCover(file);
+              }}
+              onRemove={template.imageUrl ? () => void onRemoveCover() : undefined}
+            />
             <div className="grid gap-4 md:grid-cols-2">
               <Controller
                 control={form.control}

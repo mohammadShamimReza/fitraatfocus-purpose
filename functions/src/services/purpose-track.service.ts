@@ -1,3 +1,5 @@
+import { FieldValue } from "firebase-admin/firestore";
+
 import { collections, db } from "../config/admin";
 import { nowIso, purposeTrackDocId } from "../lib/ids";
 import {
@@ -24,6 +26,9 @@ function asTrack(id: string, data: Record<string, unknown>): PurposeTrack {
     creatorName: String(data.creatorName ?? ""),
     pulledAt: String(data.pulledAt ?? nowIso()),
     updatedAt: String(data.updatedAt ?? nowIso()),
+    ...(typeof data.imageUrl === "string" && data.imageUrl.trim()
+      ? { imageUrl: data.imageUrl.trim() }
+      : {}),
     sections: Array.isArray(data.sections) ? (data.sections as PurposeTrackSection[]) : [],
     tasks: Array.isArray(data.tasks) ? (data.tasks as PurposeTrackTask[]) : [],
     doneCount: Number(data.doneCount ?? 0),
@@ -45,6 +50,7 @@ function buildTrack(ownerUid: string, template: PurposeTemplateDetail): PurposeT
     creatorName: template.creatorName,
     pulledAt,
     updatedAt: pulledAt,
+    ...(template.imageUrl ? { imageUrl: template.imageUrl } : {}),
     sections: template.sections.map((section) => ({ ...section })),
     tasks: copyTasksFromTemplate(template.tasks),
     doneCount: 0,
@@ -64,4 +70,25 @@ export async function ensurePurposeTrack(ownerUid: string, template: PurposeTemp
     tx.set(ref, track);
     return track;
   });
+}
+
+export async function syncTrackCovers(sourceTemplateId: string, imageUrl?: string): Promise<void> {
+  const snapshot = await tracks.where("sourceTemplateId", "==", sourceTemplateId).get();
+  if (snapshot.empty) {
+    return;
+  }
+
+  const url = imageUrl?.trim() ?? "";
+  const docs = snapshot.docs;
+  for (let i = 0; i < docs.length; i += 450) {
+    const batch = db.batch();
+    for (const doc of docs.slice(i, i + 450)) {
+      if (url) {
+        batch.update(doc.ref, { imageUrl: url });
+      } else {
+        batch.update(doc.ref, { imageUrl: FieldValue.delete() });
+      }
+    }
+    await batch.commit();
+  }
 }

@@ -34,7 +34,7 @@ export function LandingGetApp() {
               <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">{t("landing.cta.body")}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button size="lg" nativeButton={false} render={<Link to="/" hash="systems" />}>
+              <Button size="lg" nativeButton={false} render={<Link to="/systems" />}>
                 {t("landing.hero.browse")}
               </Button>
               <Button size="lg" nativeButton={false} variant="outline" render={createLink}>

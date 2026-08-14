@@ -33,7 +33,13 @@ export function OwnerInsights({ template }: { template: PurposeTemplateDetail })
         icon={ListTodo}
         label={t("insights.updated")}
         value={formatUpdatedAt(template.updatedAt, locale)}
-        hint={template.status === "published" ? t("insights.live") : t("insights.draft")}
+        hint={
+          template.status === "published"
+            ? template.visibility === "public"
+              ? t("insights.live")
+              : t("insights.privateLive")
+            : t("insights.draft")
+        }
       />
     </div>
   );

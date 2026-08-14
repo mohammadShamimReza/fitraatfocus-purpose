@@ -46,6 +46,8 @@ export type PurposeTemplate = {
   downloaderUids: string[];
   createdAt: string;
   updatedAt: string;
+  imageUrl?: string;
+  storagePath?: string;
 };
 
 export type PurposeTemplateDetail = PurposeTemplate & {
@@ -81,7 +83,10 @@ export type CreateTemplateInput = {
 };
 
 export type UpdateTemplateInput = Partial<
-  Pick<PurposeTemplate, "title" | "purpose" | "story" | "description" | "category" | "tags" | "visibility">
+  Pick<
+    PurposeTemplate,
+    "title" | "purpose" | "story" | "description" | "category" | "tags" | "visibility" | "imageUrl" | "storagePath"
+  >
 >;
 
 export type CreateSectionInput = {
@@ -125,11 +130,13 @@ export function toSummary(template: PurposeTemplateDetail): PurposeTemplate {
     downloaderUids: template.downloaderUids,
     createdAt: template.createdAt,
     updatedAt: template.updatedAt,
+    ...(template.imageUrl ? { imageUrl: template.imageUrl } : {}),
+    ...(template.storagePath ? { storagePath: template.storagePath } : {}),
   };
 }
 
 export function isPublicTemplate(template: PurposeTemplateDetail): boolean {
-  return template.status === "published" && template.visibility !== "private";
+  return template.status === "published" && template.visibility === "public";
 }
 
 export function canViewTemplate(template: PurposeTemplateDetail, uid: string | undefined): boolean {

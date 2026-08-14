@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { useI18n } from "@/lib/i18n/i18n-provider";
 import { getExpertiseLabel } from "@/lib/profiles/options";
 import { getInitials } from "@/lib/utils";
 import { useProfileQuery } from "@/query/profiles";
@@ -16,6 +17,7 @@ import { useCreatorTemplatesQuery } from "@/query/templates";
 import { TemplateCard } from "../../-components/template-card";
 
 export function PublicCreatorView({ creatorId }: { creatorId: string }) {
+  const { t } = useI18n();
   const profileQuery = useProfileQuery(creatorId, true);
   const templatesQuery = useCreatorTemplatesQuery(creatorId, true);
 
@@ -35,8 +37,8 @@ export function PublicCreatorView({ creatorId }: { creatorId: string }) {
         <AlertTitle>Could not load this creator</AlertTitle>
         <AlertDescription className="flex flex-col gap-3">
           <p>{profileQuery.error ? getFunctionsErrorMessage(profileQuery.error) : "Creator not found."}</p>
-          <Button nativeButton={false} variant="ghost" size="sm" render={<Link to="/" />}>
-            Back to systems
+          <Button nativeButton={false} variant="ghost" size="sm" render={<Link to="/systems" />}>
+            {t("catalog.back")}
           </Button>
         </AlertDescription>
       </Alert>
@@ -48,9 +50,9 @@ export function PublicCreatorView({ creatorId }: { creatorId: string }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/" />}>
+      <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
         <ArrowLeft data-icon="inline-start" />
-        All systems
+        {t("catalog.back")}
       </Button>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">

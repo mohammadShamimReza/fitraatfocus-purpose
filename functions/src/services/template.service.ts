@@ -21,7 +21,7 @@ import {
   withCounts,
 } from "../models/template.model";
 import { getCatalogCreator, getOrCreateMyProfile } from "./profile.service";
-import { ensurePurposeTrack } from "./purpose-track.service";
+import { ensurePurposeTrack, syncTrackCovers } from "./purpose-track.service";
 
 const templates = db.collection(collections.templates);
 
@@ -46,6 +46,12 @@ function asTemplate(id: string, data: Record<string, unknown>): PurposeTemplateD
     downloaderUids: Array.isArray(data.downloaderUids) ? data.downloaderUids.map(String) : [],
     createdAt: String(data.createdAt ?? nowIso()),
     updatedAt: String(data.updatedAt ?? nowIso()),
+    ...(typeof data.imageUrl === "string" && data.imageUrl.trim()
+      ? { imageUrl: data.imageUrl.trim() }
+      : {}),
+    ...(typeof data.storagePath === "string" && data.storagePath.trim()
+      ? { storagePath: data.storagePath.trim() }
+      : {}),
     sections: Array.isArray(data.sections) ? (data.sections as TemplateSection[]) : [],
     tasks: Array.isArray(data.tasks) ? (data.tasks as TemplateTask[]) : [],
   };
@@ -144,7 +150,7 @@ export async function createTemplate(user: AuthUser, input: CreateTemplateInput)
     creatorUid: user.uid,
     creatorName: profile.displayName,
     status: "draft",
-    visibility: input.visibility ?? "public",
+    visibility: input.visibility ?? "private",
     access: input.access ?? "free",
     sectionCount: 0,
     taskCount: 0,
@@ -166,12 +172,23 @@ export async function updateTemplate(
   input: UpdateTemplateInput,
 ): Promise<PurposeTemplate> {
   const current = await requireOwned(templateId, uid);
-  return toSummary(await saveTemplate({ ...current, ...input }));
+  const next: PurposeTemplateDetail = { ...current, ...input };
+  if (input.imageUrl !== undefined && !input.imageUrl.trim()) {
+    delete next.imageUrl;
+  }
+  if (input.storagePath !== undefined && !input.storagePath.trim()) {
+    delete next.storagePath;
+  }
+  const saved = await saveTemplate(next);
+  if (input.imageUrl !== undefined) {
+    await syncTrackCovers(templateId, saved.imageUrl);
+  }
+  return toSummary(saved);
 }
 
 export async function publishTemplate(uid: string, templateId: string): Promise<PurposeTemplate> {
   const current = await requireOwned(templateId, uid);
-  return toSummary(await saveTemplate({ ...current, status: "published", visibility: "public" }));
+  return toSummary(await saveTemplate({ ...current, status: "published" }));
 }
 
 export async function downloadTemplate(uid: string, templateId: string): Promise<PurposeTemplate> {

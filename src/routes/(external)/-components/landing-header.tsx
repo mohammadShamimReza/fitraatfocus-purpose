@@ -23,7 +23,7 @@ export function LandingHeader() {
           <Button nativeButton={false} size="sm" variant="ghost" render={<Link to="/" hash="how" />}>
             {t("landing.nav.how")}
           </Button>
-          <Button nativeButton={false} size="sm" variant="ghost" render={<Link to="/" hash="systems" />}>
+          <Button nativeButton={false} size="sm" variant="ghost" render={<Link to="/systems" />}>
             {t("landing.nav.browse")}
           </Button>
           <Button nativeButton={false} size="sm" variant="ghost" render={<Link to="/" hash="app" />}>

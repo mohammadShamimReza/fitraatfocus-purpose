@@ -20,7 +20,7 @@ export function LandingFooter() {
           <Link to="/" hash="how" className="transition-colors hover:text-foreground">
             {t("landing.nav.how")}
           </Link>
-          <Link to="/" hash="systems" className="transition-colors hover:text-foreground">
+          <Link to="/systems" className="transition-colors hover:text-foreground">
             {t("landing.nav.systems")}
           </Link>
           <Link to="/" hash="app" className="transition-colors hover:text-foreground">

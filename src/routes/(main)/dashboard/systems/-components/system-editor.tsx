@@ -7,16 +7,17 @@ import { ArrowLeft, CircleAlert, Layers, ListTodo } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
-import { categoryLabel, statusLabel } from "@/lib/i18n/labels";
+import { categoryLabel, statusLabel, visibilityLabel, visibilitySelectItems } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";
-import { usePublishTemplateMutation, useTemplateQuery } from "@/query/templates";
-import type { TemplateStatus } from "@/types/template";
+import { usePublishTemplateMutation, useTemplateQuery, useUpdateTemplateMutation } from "@/query/templates";
+import type { TemplateStatus, TemplateVisibility } from "@/types/template";
 
 import { EditorMetadataForm } from "./editor-metadata-form";
 import { EditorSections } from "./editor-sections";
@@ -40,7 +41,9 @@ export function SystemEditor({ templateId }: { templateId: string }) {
   const { t } = useI18n();
   const query = useTemplateQuery(templateId, isReady);
   const publish = usePublishTemplateMutation(templateId);
+  const updateTemplate = useUpdateTemplateMutation(templateId);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const visibilityItems = visibilitySelectItems(t);
 
   const sections = useMemo(() => {
     return [...(query.data?.sections ?? [])].sort((left, right) => left.order - right.order);
@@ -67,14 +70,30 @@ export function SystemEditor({ templateId }: { templateId: string }) {
 
   const onPublish = async () => {
     try {
-      await publish.mutateAsync();
+      const next = await publish.mutateAsync();
       toast.add({
         title: t("editor.published"),
-        description: t("editor.publishedToast"),
+        description:
+          next.visibility === "public" ? t("editor.publishedToast") : t("editor.publishedPrivateToast"),
       });
     } catch (error) {
       toast.add({
         title: t("editor.publishError"),
+        description: getFunctionsErrorMessage(error),
+      });
+    }
+  };
+
+  const onVisibilityChange = async (visibility: TemplateVisibility) => {
+    try {
+      await updateTemplate.mutateAsync({ visibility });
+      toast.add({
+        title: t("visibility.saved"),
+        description: visibility === "public" ? t("visibility.savedPublic") : t("visibility.savedPrivate"),
+      });
+    } catch (error) {
+      toast.add({
+        title: t("visibility.error"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -129,11 +148,19 @@ export function SystemEditor({ templateId }: { templateId: string }) {
         </Button>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
+            {template.imageUrl ? (
+              <img
+                src={template.imageUrl}
+                alt={template.title || t("cover.alt")}
+                className="aspect-[16/9] w-full max-w-xl rounded-xl border object-cover"
+              />
+            ) : null}
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline">{categoryLabel(t, template.category)}</Badge>
               <Badge variant={template.status === "published" ? "default" : "secondary"}>
                 {statusLabel(t, template.status)}
               </Badge>
+              <Badge variant="outline">{visibilityLabel(t, template.visibility)}</Badge>
             </div>
             <h1 className="text-3xl tracking-tight">{template.title || t("systems.untitled")}</h1>
             <p className="max-w-2xl text-muted-foreground text-sm">
@@ -163,14 +190,39 @@ export function SystemEditor({ templateId }: { templateId: string }) {
             </div>
           </div>
           {canEdit ? (
-            <Button
-              disabled={template.status === "published" || publish.isPending}
-              onClick={() => {
-                void onPublish();
-              }}
-            >
-              {getPublishLabel(template.status, publish.isPending, t)}
-            </Button>
+            <div className="flex w-full max-w-xs flex-col gap-2">
+              <p className="text-muted-foreground text-xs">{t("editor.visibility")}</p>
+              <Select
+                value={template.visibility === "public" ? "public" : "private"}
+                onValueChange={(value) => {
+                  void onVisibilityChange(value === "public" ? "public" : "private");
+                }}
+                items={visibilityItems}
+                disabled={updateTemplate.isPending}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {visibilityItems.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <p className="text-muted-foreground text-xs">{t("visibility.help")}</p>
+              <Button
+                disabled={template.status === "published" || publish.isPending}
+                onClick={() => {
+                  void onPublish();
+                }}
+              >
+                {getPublishLabel(template.status, publish.isPending, t)}
+              </Button>
+            </div>
           ) : null}
         </div>
       </div>

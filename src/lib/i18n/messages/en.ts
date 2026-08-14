@@ -10,6 +10,10 @@ export const en = {
   "search.label": "Search",
   "search.placeholder": "Search systems…",
   "search.empty": "No results found.",
+  "search.titlePlaceholder": "Search by title…",
+  "search.category": "Category",
+  "search.categoryAll": "All categories",
+  "search.statusAll": "All statuses",
 
   "common.tryAgain": "Try again",
   "common.cancel": "Cancel",
@@ -22,6 +26,13 @@ export const en = {
 
   "status.draft": "draft",
   "status.published": "published",
+  "visibility.public": "Public",
+  "visibility.private": "Private",
+  "visibility.help": "Public appears in the catalog. Private stays on your account and in the Fitraat Focus app.",
+  "visibility.saved": "Visibility updated",
+  "visibility.savedPublic": "This system is in the public catalog.",
+  "visibility.savedPrivate": "Only you can see this system, including in the Fitraat Focus app.",
+  "visibility.error": "Could not update visibility",
 
   "category.exam": "Exam",
   "category.career": "Career",
@@ -61,7 +72,7 @@ export const en = {
   "auth.firebaseHelp": "Copy .env.example to .env and add the shared Fitraat Focus Firebase values.",
 
   "systems.title": "My systems",
-  "systems.lead": "Write the library. Publish it to the catalog. Track how many people download it.",
+  "systems.lead": "Write the library. Keep it private for the Fitraat Focus app, or make it public in the catalog.",
   "systems.loading": "Loading your systems",
   "systems.loadError": "Could not load your systems",
   "systems.emptyTitle": "Start with one purpose",
@@ -103,6 +114,18 @@ export const en = {
   "newSystem.createError": "Could not create the system",
   "newSystem.createMissing": "The system could not be created.",
 
+  "cover.label": "Cover image",
+  "cover.help": "A still image for the catalog and the Fitraat Focus app. JPEG, PNG, or WebP, up to 10 MB.",
+  "cover.alt": "System cover",
+  "cover.add": "Add image",
+  "cover.replace": "Replace image",
+  "cover.remove": "Remove image",
+  "cover.uploading": "Uploading…",
+  "cover.typeError": "Choose a JPEG, PNG, or WebP image.",
+  "cover.sizeError": "Keep the image under 10 MB.",
+  "cover.uploadError": "Could not upload the image",
+  "cover.removeError": "Could not remove the image",
+
   "editor.loading": "Loading the system",
   "editor.loadError": "Could not load this system",
   "editor.notFound": "The system was not found.",
@@ -111,8 +134,10 @@ export const en = {
   "editor.publish": "Publish",
   "editor.publishing": "Publishing…",
   "editor.published": "Published",
-  "editor.publishedToast": "This system is now published in the catalog.",
+  "editor.publishedToast": "This system is now in the public catalog.",
+  "editor.publishedPrivateToast": "This system is ready in the Fitraat Focus app. It stays off the catalog while it is private.",
   "editor.publishError": "Could not publish",
+  "editor.visibility": "Who can see this",
   "editor.library": "Library",
   "editor.details": "Details",
   "editor.purposeStory": "Purpose and story",
@@ -133,6 +158,7 @@ export const en = {
   "insights.libraryHint": "Sections and tasks",
   "insights.updated": "Updated",
   "insights.live": "Live on the catalog",
+  "insights.privateLive": "Ready in your app, not on the catalog",
   "insights.draft": "Still a draft",
   "insights.libraryValue": "{sections} / {tasks}",
 
@@ -277,6 +303,25 @@ export const en = {
   "landing.loop.reflect": "Reflect",
   "landing.loop.reflectBody": "Score focus, energy, and satisfaction so the next session is a little better.",
 
+  "landing.showcase.title": "What a published system looks like",
+  "landing.showcase.body":
+    "Purpose, a named creator, sections, and finishable tasks. These cards show the catalog shape. Browse to open the live systems and take a copy.",
+  "landing.sample.1.title": "Ninety days to a board exam",
+  "landing.sample.1.purpose":
+    "A close-range exam library: what to study, what to drop, and how to close each week without rebuilding the plan.",
+  "landing.sample.1.creator": "N. Rahman",
+  "landing.sample.1.role": "Exam coach",
+  "landing.sample.2.title": "Portfolio first, then interviews",
+  "landing.sample.2.purpose":
+    "Ship a body of work you can stand behind, then walk into interviews with a sequence instead of a scramble.",
+  "landing.sample.2.creator": "A. Karim",
+  "landing.sample.2.role": "Career mentor",
+  "landing.sample.3.title": "Read with a close, not a pile",
+  "landing.sample.3.purpose":
+    "A reading method that finishes books: capture, review, and a weekly close so unread stacks stop growing.",
+  "landing.sample.3.creator": "S. Ahmed",
+  "landing.sample.3.role": "Study method",
+
   "landing.catalog.title": "Published systems",
   "landing.catalog.body":
     "Open a library, read the purpose, and see who wrote it. Sign in only if you want to take a copy or publish your own.",
@@ -284,6 +329,11 @@ export const en = {
   "landing.catalog.error": "Could not load systems",
   "landing.catalog.emptyTitle": "No published systems yet",
   "landing.catalog.emptyBody": "When a creator publishes a library, it will show up here.",
+  "catalog.back": "All systems",
+
+  "gif.library": "Sections gathering into a still library",
+  "gif.plan": "A task settling onto a day",
+  "gif.complete": "A still flame of attention becoming a mark of completion",
 
   "landing.faq.kicker": "FAQ",
   "landing.faq.title": "Questions before you begin",

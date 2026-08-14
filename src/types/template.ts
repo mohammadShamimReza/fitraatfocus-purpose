@@ -46,6 +46,8 @@ export type PurposeTemplate = {
   downloaderUids: string[];
   createdAt: string;
   updatedAt: string;
+  imageUrl?: string;
+  storagePath?: string;
 };
 
 export type PurposeTemplateDetail = PurposeTemplate & {
@@ -81,7 +83,10 @@ export type CreateTemplateInput = {
 };
 
 export type UpdateTemplateInput = Partial<
-  Pick<PurposeTemplate, "title" | "purpose" | "story" | "description" | "category" | "tags" | "visibility">
+  Pick<
+    PurposeTemplate,
+    "title" | "purpose" | "story" | "description" | "category" | "tags" | "visibility" | "imageUrl" | "storagePath"
+  >
 >;
 
 export type CreateSectionInput = {

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
@@ -13,11 +13,21 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
+import { useAuth } from "@/lib/auth/auth-provider";
+import {
+  assertCoverFile,
+  coverExtension,
+  templateCoverPath,
+  uploadTemplateCover,
+} from "@/lib/firebase/storage";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { updateTemplate } from "@/lib/functions/templates";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categorySelectItems } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";
 import { useCreateTemplateMutation } from "@/query/templates";
+
+import { SystemCoverField } from "./system-cover-field";
 
 function createFormSchema(t: TranslateFn) {
   return z.object({
@@ -43,8 +53,12 @@ function createFormSchema(t: TranslateFn) {
 
 export function CreateSystemForm() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { t } = useI18n();
   const createTemplate = useCreateTemplateMutation();
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverBusy, setCoverBusy] = useState(false);
+  const coverPreview = useMemo(() => (coverFile ? URL.createObjectURL(coverFile) : ""), [coverFile]);
   const formSchema = useMemo(() => createFormSchema(t), [t]);
   const categoryItems = categorySelectItems(t);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -58,12 +72,37 @@ export function CreateSystemForm() {
     },
   });
 
+  useEffect(() => {
+    return () => {
+      if (coverPreview) {
+        URL.revokeObjectURL(coverPreview);
+      }
+    };
+  }, [coverPreview]);
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       const created = await createTemplate.mutateAsync(data);
 
       if (!created?.id) {
         throw new Error(t("newSystem.createMissing"));
+      }
+
+      if (coverFile && user?.uid) {
+        setCoverBusy(true);
+        try {
+          assertCoverFile(coverFile, { type: t("cover.typeError"), size: t("cover.sizeError") });
+          const path = templateCoverPath(user.uid, created.id, coverExtension(coverFile));
+          const imageUrl = await uploadTemplateCover(path, coverFile);
+          await updateTemplate(created.id, { imageUrl, storagePath: path });
+        } catch (error) {
+          toast.add({
+            title: t("cover.uploadError"),
+            description: getFunctionsErrorMessage(error),
+          });
+        } finally {
+          setCoverBusy(false);
+        }
       }
 
       await navigate({ to: "/dashboard/systems/$templateId", params: { templateId: created.id } });
@@ -80,6 +119,23 @@ export function CreateSystemForm() {
       <CardContent>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
           <FieldGroup>
+            <SystemCoverField
+              imageUrl={coverPreview}
+              canEdit
+              busy={coverBusy || createTemplate.isPending}
+              onPick={(file) => {
+                try {
+                  assertCoverFile(file, { type: t("cover.typeError"), size: t("cover.sizeError") });
+                  setCoverFile(file);
+                } catch (error) {
+                  toast.add({
+                    title: t("cover.uploadError"),
+                    description: error instanceof Error ? error.message : t("cover.typeError"),
+                  });
+                }
+              }}
+              onRemove={coverFile ? () => setCoverFile(null) : undefined}
+            />
             <Controller
               control={form.control}
               name="title"
@@ -153,8 +209,8 @@ export function CreateSystemForm() {
             />
           </FieldGroup>
           <div className="flex items-center justify-end gap-2 border-t pt-4">
-            <Button type="submit" disabled={createTemplate.isPending}>
-              {createTemplate.isPending ? t("newSystem.creating") : t("newSystem.continue")}
+            <Button type="submit" disabled={createTemplate.isPending || coverBusy}>
+              {createTemplate.isPending || coverBusy ? t("newSystem.creating") : t("newSystem.continue")}
             </Button>
           </div>
         </form>

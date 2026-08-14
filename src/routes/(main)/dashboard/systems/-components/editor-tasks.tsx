@@ -5,10 +5,11 @@ import { Clock, Plus, Trash2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { StudioGif } from "@/components/studio-gif";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -247,6 +248,9 @@ export function EditorTasks({
         {section && tasks.length === 0 && !isAdding ? (
           <Empty className="min-h-56">
             <EmptyHeader>
+              <EmptyMedia>
+                <StudioGif id="purpose-plan" alt={t("gif.plan")} size={120} />
+              </EmptyMedia>
               <EmptyTitle>{t("tasks.emptyTitle")}</EmptyTitle>
               <EmptyDescription>{canEdit ? t("tasks.emptyEdit") : t("tasks.emptyView")}</EmptyDescription>
             </EmptyHeader>

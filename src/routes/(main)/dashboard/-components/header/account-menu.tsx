@@ -52,7 +52,7 @@ export function AccountMenu() {
           <span className="truncate font-semibold">{name}</span>
           {email ? <span className="truncate text-muted-foreground text-xs">{email}</span> : null}
         </div>
-        <DropdownMenuItem render={<Link to="/" />}>
+        <DropdownMenuItem render={<Link to="/systems" />}>
           <LayoutGrid />
           {t("nav.catalog")}
         </DropdownMenuItem>

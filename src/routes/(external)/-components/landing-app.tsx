@@ -1,3 +1,4 @@
+import { StudioGif } from "@/components/studio-gif";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import type { MessageKey } from "@/lib/i18n/messages/en";
 
@@ -9,12 +10,15 @@ export function LandingApp() {
   return (
     <section id="app" className="scroll-mt-20 border-y bg-muted/35">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20">
-        <LandingReveal className="max-w-2xl space-y-3">
-          <LandingKicker>{t("landing.loop.kicker")}</LandingKicker>
-          <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">{t("landing.loop.title")}</h2>
-          <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
-            {t("landing.loop.body")}
-          </p>
+        <LandingReveal className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-2xl space-y-3">
+            <LandingKicker>{t("landing.loop.kicker")}</LandingKicker>
+            <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">{t("landing.loop.title")}</h2>
+            <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
+              {t("landing.loop.body")}
+            </p>
+          </div>
+          <StudioGif id="purpose-plan" alt={t("gif.plan")} size={140} className="self-start sm:self-center" />
         </LandingReveal>
 
         <ol className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">

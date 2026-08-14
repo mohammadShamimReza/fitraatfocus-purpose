@@ -1,3 +1,4 @@
+import { StudioGif } from "@/components/studio-gif";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import type { MessageKey } from "@/lib/i18n/messages/en";
@@ -10,15 +11,18 @@ export function LandingProblem() {
 
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20">
-      <LandingReveal className="max-w-2xl space-y-3">
-        <LandingKicker>{t("landing.problem.kicker")}</LandingKicker>
-        <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">
-          {t("landing.problem.title")}
-          <span className="mt-1 block text-muted-foreground">{t("landing.problem.titleAccent")}</span>
-        </h2>
-        <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
-          {t("landing.problem.body")}
-        </p>
+      <LandingReveal className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-2xl space-y-3">
+          <LandingKicker>{t("landing.problem.kicker")}</LandingKicker>
+          <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">
+            {t("landing.problem.title")}
+            <span className="mt-1 block text-muted-foreground">{t("landing.problem.titleAccent")}</span>
+          </h2>
+          <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
+            {t("landing.problem.body")}
+          </p>
+        </div>
+        <StudioGif id="purpose-complete" alt={t("gif.complete")} size={140} className="self-start sm:self-center" />
       </LandingReveal>
       <div className="grid gap-3 sm:grid-cols-2">
         {PROBLEMS.map((item, index) => (
