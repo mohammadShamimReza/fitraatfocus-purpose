@@ -37,7 +37,9 @@ async function readLegacyExtras(uid: string): Promise<CreatorExtras | undefined>
     return undefined;
   }
 
-  const extras = extrasFromUnknown((snapshot.data() ?? {}) as Record<string, unknown>);
+  const extras = extrasFromUnknown(
+    (snapshot.data() ?? {}) as Record<string, unknown>,
+  );
   return extrasAreEmpty(extras) ? undefined : extras;
 }
 
@@ -75,7 +77,12 @@ async function findProfile(uid: string): Promise<CreatorProfile | undefined> {
   return userDocToCreatorProfile(uid, adopted.data, adopted.extras);
 }
 
-function buildAppUserDoc(uid: string, displayName: string, email: string, photoURL: string): Record<string, unknown> {
+function buildAppUserDoc(
+  uid: string,
+  displayName: string,
+  email: string,
+  photoURL: string,
+): Record<string, unknown> {
   const now = Date.now();
   const name = displayName.trim() || email.split("@")[0] || "User";
 
@@ -112,7 +119,10 @@ export async function getOrCreateMyProfile(
     return existing;
   }
 
-  await users.doc(uid).set(buildAppUserDoc(uid, displayName, email, avatarUrl), { merge: true });
+  await users.doc(uid).set(
+    buildAppUserDoc(uid, displayName, email, avatarUrl),
+    { merge: true },
+  );
   const created = await findProfile(uid);
   if (!created) {
     throw notFound("Creator not found.");
@@ -121,7 +131,10 @@ export async function getOrCreateMyProfile(
   return created;
 }
 
-export async function updateMyProfile(uid: string, input: UpdateProfileInput): Promise<CreatorProfile> {
+export async function updateMyProfile(
+  uid: string,
+  input: UpdateProfileInput,
+): Promise<CreatorProfile> {
   const current = await users.doc(uid).get();
   if (!current.exists) {
     throw notFound("Creator not found.");
@@ -146,7 +159,10 @@ export async function updateMyProfile(uid: string, input: UpdateProfileInput): P
 
   await users.doc(uid).set(patch, { merge: true });
 
-  const owned = await db.collection(collections.templates).where("creatorUid", "==", uid).get();
+  const owned = await db
+    .collection(collections.templates)
+    .where("creatorUid", "==", uid)
+    .get();
   const batch = db.batch();
   let writes = 0;
   for (const doc of owned.docs) {
@@ -163,7 +179,10 @@ export async function updateMyProfile(uid: string, input: UpdateProfileInput): P
   return userDocToCreatorProfile(uid, asUserData(snapshot), extras);
 }
 
-export async function getCatalogCreator(uid: string, fallbackName: string): Promise<CatalogCreator> {
+export async function getCatalogCreator(
+  uid: string,
+  fallbackName: string,
+): Promise<CatalogCreator> {
   const profile = await findProfile(uid);
   return toCatalogCreator(profile, uid, fallbackName);
 }

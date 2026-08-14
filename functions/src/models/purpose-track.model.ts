@@ -1,4 +1,8 @@
-import type { TemplateSection, TemplateTask, TaskPriority } from "./template.model";
+import type {
+  TemplateSection,
+  TemplateTask,
+  TaskPriority,
+} from "./template.model";
 
 export type PurposeTrackTaskStatus = "open" | "done";
 
@@ -28,7 +32,9 @@ export type PurposeTrack = {
   taskCount: number;
 };
 
-export function copyTasksFromTemplate(tasks: TemplateTask[]): PurposeTrackTask[] {
+export function copyTasksFromTemplate(
+  tasks: TemplateTask[],
+): PurposeTrackTask[] {
   return tasks.map((task) => ({
     ...task,
     status: "open" as const,

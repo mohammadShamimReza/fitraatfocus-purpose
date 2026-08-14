@@ -32,7 +32,10 @@ export type CreatorExtras = {
 };
 
 export function extrasFromUnknown(value: unknown): CreatorExtras {
-  const data = value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+  const data =
+    value && typeof value === "object" && !Array.isArray(value) ?
+      (value as Record<string, unknown>) :
+      {};
 
   return {
     headline: String(data.headline ?? ""),
@@ -80,7 +83,8 @@ export function toCatalogCreator(
   uid: string,
   fallbackName: string,
 ): CatalogCreator {
-  const displayName = profile?.displayName?.trim() || fallbackName.trim() || "Creator";
+  const displayName =
+    profile?.displayName?.trim() || fallbackName.trim() || "Creator";
 
   return {
     uid,

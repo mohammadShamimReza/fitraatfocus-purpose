@@ -26,11 +26,15 @@ function asTrack(id: string, data: Record<string, unknown>): PurposeTrack {
     creatorName: String(data.creatorName ?? ""),
     pulledAt: String(data.pulledAt ?? nowIso()),
     updatedAt: String(data.updatedAt ?? nowIso()),
-    ...(typeof data.imageUrl === "string" && data.imageUrl.trim()
-      ? { imageUrl: data.imageUrl.trim() }
-      : {}),
-    sections: Array.isArray(data.sections) ? (data.sections as PurposeTrackSection[]) : [],
-    tasks: Array.isArray(data.tasks) ? (data.tasks as PurposeTrackTask[]) : [],
+    ...(typeof data.imageUrl === "string" && data.imageUrl.trim() ?
+      { imageUrl: data.imageUrl.trim() } :
+      {}),
+    sections: Array.isArray(data.sections) ?
+      (data.sections as PurposeTrackSection[]) :
+      [],
+    tasks: Array.isArray(data.tasks) ?
+      (data.tasks as PurposeTrackTask[]) :
+      [],
     doneCount: Number(data.doneCount ?? 0),
     taskCount: Number(data.taskCount ?? 0),
   });
@@ -58,12 +62,18 @@ function buildTrack(ownerUid: string, template: PurposeTemplateDetail): PurposeT
   });
 }
 
-export async function ensurePurposeTrack(ownerUid: string, template: PurposeTemplateDetail): Promise<PurposeTrack> {
+export async function ensurePurposeTrack(
+  ownerUid: string,
+  template: PurposeTemplateDetail,
+): Promise<PurposeTrack> {
   const ref = tracks.doc(purposeTrackDocId(ownerUid, template.id));
   return db.runTransaction(async (tx) => {
     const snapshot = await tx.get(ref);
     if (snapshot.exists) {
-      return asTrack(snapshot.id, (snapshot.data() ?? {}) as Record<string, unknown>);
+      return asTrack(
+        snapshot.id,
+        (snapshot.data() ?? {}) as Record<string, unknown>,
+      );
     }
 
     const track = buildTrack(ownerUid, template);
@@ -72,8 +82,13 @@ export async function ensurePurposeTrack(ownerUid: string, template: PurposeTemp
   });
 }
 
-export async function syncTrackCovers(sourceTemplateId: string, imageUrl?: string): Promise<void> {
-  const snapshot = await tracks.where("sourceTemplateId", "==", sourceTemplateId).get();
+export async function syncTrackCovers(
+  sourceTemplateId: string,
+  imageUrl?: string,
+): Promise<void> {
+  const snapshot = await tracks
+    .where("sourceTemplateId", "==", sourceTemplateId)
+    .get();
   if (snapshot.empty) {
     return;
   }

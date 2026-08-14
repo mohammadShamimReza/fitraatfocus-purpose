@@ -13,7 +13,7 @@ export const APP_LINKS = {
 
 export const APP_CONFIG = {
   name: "Fitraat Focus",
-  version: "0.1.0",
+  version: "1.0.0",
   copyright: `© ${currentYear}, Fitraat Focus. Built for consistency, clarity, and meaningful work.`,
   meta: {
     title: "Fitraat Focus — Purpose System Studio",

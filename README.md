@@ -1,49 +1,53 @@
 # Fitraat Focus — Purpose System Studio
 
-Creator studio for **Fitraat Focus**. Authors write purpose-driven todo systems (libraries of sections and tasks). People in the Fitraat Focus app fork their own copy and use it.
+Creator studio for **Fitraat Focus**. Authors write purpose-driven todo systems (libraries of sections and tasks). People in the Fitraat Focus app take a copy and run the work.
 
-The UI is built on a [TanStack Start](https://tanstack.com/start) admin dashboard (shadcn/ui, Tailwind CSS v4). The product surface today is the studio: sign in, create systems, and edit the library.
+The UI is built on [TanStack Start](https://tanstack.com/start) (shadcn/ui, Tailwind CSS v4). Production hosting is **Vercel**. The API is the Firebase HTTPS function `studio`.
 
 ## What you can do
 
-- Sign in with **Google** or **email and password** (same Firebase project as the Fitraat Focus app)
-- Create a system with a title, purpose, story, description, and category (exam, career, study, craft, health, other)
+- Sign in with **Google** (same Firebase project as the Fitraat Focus app)
+- Create a system with a title, purpose, story, description, and category
 - Organize the library into **sections** and **tasks**
 - Set task priority, tags, notes, and estimated minutes
-- Mark a system **draft** or **published**
-- Switch theme and layout from the dashboard header
+- Mark a system **draft** or **published** (publish requires at least one task)
+- Public catalog and creator pages for published systems
 
-Systems and creator profiles are stored in Firestore through the Firebase HTTP function in `functions/`. Local `npm run dev` talks to the Functions emulator; production builds talk to the deployed `studio` function.
+Systems and creator profiles are stored in Firestore through `functions/`. Local `npm run dev` talks to the Functions emulator; Vercel production talks to the deployed `studio` function.
 
 ## Screens
 
 | Path | Purpose |
 | --- | --- |
-| `/` | Redirects to the systems list |
-| `/auth/v1/login` | Sign in |
-| `/auth/v1/register` | Create an account |
-| `/dashboard/systems` | List your systems |
+| `/` | Public landing |
+| `/systems` | Public catalog |
+| `/systems/$templateId` | Public system |
+| `/creators/$creatorId` | Public creator |
+| `/auth/v1/login` | Google sign-in |
+| `/dashboard/systems` | Your systems |
 | `/dashboard/systems/new` | Create a system |
 | `/dashboard/systems/$templateId` | Edit metadata, sections, and tasks |
+| `/dashboard/profile` | Creator profile |
 
 Dashboard routes require a signed-in session. Unauthenticated visits are sent to login.
 
 ## Tech stack
 
 - **App**: TanStack Start, TanStack Router, React 19, TypeScript
-- **Data**: TanStack Query and Firebase Functions HTTP API
+- **Data**: TanStack Query and Firebase Functions HTTP API (`/v1`)
 - **Auth**: Firebase Authentication (Google)
 - **Backend**: Firebase Cloud Functions (Express, MVC) and Firestore
 - **UI**: Tailwind CSS v4, shadcn/ui, React Hook Form, Zod
 - **Tooling**: Vite, Nitro, Biome, Husky, Firebase emulators
+- **Hosting**: Vercel (web) and Firebase Functions (API)
 
 ## Getting started
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 20+ (Cloud Functions use Node 24)
 - npm
-- [Firebase CLI](https://firebase.google.com/docs/cli) (`npm i -g firebase-tools`) for emulators and deploy
+- [Firebase CLI](https://firebase.google.com/docs/cli) (`npm i -g firebase-tools`) for emulators and function deploy
 - Firebase web credentials for the shared Fitraat Focus project
 
 ### Install and run
@@ -57,6 +61,12 @@ cp .env.example .env
 ```
 
 Fill in `.env` (see [Environment](#environment)), then:
+
+```bash
+npm run emulators
+```
+
+In another terminal:
 
 ```bash
 npm run dev
@@ -78,7 +88,39 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 | `npm run generate-routes` | Regenerate the TanStack Router tree |
 | `npm run functions:install` | Install Cloud Functions dependencies |
 | `npm run functions:build` | Compile `functions/src` to `functions/lib` |
-| `npm run emulators` | Run Firestore and Functions emulators (Auth stays production, like the app) |
+| `npm run functions:deploy` | Lint, build, and deploy the `studio` function |
+| `npm run emulators` | Run Firestore and Functions emulators (Auth stays production) |
+
+## Deploy
+
+### Web (Vercel)
+
+1. Import this GitHub repo in Vercel. Framework preset should be **TanStack Start**.
+2. Set the `VITE_FIREBASE_*` and `VITE_FUNCTIONS_REGION` values from `.env.example` in **Project Settings → Environment Variables** (Production). Leave `VITE_FUNCTIONS_URL` unset so the site calls the deployed `studio` function.
+3. Add the production domain (for example `studio.fitraatfocus.fitraat.com`) to **Firebase Authentication → Settings → Authorized domains**.
+4. Point the custom domain at Vercel.
+
+Do not start the Auth emulator. Google sign-in uses production Auth.
+
+### Functions (Firebase)
+
+Studio and the Fitraat Focus app share the **same Firebase project** (`fitraat-focus`). They are two HTTPS functions in two codebases, so one deploy does not replace the other:
+
+| Repo | Codebase | Function | URL |
+| --- | --- | --- | --- |
+| `fitraatfocusapp` | `default` | `api` | `https://us-central1-fitraat-focus.cloudfunctions.net/api` |
+| `fitraatfocustodotemplate` | `studio` | `studio` | `https://us-central1-fitraat-focus.cloudfunctions.net/studio` |
+
+From this repo:
+
+```bash
+npm run functions:install
+npm run functions:deploy
+```
+
+That runs `firebase deploy --only functions:studio`. It updates `studio` only. It does not delete or overwrite `api`. Deploy `api` from the app repo with `npm --prefix functions run deploy` (`--only functions:default`).
+
+Predeploy runs `lint` then `build`, same as the Fitraat Focus app. Do not add Firestore rules here — production rules, Auth, and Storage live in the Fitraat Focus app and are shared. After deploy, `GET https://us-central1-fitraat-focus.cloudfunctions.net/studio/v1/health` should return `{ "ok": true, "service": "fitraat-studio", "version": "v1" }`.
 
 ## Cloud Functions
 
@@ -89,7 +131,7 @@ functions/src
 ├── index.ts              # export const studio = onRequest(...)
 ├── app.ts                # Express app
 ├── config/               # Admin SDK and collection names
-├── routes/               # URL wiring
+├── routes/               # URL wiring (/v1)
 ├── controllers/          # HTTP handlers
 ├── services/             # Firestore + business rules
 ├── models/               # Types and mapping helpers
@@ -98,19 +140,15 @@ functions/src
 └── lib/                  # Shared HTTP helpers
 ```
 
-Client Firestore access is denied in `firestore.rules`. The Admin SDK in Functions is the only writer.
+Client Firestore access is denied. The Admin SDK in Functions is the only writer.
 
-Firebase targeting matches the Fitraat Focus app:
+Firebase targeting:
 
 - `npm run dev` → `http://127.0.0.1:5001/fitraat-focus/us-central1/studio`
-- production build → `https://us-central1-fitraat-focus.cloudfunctions.net/studio`
-- Google / email sign-in always uses **production** Auth (do not start the Auth emulator, or production ID tokens return 401)
-
-Run `npm run emulators` (or `npm --prefix functions run serve`) alongside the Vite server. `GET /health` should return `{ "data": { "ok": true } }`.
+- production → `https://us-central1-fitraat-focus.cloudfunctions.net/studio`
+- Google sign-in always uses **production** Auth (do not start the Auth emulator, or production ID tokens return 401)
 
 Set `VITE_FUNCTIONS_URL` only if you need to override the auto target.
-
-This repo's `firebase.json` deploys **functions only** (codebase `studio`). Do not add Firestore rules here — production rules live in the Fitraat Focus app. Deploy with `npm run functions:deploy`.
 
 ## Environment
 
@@ -165,7 +203,7 @@ A **system** (`PurposeTemplate`) has:
 - **Sections**: ordered groups with a title and description
 - **Tasks**: title, notes, priority (`low` / `medium` / `high`), tags, estimated minutes, assigned section
 
-Systems and profiles are stored in Firestore (`templates`, `profiles`). The browser does not keep a product data copy.
+Systems live in Firestore `templates`. Creator extras live on `users/{uid}.creator`. The browser does not keep a product data copy.
 
 ## Contributing
 

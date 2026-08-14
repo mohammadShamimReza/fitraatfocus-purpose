@@ -3,18 +3,35 @@ import { ZodError } from "zod";
 
 import { HttpError } from "../lib/http-error";
 
-export function errorMiddleware(error: unknown, _req: Request, res: Response, _next: NextFunction): void {
-  if (error instanceof ZodError) {
-    const message = error.issues[0]?.message ?? "Invalid request.";
-    res.status(400).json({ error: message, code: "invalid-argument" });
+/** Central error handler for the Express API. */
+export function errorHandler(
+  err: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void {
+  if (err instanceof ZodError) {
+    const message = err.issues[0]?.message ?? "Invalid request.";
+    res.status(400).json({
+      ok: false,
+      error: message,
+    });
     return;
   }
 
-  if (error instanceof HttpError) {
-    res.status(error.status).json({ error: error.message, code: error.code });
+  if (err instanceof HttpError) {
+    res.status(err.status).json({
+      ok: false,
+      error: err.message,
+    });
     return;
   }
 
-  console.error(error);
-  res.status(500).json({ error: "Something went wrong.", code: "internal" });
+  console.error("[studio]", err);
+
+  // Never leak internal exception details to clients.
+  res.status(500).json({
+    ok: false,
+    error: "Internal server error",
+  });
 }

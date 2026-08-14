@@ -1,15 +1,39 @@
-import cors from "cors";
 import express from "express";
 
-import { errorMiddleware } from "./middleware/error.middleware";
+import { errorHandler } from "./middleware/error.middleware";
+import { notFound } from "./middleware/not-found.middleware";
 import { apiRouter } from "./routes";
 
-export const app = express();
+const app = express();
 
-app.use(cors({ origin: true }));
-app.use(express.json({ limit: "1mb" }));
-app.use(apiRouter);
-app.use((_req, res) => {
-  res.status(404).json({ error: "Not found.", code: "not-found" });
+app.use(express.json({ limit: "100kb" }));
+
+app.get("/", (_req, res) => {
+  res.json({
+    ok: true,
+    message: "Fitraat Focus Studio API",
+    docs: {
+      health: "GET /v1/health",
+      templates:
+        "GET /v1/templates, GET /v1/templates/me, POST /v1/templates, " +
+        "GET /v1/templates/:templateId, PATCH /v1/templates/:templateId, " +
+        "POST /v1/templates/:templateId/publish, POST /v1/templates/:templateId/download",
+      sections:
+        "POST /v1/templates/:templateId/sections, " +
+        "PATCH /v1/templates/:templateId/sections/:sectionId, " +
+        "DELETE /v1/templates/:templateId/sections/:sectionId",
+      tasks:
+        "POST /v1/templates/:templateId/tasks, " +
+        "PATCH /v1/templates/:templateId/tasks/:taskId, " +
+        "DELETE /v1/templates/:templateId/tasks/:taskId",
+      profiles: "GET/PATCH /v1/profiles/me, GET /v1/profiles/:uid",
+    },
+  });
 });
-app.use(errorMiddleware);
+
+app.use("/v1", apiRouter);
+
+app.use(notFound);
+app.use(errorHandler);
+
+export default app;

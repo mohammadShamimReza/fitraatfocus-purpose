@@ -1,6 +1,6 @@
 import { toFunctionsApiError } from "./errors";
 import { getBearerToken } from "./token";
-import { type FunctionsSearchParams, buildFunctionsUrl } from "./url";
+import { buildFunctionsUrl, type FunctionsSearchParams } from "./url";
 
 export type FunctionsHttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
@@ -52,8 +52,11 @@ export async function functionsRequest<T>(path: string, options: FunctionsHttpOp
   });
 
   const payload = await parsePayload(response);
+  const failed =
+    !response.ok ||
+    (payload !== null && typeof payload === "object" && "ok" in payload && (payload as { ok?: unknown }).ok === false);
 
-  if (!response.ok) {
+  if (failed) {
     throw toFunctionsApiError(payload, response.status, `Request failed (${response.status}).`);
   }
 

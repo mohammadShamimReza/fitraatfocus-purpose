@@ -37,23 +37,32 @@ function asTemplate(id: string, data: Record<string, unknown>): PurposeTemplateD
     creatorUid: String(data.creatorUid ?? ""),
     creatorName: String(data.creatorName ?? ""),
     status: data.status === "published" ? "published" : "draft",
-    visibility: data.visibility === "private" || data.visibility === "unlisted" ? data.visibility : "public",
+    visibility:
+      data.visibility === "private" || data.visibility === "unlisted" ?
+        data.visibility :
+        "public",
     access: "free",
     sectionCount: Number(data.sectionCount ?? 0),
     taskCount: Number(data.taskCount ?? 0),
     forkCount: Number(data.forkCount ?? data.downloadCount ?? 0),
     downloadCount: Number(data.downloadCount ?? 0),
-    downloaderUids: Array.isArray(data.downloaderUids) ? data.downloaderUids.map(String) : [],
+    downloaderUids: Array.isArray(data.downloaderUids) ?
+      data.downloaderUids.map(String) :
+      [],
     createdAt: String(data.createdAt ?? nowIso()),
     updatedAt: String(data.updatedAt ?? nowIso()),
-    ...(typeof data.imageUrl === "string" && data.imageUrl.trim()
-      ? { imageUrl: data.imageUrl.trim() }
-      : {}),
-    ...(typeof data.storagePath === "string" && data.storagePath.trim()
-      ? { storagePath: data.storagePath.trim() }
-      : {}),
-    sections: Array.isArray(data.sections) ? (data.sections as TemplateSection[]) : [],
-    tasks: Array.isArray(data.tasks) ? (data.tasks as TemplateTask[]) : [],
+    ...(typeof data.imageUrl === "string" && data.imageUrl.trim() ?
+      { imageUrl: data.imageUrl.trim() } :
+      {}),
+    ...(typeof data.storagePath === "string" && data.storagePath.trim() ?
+      { storagePath: data.storagePath.trim() } :
+      {}),
+    sections: Array.isArray(data.sections) ?
+      (data.sections as TemplateSection[]) :
+      [],
+    tasks: Array.isArray(data.tasks) ?
+      (data.tasks as TemplateTask[]) :
+      [],
   };
 }
 
@@ -63,7 +72,10 @@ async function readTemplate(templateId: string): Promise<PurposeTemplateDetail |
     return undefined;
   }
 
-  return asTemplate(snapshot.id, (snapshot.data() ?? {}) as Record<string, unknown>);
+  return asTemplate(
+    snapshot.id,
+    (snapshot.data() ?? {}) as Record<string, unknown>,
+  );
 }
 
 async function saveTemplate(template: PurposeTemplateDetail): Promise<PurposeTemplateDetail> {
@@ -73,11 +85,17 @@ async function saveTemplate(template: PurposeTemplateDetail): Promise<PurposeTem
 }
 
 async function toCatalog(template: PurposeTemplateDetail): Promise<CatalogTemplate> {
-  const creator = await getCatalogCreator(template.creatorUid, template.creatorName);
+  const creator = await getCatalogCreator(
+    template.creatorUid,
+    template.creatorName,
+  );
   return { ...toSummary(template), creator };
 }
 
-async function requireVisible(templateId: string, uid?: string): Promise<PurposeTemplateDetail> {
+async function requireVisible(
+  templateId: string,
+  uid?: string,
+): Promise<PurposeTemplateDetail> {
   const template = await readTemplate(templateId);
   if (!template || !canViewTemplate(template, uid)) {
     throw notFound("System not found.");
@@ -86,7 +104,10 @@ async function requireVisible(templateId: string, uid?: string): Promise<Purpose
   return template;
 }
 
-async function requireOwned(templateId: string, uid: string): Promise<PurposeTemplateDetail> {
+async function requireOwned(
+  templateId: string,
+  uid: string,
+): Promise<PurposeTemplateDetail> {
   const template = await readTemplate(templateId);
   if (!template || template.creatorUid !== uid) {
     throw notFound("System not found.");
@@ -100,12 +121,17 @@ export async function listPublicTemplates(): Promise<CatalogTemplate[]> {
   const items = snapshot.docs
     .map((doc) => asTemplate(doc.id, doc.data() as Record<string, unknown>))
     .filter(isPublicTemplate)
-    .sort((left, right) => right.downloadCount - left.downloadCount || right.updatedAt.localeCompare(left.updatedAt));
+    .sort((left, right) => {
+      return right.downloadCount - left.downloadCount ||
+        right.updatedAt.localeCompare(left.updatedAt);
+    });
 
   return Promise.all(items.map(toCatalog));
 }
 
-export async function listTemplatesByCreator(creatorId: string): Promise<CatalogTemplate[]> {
+export async function listTemplatesByCreator(
+  creatorId: string,
+): Promise<CatalogTemplate[]> {
   const items = await listPublicTemplates();
   return items.filter((template) => template.creatorUid === creatorId);
 }
@@ -113,30 +139,45 @@ export async function listTemplatesByCreator(creatorId: string): Promise<Catalog
 export async function listMyTemplates(uid: string): Promise<PurposeTemplate[]> {
   const snapshot = await templates.where("creatorUid", "==", uid).get();
   return snapshot.docs
-    .map((doc) => toSummary(asTemplate(doc.id, doc.data() as Record<string, unknown>)))
+    .map((doc) => {
+      return toSummary(asTemplate(doc.id, doc.data() as Record<string, unknown>));
+    })
     .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
 }
 
-export async function getTemplate(templateId: string, uid?: string): Promise<PurposeTemplateDetail> {
+export async function getTemplate(
+  templateId: string,
+  uid?: string,
+): Promise<PurposeTemplateDetail> {
   return requireVisible(templateId, uid);
 }
 
-export async function getPublicTemplate(templateId: string): Promise<PublicTemplateDetail> {
+export async function getPublicTemplate(
+  templateId: string,
+): Promise<PublicTemplateDetail> {
   const template = await readTemplate(templateId);
   if (!template || !isPublicTemplate(template)) {
     throw notFound("System not found.");
   }
 
   const catalog = await toCatalog(template);
-  return { ...template, ...catalog, sections: template.sections, tasks: template.tasks };
+  return {
+    ...template,
+    ...catalog,
+    sections: template.sections,
+    tasks: template.tasks,
+  };
 }
 
-export async function createTemplate(user: AuthUser, input: CreateTemplateInput): Promise<PurposeTemplate> {
+export async function createTemplate(
+  user: AuthUser,
+  input: CreateTemplateInput,
+): Promise<PurposeTemplate> {
   const profile = await getOrCreateMyProfile(
     user.uid,
     user.name || user.email || "User",
-    user.picture,
-    user.email,
+    user.picture ?? "",
+    user.email ?? "",
   );
   const createdAt = nowIso();
   const template = await saveTemplate({
@@ -186,12 +227,21 @@ export async function updateTemplate(
   return toSummary(saved);
 }
 
-export async function publishTemplate(uid: string, templateId: string): Promise<PurposeTemplate> {
+export async function publishTemplate(
+  uid: string,
+  templateId: string,
+): Promise<PurposeTemplate> {
   const current = await requireOwned(templateId, uid);
+  if (current.tasks.length < 1) {
+    throw badRequest("Add at least one task before publishing.");
+  }
   return toSummary(await saveTemplate({ ...current, status: "published" }));
 }
 
-export async function downloadTemplate(uid: string, templateId: string): Promise<PurposeTemplate> {
+export async function downloadTemplate(
+  uid: string,
+  templateId: string,
+): Promise<PurposeTemplate> {
   const current = await readTemplate(templateId);
   if (!current || !isPublicTemplate(current)) {
     throw notFound("System not found.");
@@ -215,7 +265,11 @@ export async function downloadTemplate(uid: string, templateId: string): Promise
   return toSummary(next);
 }
 
-export async function createSection(uid: string, templateId: string, input: CreateSectionInput): Promise<TemplateSection> {
+export async function createSection(
+  uid: string,
+  templateId: string,
+  input: CreateSectionInput,
+): Promise<TemplateSection> {
   const current = await requireOwned(templateId, uid);
   const section: TemplateSection = {
     id: newId(),
@@ -234,7 +288,9 @@ export async function updateSection(
   input: UpdateSectionInput,
 ): Promise<TemplateSection> {
   const current = await requireOwned(templateId, uid);
-  const sections = current.sections.map((section) => (section.id === sectionId ? { ...section, ...input } : section));
+  const sections = current.sections.map((section) => {
+    return section.id === sectionId ? { ...section, ...input } : section;
+  });
   const updated = sections.find((section) => section.id === sectionId);
   if (!updated) {
     throw notFound("Section not found.");
@@ -244,7 +300,11 @@ export async function updateSection(
   return updated;
 }
 
-export async function deleteSection(uid: string, templateId: string, sectionId: string): Promise<void> {
+export async function deleteSection(
+  uid: string,
+  templateId: string,
+  sectionId: string,
+): Promise<void> {
   const current = await requireOwned(templateId, uid);
   await saveTemplate({
     ...current,
@@ -253,7 +313,11 @@ export async function deleteSection(uid: string, templateId: string, sectionId: 
   });
 }
 
-export async function createTask(uid: string, templateId: string, input: CreateTaskInput): Promise<TemplateTask> {
+export async function createTask(
+  uid: string,
+  templateId: string,
+  input: CreateTaskInput,
+): Promise<TemplateTask> {
   const current = await requireOwned(templateId, uid);
   if (!current.sections.some((section) => section.id === input.sectionId)) {
     throw badRequest("Section not found.");
@@ -266,8 +330,11 @@ export async function createTask(uid: string, templateId: string, input: CreateT
     priority: input.priority ?? "medium",
     tags: input.tags ?? [],
     sectionId: input.sectionId,
-    order: current.tasks.filter((item) => item.sectionId === input.sectionId).length,
-    ...(typeof input.estimatedMinutes === "number" ? { estimatedMinutes: input.estimatedMinutes } : {}),
+    order: current.tasks.filter((item) => item.sectionId === input.sectionId)
+      .length,
+    ...(typeof input.estimatedMinutes === "number" ?
+      { estimatedMinutes: input.estimatedMinutes } :
+      {}),
   };
   await saveTemplate({ ...current, tasks: [...current.tasks, task] });
   return task;
@@ -280,7 +347,9 @@ export async function updateTask(
   input: UpdateTaskInput,
 ): Promise<TemplateTask> {
   const current = await requireOwned(templateId, uid);
-  const tasks = current.tasks.map((task) => (task.id === taskId ? { ...task, ...input } : task));
+  const tasks = current.tasks.map((task) => {
+    return task.id === taskId ? { ...task, ...input } : task;
+  });
   const updated = tasks.find((task) => task.id === taskId);
   if (!updated) {
     throw notFound("Task not found.");
@@ -290,7 +359,11 @@ export async function updateTask(
   return updated;
 }
 
-export async function deleteTask(uid: string, templateId: string, taskId: string): Promise<void> {
+export async function deleteTask(
+  uid: string,
+  templateId: string,
+  taskId: string,
+): Promise<void> {
   const current = await requireOwned(templateId, uid);
   await saveTemplate({
     ...current,

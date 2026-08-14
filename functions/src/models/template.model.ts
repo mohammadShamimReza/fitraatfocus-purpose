@@ -85,7 +85,15 @@ export type CreateTemplateInput = {
 export type UpdateTemplateInput = Partial<
   Pick<
     PurposeTemplate,
-    "title" | "purpose" | "story" | "description" | "category" | "tags" | "visibility" | "imageUrl" | "storagePath"
+    | "title"
+    | "purpose"
+    | "story"
+    | "description"
+    | "category"
+    | "tags"
+    | "visibility"
+    | "imageUrl"
+    | "storagePath"
   >
 >;
 
@@ -94,7 +102,9 @@ export type CreateSectionInput = {
   description?: string;
 };
 
-export type UpdateSectionInput = Partial<Pick<TemplateSection, "title" | "description" | "order">>;
+export type UpdateSectionInput = Partial<
+  Pick<TemplateSection, "title" | "description" | "order">
+>;
 
 export type CreateTaskInput = {
   title: string;
@@ -106,7 +116,10 @@ export type CreateTaskInput = {
 };
 
 export type UpdateTaskInput = Partial<
-  Pick<TemplateTask, "title" | "notes" | "priority" | "tags" | "sectionId" | "order" | "estimatedMinutes">
+  Pick<
+    TemplateTask,
+    "title" | "notes" | "priority" | "tags" | "sectionId" | "order" | "estimatedMinutes"
+  >
 >;
 
 export function toSummary(template: PurposeTemplateDetail): PurposeTemplate {
@@ -139,7 +152,10 @@ export function isPublicTemplate(template: PurposeTemplateDetail): boolean {
   return template.status === "published" && template.visibility === "public";
 }
 
-export function canViewTemplate(template: PurposeTemplateDetail, uid: string | undefined): boolean {
+export function canViewTemplate(
+  template: PurposeTemplateDetail,
+  uid: string | undefined,
+): boolean {
   return isPublicTemplate(template) || Boolean(uid && template.creatorUid === uid);
 }
 

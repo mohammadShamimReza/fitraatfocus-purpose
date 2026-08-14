@@ -1,9 +1,12 @@
 {
-  "name": "tanstack-shadcn-admin-dashboard",
+  "name": "fitraat-focus-studio",
   "private": true,
   "type": "module",
   "imports": {
     "#/*": "./src/*"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
     "dev": "vite dev --port 3000",
@@ -18,7 +21,7 @@
     "generate:presets": "ts-node -P tsconfig.scripts.json src/scripts/generate-theme-presets.ts",
     "functions:install": "npm --prefix functions install",
     "functions:build": "npm --prefix functions run build",
-    "functions:deploy": "firebase deploy --only functions",
+    "functions:deploy": "firebase deploy --only functions:studio",
     "emulators": "npm --prefix functions run build && firebase emulators:start --only functions,firestore"
   },
   "lint-staged": {

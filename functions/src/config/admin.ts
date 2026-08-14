@@ -1,12 +1,21 @@
 import "./strip-auth-emulator";
-import { initializeApp } from "firebase-admin/app";
+import { getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
-const app = initializeApp();
+/**
+ * Initialize the Admin SDK once per cold start.
+ */
+export function initializeFirebaseAdmin(): void {
+  if (getApps().length === 0) {
+    initializeApp();
+  }
+}
 
-export const adminAuth = getAuth(app);
-export const db = getFirestore(app);
+initializeFirebaseAdmin();
+
+export const adminAuth = getAuth();
+export const db = getFirestore();
 db.settings({ ignoreUndefinedProperties: true });
 
 export const collections = {

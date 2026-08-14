@@ -2,26 +2,28 @@ import type { NextFunction, Request, Response } from "express";
 import type { DecodedIdToken } from "firebase-admin/auth";
 
 import { adminAuth } from "../config/admin";
-import { unauthorized } from "../lib/http-error";
 
 export type AuthUser = {
   uid: string;
-  email: string;
-  name: string;
-  picture: string;
+  email?: string;
+  name?: string;
+  picture?: string;
 };
 
-export type AuthedRequest = Request & { user: AuthUser };
+export type AuthedRequest = Request & { user?: AuthUser };
 
 function toAuthUser(decoded: DecodedIdToken): AuthUser {
   return {
     uid: decoded.uid,
-    email: typeof decoded.email === "string" ? decoded.email : "",
-    name: typeof decoded.name === "string" ? decoded.name : "",
-    picture: typeof decoded.picture === "string" ? decoded.picture : "",
+    email: decoded.email,
+    name: decoded.name,
+    picture: decoded.picture,
   };
 }
 
+/**
+ * Verifies Firebase ID token from Authorization: Bearer <token>.
+ */
 async function readUser(req: Request): Promise<AuthUser | undefined> {
   const header = req.headers.authorization;
   if (!header?.startsWith("Bearer ")) {
@@ -37,39 +39,61 @@ async function readUser(req: Request): Promise<AuthUser | undefined> {
   return toAuthUser(decoded);
 }
 
-export async function optionalAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
+export async function optionalAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
     const user = await readUser(req);
     if (user) {
-      req.user = user;
+      (req as AuthedRequest).user = user;
     }
     next();
-  } catch (error) {
-    if (process.env.FUNCTIONS_EMULATOR === "true") {
-      console.error("[auth] verifyIdToken failed", error);
-    }
-    next(unauthorized("Invalid or expired sign-in token."));
+  } catch {
+    res.status(401).json({
+      ok: false,
+      error: "Invalid or expired ID token.",
+    });
   }
 }
 
-export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-  await optionalAuth(req, res, (error?: unknown) => {
-    if (error) {
-      next(error);
+export async function requireAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const header = req.headers.authorization;
+    if (!header?.startsWith("Bearer ")) {
+      res.status(401).json({
+        ok: false,
+        error: "Missing or invalid Authorization header.",
+      });
       return;
     }
 
-    if (!req.user) {
-      next(unauthorized());
+    const idToken = header.slice("Bearer ".length).trim();
+    if (!idToken) {
+      res.status(401).json({ ok: false, error: "Missing ID token." });
       return;
     }
 
+    const decoded = await adminAuth.verifyIdToken(idToken);
+    (req as AuthedRequest).user = toAuthUser(decoded);
     next();
-  });
+  } catch {
+    res.status(401).json({
+      ok: false,
+      error: "Invalid or expired ID token.",
+    });
+  }
 }
 
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: AuthUser;
+export function requireUser(req: Request): AuthUser {
+  const user = (req as AuthedRequest).user;
+  if (!user) {
+    throw new Error("Unauthenticated request.");
   }
+  return user;
 }

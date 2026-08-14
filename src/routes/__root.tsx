@@ -1,7 +1,7 @@
-import { TanStackDevtools } from "@tanstack/react-devtools";
+import { lazy, type ReactNode, Suspense } from "react";
+
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +19,10 @@ import { PreferencesStoreProvider } from "@/stores/preferences/preferences-provi
 import appCss from "../styles/styles.css?url";
 import { NotFound } from "./-components/not-found";
 import { RootError } from "./-components/root-error";
+
+const AppDevtools = import.meta.env.DEV
+  ? lazy(() => import("./-components/app-devtools").then((mod) => ({ default: mod.AppDevtools })))
+  : () => null;
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: () => getInitialLocale(),
@@ -83,7 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   shellComponent: RootDocument,
 });
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({ children }: { children: ReactNode }) {
   const { theme_mode, theme_preset, content_layout, navbar_style, sidebar_variant, sidebar_collapsible, font } =
     PREFERENCE_DEFAULTS;
 
@@ -107,24 +111,18 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="min-h-screen antialiased">
         {children}
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        {import.meta.env.DEV ? (
+          <Suspense fallback={null}>
+            <AppDevtools />
+          </Suspense>
+        ) : null}
         <Scripts />
       </body>
     </html>
   );
 }
 
-function AppProviders({ children, locale }: { children: React.ReactNode; locale?: AppLocale }) {
+function AppProviders({ children, locale }: { children: ReactNode; locale?: AppLocale }) {
   return (
     <TooltipProvider>
       <PreferencesStoreProvider initialValues={PREFERENCE_DEFAULTS}>

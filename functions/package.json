@@ -1,27 +1,32 @@
 {
-  "name": "fitraat-focus-functions",
+  "name": "fitraat-studio-functions",
   "private": true,
   "main": "lib/index.js",
   "engines": {
-    "node": "20"
+    "node": "24"
   },
   "scripts": {
+    "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "deploy": "firebase deploy --only functions:studio",
+    "logs": "firebase functions:log --only studio"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "firebase-admin": "^13.4.0",
-    "firebase-functions": "^6.4.0",
+    "express": "^5.2.1",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.23",
-    "typescript": "^5.9.2"
+    "@types/express": "^5.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^6.0.0"
   }
 }
