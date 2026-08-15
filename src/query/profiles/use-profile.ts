@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-import { getProfile } from "@/lib/functions/profiles";
+import { getProfile } from "@/lib/api/profiles";
 import { profileKeys } from "@/query/keys/profiles";
 
 export function profileQueryOptions(uid: string) {

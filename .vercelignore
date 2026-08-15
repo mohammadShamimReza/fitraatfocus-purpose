@@ -1,5 +1,5 @@
-functions
-.firebase
+/functions
+/.firebase
 firebase-debug.log
 firebase-debug.*.log
 firestore-debug.log

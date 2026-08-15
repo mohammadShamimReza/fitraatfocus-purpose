@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { updateMyProfile } from "@/lib/functions/profiles";
+import { updateMyProfile } from "@/lib/api/profiles";
 import { invalidateProfileQueries } from "@/query/invalidate/profiles";
 import type { UpdateProfileInput } from "@/types/profile";
 

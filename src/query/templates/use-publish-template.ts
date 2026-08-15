@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { publishTemplate } from "@/lib/functions/templates";
+import { publishTemplate } from "@/lib/api/templates";
 
 import { useInvalidateTemplates } from "./use-invalidate-templates";
 

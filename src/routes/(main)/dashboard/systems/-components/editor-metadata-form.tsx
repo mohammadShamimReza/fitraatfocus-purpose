@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import type { TranslateFn } from "@/lib/i18n/translate";
 import { useUpdateTemplateMutation } from "@/query/templates";

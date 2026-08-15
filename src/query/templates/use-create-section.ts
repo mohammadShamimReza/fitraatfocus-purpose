@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { createSection } from "@/lib/functions/templates";
+import { createSection } from "@/lib/api/templates";
 import type { CreateSectionInput } from "@/types/template";
 
 import { useInvalidateTemplates } from "./use-invalidate-templates";

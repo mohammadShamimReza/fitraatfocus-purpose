@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { deleteTask } from "@/lib/functions/templates";
+import { deleteTask } from "@/lib/api/templates";
 
 import { useInvalidateTemplates } from "./use-invalidate-templates";
 

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { reorderSections } from "@/lib/functions/templates";
+import { reorderSections } from "@/lib/api/templates";
 import type { ReorderSectionsInput } from "@/types/template";
 
 import { useInvalidateTemplates } from "./use-invalidate-templates";

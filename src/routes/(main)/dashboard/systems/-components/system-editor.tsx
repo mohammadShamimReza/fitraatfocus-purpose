@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categoryLabel, statusLabel, visibilityLabel } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";
@@ -70,8 +70,7 @@ export function SystemEditor({ templateId }: { templateId: string }) {
       const next = await publish.mutateAsync();
       toast.add({
         title: t("editor.published"),
-        description:
-          next.visibility === "public" ? t("editor.publishedToast") : t("editor.publishedPrivateToast"),
+        description: next.visibility === "public" ? t("editor.publishedToast") : t("editor.publishedPrivateToast"),
       });
     } catch (error) {
       toast.add({

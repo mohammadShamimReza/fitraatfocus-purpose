@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { getExpertiseLabel } from "@/lib/profiles/options";
 import { getInitials } from "@/lib/utils";

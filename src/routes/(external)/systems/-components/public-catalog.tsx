@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { matchesTemplateSearch } from "@/lib/templates/filter";
 import { usePublicTemplatesQuery } from "@/query/templates";

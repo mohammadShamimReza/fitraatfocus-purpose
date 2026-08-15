@@ -177,7 +177,7 @@ src
 ├── lib
 │   ├── auth                    # Firebase session, guards, display name
 │   ├── firebase                # Client SDK and env config
-│   ├── functions               # HTTP client for Cloud Functions
+│   ├── api                     # HTTP client for Cloud Functions
 │   └── templates               # Category labels and formatting
 ├── navigation                  # Dashboard sidebar
 ├── query                       # TanStack Query hooks for systems

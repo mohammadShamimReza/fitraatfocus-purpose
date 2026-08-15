@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { priorityLabel, prioritySelectItems } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";

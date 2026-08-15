@@ -10,6 +10,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
 import {
   assertCoverFile,
@@ -18,7 +19,6 @@ import {
   templateCoverPath,
   uploadTemplateCover,
 } from "@/lib/firebase/storage";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categoryLabel, categorySelectItems, visibilitySelectItems } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";

@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { getExpertiseLabel } from "@/lib/profiles/options";
 import { formatCount } from "@/lib/templates/format";
@@ -106,11 +106,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-3">
-          <SystemCover
-            src={template.imageUrl}
-            alt={template.title}
-            className="max-w-xl rounded-xl border"
-          />
+          <SystemCover src={template.imageUrl} alt={template.title} className="max-w-xl rounded-xl border" />
           <Badge variant="outline">{getCategoryLabel(template.category)}</Badge>
           <h1 className="text-3xl tracking-tight sm:text-4xl">{template.title}</h1>
           <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{template.purpose}</p>

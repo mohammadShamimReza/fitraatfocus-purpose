@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-import { getTemplate } from "@/lib/functions/templates";
+import { getTemplate } from "@/lib/api/templates";
 import { templateKeys } from "@/query/keys/templates";
 
 export function templateQueryOptions(templateId: string) {

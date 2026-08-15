@@ -13,8 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
+import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
-import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categoryLabel, statusLabel, visibilityLabel } from "@/lib/i18n/labels";
 import { matchesTemplateSearch } from "@/lib/templates/filter";
@@ -33,10 +33,7 @@ export function SystemsList() {
   const published = query.data?.filter((item) => item.status === "published").length ?? 0;
   const downloads = query.data?.reduce((sum, item) => sum + item.downloadCount, 0) ?? 0;
   const filtered = useMemo(
-    () =>
-      (query.data ?? []).filter((item) =>
-        matchesTemplateSearch(item, titleQuery, category, status),
-      ),
+    () => (query.data ?? []).filter((item) => matchesTemplateSearch(item, titleQuery, category, status)),
     [query.data, titleQuery, category, status],
   );
 

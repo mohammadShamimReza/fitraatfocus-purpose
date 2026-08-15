@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { updateTemplate } from "@/lib/functions/templates";
+import { updateTemplate } from "@/lib/api/templates";
 import type { UpdateTemplateInput } from "@/types/template";
 
 import { useInvalidateTemplates } from "./use-invalidate-templates";

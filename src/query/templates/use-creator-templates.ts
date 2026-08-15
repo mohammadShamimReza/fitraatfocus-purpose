@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-import { listTemplatesByCreator } from "@/lib/functions/templates";
+import { listTemplatesByCreator } from "@/lib/api/templates";
 import { templateKeys } from "@/query/keys/templates";
 
 export function creatorTemplatesQueryOptions(creatorId: string) {
