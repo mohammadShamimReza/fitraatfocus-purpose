@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, setCookie } from "@tanstack/react-start/server";
+
+import { getCookie, setCookie } from "@/server/cookies.server";
 
 import { DEFAULT_LOCALE, isAppLocale, LOCALE_STORAGE_KEY } from "@/lib/i18n/config";
 import {

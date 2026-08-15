@@ -15,12 +15,13 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ["tsconfig.json", "tsconfig.dev.json"],
+    project: ["tsconfig.json"],
     sourceType: "module",
   },
   ignorePatterns: [
     "/lib/**/*",
     "/generated/**/*",
+    ".eslintrc.js",
   ],
   plugins: [
     "@typescript-eslint",

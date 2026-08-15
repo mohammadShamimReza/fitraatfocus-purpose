@@ -1,0 +1,1 @@
+import{v as e}from"./i18n-provider-BYBrzLWp.js";function t(t){return e(t.defaultTagName??`div`,t,t)}export{t};

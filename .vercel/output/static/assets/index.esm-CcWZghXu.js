@@ -1,0 +1,1 @@
+import{c as e}from"./index.esm-imfy1ftq.js";e(`firebase`,`12.17.1`,`app`);
