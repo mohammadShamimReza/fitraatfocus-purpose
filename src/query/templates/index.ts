@@ -9,6 +9,8 @@ export { useMyTemplatesQuery } from "./use-my-templates";
 export { usePublicTemplateQuery } from "./use-public-template";
 export { usePublicTemplatesQuery } from "./use-public-templates";
 export { usePublishTemplateMutation } from "./use-publish-template";
+export { useReorderSectionsMutation } from "./use-reorder-sections";
+export { useReorderTasksMutation } from "./use-reorder-tasks";
 export { useTemplateQuery } from "./use-template";
 export { useUpdateSectionMutation } from "./use-update-section";
 export { useUpdateTaskMutation } from "./use-update-task";

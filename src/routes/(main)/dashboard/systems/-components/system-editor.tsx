@@ -2,27 +2,26 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { ArrowLeft, CircleAlert, Layers, ListTodo } from "lucide-react";
+import { ArrowLeft, CircleAlert } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { getFunctionsErrorMessage } from "@/lib/functions/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
-import { categoryLabel, statusLabel, visibilityLabel, visibilitySelectItems } from "@/lib/i18n/labels";
+import { categoryLabel, statusLabel, visibilityLabel } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";
-import { usePublishTemplateMutation, useTemplateQuery, useUpdateTemplateMutation } from "@/query/templates";
-import type { TemplateStatus, TemplateVisibility } from "@/types/template";
+import { usePublishTemplateMutation, useTemplateQuery } from "@/query/templates";
+import type { TemplateStatus } from "@/types/template";
 
 import { EditorMetadataForm } from "./editor-metadata-form";
+import { EditorOverview } from "./editor-overview";
 import { EditorSections } from "./editor-sections";
 import { EditorTasks } from "./editor-tasks";
-import { OwnerInsights } from "./owner-insights";
 
 function getPublishLabel(status: TemplateStatus, isPending: boolean, t: TranslateFn): string {
   if (status === "published") {
@@ -41,9 +40,7 @@ export function SystemEditor({ templateId }: { templateId: string }) {
   const { t } = useI18n();
   const query = useTemplateQuery(templateId, isReady);
   const publish = usePublishTemplateMutation(templateId);
-  const updateTemplate = useUpdateTemplateMutation(templateId);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
-  const visibilityItems = visibilitySelectItems(t);
 
   const sections = useMemo(() => {
     return [...(query.data?.sections ?? [])].sort((left, right) => left.order - right.order);
@@ -84,21 +81,6 @@ export function SystemEditor({ templateId }: { templateId: string }) {
     }
   };
 
-  const onVisibilityChange = async (visibility: TemplateVisibility) => {
-    try {
-      await updateTemplate.mutateAsync({ visibility });
-      toast.add({
-        title: t("visibility.saved"),
-        description: visibility === "public" ? t("visibility.savedPublic") : t("visibility.savedPrivate"),
-      });
-    } catch (error) {
-      toast.add({
-        title: t("visibility.error"),
-        description: getFunctionsErrorMessage(error),
-      });
-    }
-  };
-
   if (query.isPending) {
     return (
       <div className="flex min-h-72 items-center justify-center">
@@ -134,7 +116,7 @@ export function SystemEditor({ templateId }: { templateId: string }) {
   const sectionTasks = selectedSection ? tasks.filter((task) => task.sectionId === selectedSection.id) : [];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-4">
         <Button
           nativeButton={false}
@@ -146,15 +128,8 @@ export function SystemEditor({ templateId }: { templateId: string }) {
           <ArrowLeft data-icon="inline-start" />
           {t("systems.title")}
         </Button>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="space-y-2">
-            {template.imageUrl ? (
-              <img
-                src={template.imageUrl}
-                alt={template.title || t("cover.alt")}
-                className="aspect-[16/9] w-full max-w-xl rounded-xl border object-cover"
-              />
-            ) : null}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline">{categoryLabel(t, template.category)}</Badge>
               <Badge variant={template.status === "published" ? "default" : "secondary"}>
@@ -162,10 +137,7 @@ export function SystemEditor({ templateId }: { templateId: string }) {
               </Badge>
               <Badge variant="outline">{visibilityLabel(t, template.visibility)}</Badge>
             </div>
-            <h1 className="text-3xl tracking-tight">{template.title || t("systems.untitled")}</h1>
-            <p className="max-w-2xl text-muted-foreground text-sm">
-              {template.purpose || (canEdit ? t("editor.addPurpose") : t("systems.noPurpose"))}
-            </p>
+            <h1 className="text-2xl tracking-tight sm:text-3xl">{template.title || t("systems.untitled")}</h1>
             {template.creatorName ? (
               <p className="text-muted-foreground text-sm">
                 {t("common.byPrefix")}{" "}
@@ -178,63 +150,35 @@ export function SystemEditor({ templateId }: { templateId: string }) {
                 </Link>
               </p>
             ) : null}
-            <div className="flex flex-wrap items-center gap-3 text-muted-foreground text-xs">
-              <span className="inline-flex items-center gap-1.5">
-                <Layers className="size-3.5" />
-                {t("systems.sectionsCount", { count: template.sectionCount })}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <ListTodo className="size-3.5" />
-                {t("systems.tasksCount", { count: template.taskCount })}
-              </span>
-            </div>
           </div>
           {canEdit ? (
-            <div className="flex w-full max-w-xs flex-col gap-2">
-              <p className="text-muted-foreground text-xs">{t("editor.visibility")}</p>
-              <Select
-                value={template.visibility === "public" ? "public" : "private"}
-                onValueChange={(value) => {
-                  void onVisibilityChange(value === "public" ? "public" : "private");
-                }}
-                items={visibilityItems}
-                disabled={updateTemplate.isPending}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {visibilityItems.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <p className="text-muted-foreground text-xs">{t("visibility.help")}</p>
-              <Button
-                disabled={template.status === "published" || publish.isPending}
-                onClick={() => {
-                  void onPublish();
-                }}
-              >
-                {getPublishLabel(template.status, publish.isPending, t)}
-              </Button>
-            </div>
+            <Button
+              className="shrink-0"
+              disabled={template.status === "published" || publish.isPending}
+              onClick={() => {
+                void onPublish();
+              }}
+            >
+              {getPublishLabel(template.status, publish.isPending, t)}
+            </Button>
           ) : null}
         </div>
       </div>
 
-      {canEdit ? <OwnerInsights template={template} /> : null}
-
-      <Tabs defaultValue="library" className="flex flex-col gap-4">
-        <TabsList>
-          <TabsTrigger value="library">{t("editor.library")}</TabsTrigger>
-          <TabsTrigger value="details">{t("editor.details")}</TabsTrigger>
+      <Tabs defaultValue="library" className="gap-5">
+        <TabsList variant="line" className="h-auto w-full justify-start rounded-none border-b bg-transparent p-0">
+          <TabsTrigger value="library" className="rounded-none px-4 py-2.5">
+            {t("editor.library")}
+          </TabsTrigger>
+          <TabsTrigger value="details" className="rounded-none px-4 py-2.5">
+            {t("editor.details")}
+          </TabsTrigger>
+          <TabsTrigger value="overview" className="rounded-none px-4 py-2.5">
+            {t("editor.overview")}
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="library" className="flex flex-col gap-4">
+        <TabsContent value="library" className="flex flex-col gap-3">
+          <p className="text-muted-foreground text-sm">{t("editor.libraryLead")}</p>
           <div className="grid gap-4 xl:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]">
             <EditorSections
               templateId={templateId}
@@ -244,11 +188,21 @@ export function SystemEditor({ templateId }: { templateId: string }) {
               onSelectSection={setSelectedSectionId}
               canEdit={canEdit}
             />
-            <EditorTasks templateId={templateId} section={selectedSection} tasks={sectionTasks} canEdit={canEdit} />
+            <EditorTasks
+              templateId={templateId}
+              section={selectedSection}
+              sections={sections}
+              tasks={sectionTasks}
+              canEdit={canEdit}
+              onSelectSection={setSelectedSectionId}
+            />
           </div>
         </TabsContent>
         <TabsContent value="details">
           <EditorMetadataForm template={template} canEdit={canEdit} />
+        </TabsContent>
+        <TabsContent value="overview">
+          <EditorOverview template={template} canEdit={canEdit} />
         </TabsContent>
       </Tabs>
     </div>

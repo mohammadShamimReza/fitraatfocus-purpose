@@ -20,10 +20,12 @@ app.get("/", (_req, res) => {
         "POST /v1/templates/:templateId/publish, POST /v1/templates/:templateId/download",
       sections:
         "POST /v1/templates/:templateId/sections, " +
+        "POST /v1/templates/:templateId/sections/reorder, " +
         "PATCH /v1/templates/:templateId/sections/:sectionId, " +
         "DELETE /v1/templates/:templateId/sections/:sectionId",
       tasks:
         "POST /v1/templates/:templateId/tasks, " +
+        "POST /v1/templates/:templateId/tasks/reorder, " +
         "PATCH /v1/templates/:templateId/tasks/:taskId, " +
         "DELETE /v1/templates/:templateId/tasks/:taskId",
       profiles: "GET/PATCH /v1/profiles/me, GET /v1/profiles/:uid",

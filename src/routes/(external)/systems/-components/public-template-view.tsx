@@ -182,7 +182,14 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
           onSelectSection={setSelectedSectionId}
           canEdit={false}
         />
-        <EditorTasks templateId={templateId} section={selectedSection} tasks={sectionTasks} canEdit={false} />
+        <EditorTasks
+          templateId={templateId}
+          section={selectedSection}
+          sections={sections}
+          tasks={sectionTasks}
+          canEdit={false}
+          onSelectSection={setSelectedSectionId}
+        />
       </div>
     </div>
   );

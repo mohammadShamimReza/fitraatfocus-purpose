@@ -14,8 +14,18 @@ templateRouter.patch("/:templateId", requireAuth, templateController.update);
 templateRouter.post("/:templateId/publish", requireAuth, templateController.publish);
 templateRouter.post("/:templateId/download", requireAuth, templateController.download);
 templateRouter.post("/:templateId/sections", requireAuth, templateController.createSection);
+templateRouter.post(
+  "/:templateId/sections/reorder",
+  requireAuth,
+  templateController.reorderSections,
+);
 templateRouter.patch("/:templateId/sections/:sectionId", requireAuth, templateController.updateSection);
 templateRouter.delete("/:templateId/sections/:sectionId", requireAuth, templateController.deleteSection);
 templateRouter.post("/:templateId/tasks", requireAuth, templateController.createTask);
+templateRouter.post(
+  "/:templateId/tasks/reorder",
+  requireAuth,
+  templateController.reorderTasks,
+);
 templateRouter.patch("/:templateId/tasks/:taskId", requireAuth, templateController.updateTask);
 templateRouter.delete("/:templateId/tasks/:taskId", requireAuth, templateController.deleteTask);

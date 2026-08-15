@@ -10,6 +10,8 @@ import {
   createSectionSchema,
   createTaskSchema,
   createTemplateSchema,
+  reorderSectionsSchema,
+  reorderTasksSchema,
   updateSectionSchema,
   updateTaskSchema,
   updateTemplateSchema,
@@ -131,6 +133,22 @@ export const deleteSection = asyncHandler(async (req: Request, res: Response) =>
   sendEmpty(res);
 });
 
+export const reorderSections = asyncHandler(async (req: Request, res: Response) => {
+  const templateId = paramValue(req, "templateId");
+  if (!templateId) {
+    throw badRequest("templateId is required.");
+  }
+  const input = reorderSectionsSchema.parse(req.body);
+  sendData(
+    res,
+    await templateService.reorderSections(
+      requireUser(req).uid,
+      templateId,
+      input.sectionIds,
+    ),
+  );
+});
+
 export const createTask = asyncHandler(async (req: Request, res: Response) => {
   const templateId = paramValue(req, "templateId");
   if (!templateId) {
@@ -141,6 +159,23 @@ export const createTask = asyncHandler(async (req: Request, res: Response) => {
     res,
     await templateService.createTask(requireUser(req).uid, templateId, input),
     201,
+  );
+});
+
+export const reorderTasks = asyncHandler(async (req: Request, res: Response) => {
+  const templateId = paramValue(req, "templateId");
+  if (!templateId) {
+    throw badRequest("templateId is required.");
+  }
+  const input = reorderTasksSchema.parse(req.body);
+  sendData(
+    res,
+    await templateService.reorderTasks(
+      requireUser(req).uid,
+      templateId,
+      input.sectionId,
+      input.taskIds,
+    ),
   );
 });
 

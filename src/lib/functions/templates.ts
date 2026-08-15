@@ -6,6 +6,8 @@ import type {
   PublicTemplateDetail,
   PurposeTemplate,
   PurposeTemplateDetail,
+  ReorderSectionsInput,
+  ReorderTasksInput,
   TemplateSection,
   TemplateTask,
   UpdateSectionInput,
@@ -80,6 +82,12 @@ export async function deleteSection(templateId: string, sectionId: string): Prom
   await functionsRequest(functionPaths.templates.section(templateId, sectionId), { method: "DELETE" });
 }
 
+export async function reorderSections(templateId: string, input: ReorderSectionsInput): Promise<PurposeTemplateDetail> {
+  return unwrapData(
+    await functionsRequest(functionPaths.templates.reorderSections(templateId), { method: "POST", body: input }),
+  );
+}
+
 export async function createTask(templateId: string, input: CreateTaskInput): Promise<TemplateTask> {
   return unwrapData(await functionsRequest(functionPaths.templates.tasks(templateId), { method: "POST", body: input }));
 }
@@ -92,4 +100,10 @@ export async function updateTask(templateId: string, taskId: string, input: Upda
 
 export async function deleteTask(templateId: string, taskId: string): Promise<void> {
   await functionsRequest(functionPaths.templates.task(templateId, taskId), { method: "DELETE" });
+}
+
+export async function reorderTasks(templateId: string, input: ReorderTasksInput): Promise<PurposeTemplateDetail> {
+  return unwrapData(
+    await functionsRequest(functionPaths.templates.reorderTasks(templateId), { method: "POST", body: input }),
+  );
 }

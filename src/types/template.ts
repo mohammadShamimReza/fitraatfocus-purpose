@@ -108,3 +108,12 @@ export type CreateTaskInput = {
 export type UpdateTaskInput = Partial<
   Pick<TemplateTask, "title" | "notes" | "priority" | "tags" | "sectionId" | "order" | "estimatedMinutes">
 >;
+
+export type ReorderSectionsInput = {
+  sectionIds: string[];
+};
+
+export type ReorderTasksInput = {
+  sectionId: string;
+  taskIds: string[];
+};

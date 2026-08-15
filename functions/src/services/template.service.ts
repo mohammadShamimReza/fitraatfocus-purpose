@@ -116,6 +116,46 @@ async function requireOwned(
   return template;
 }
 
+function assertPermutation(currentIds: string[], nextIds: string[]): void {
+  if (nextIds.length !== currentIds.length) {
+    throw badRequest("Order must include every item once.");
+  }
+
+  const unique = new Set(nextIds);
+  if (unique.size !== nextIds.length) {
+    throw badRequest("Order must include every item once.");
+  }
+
+  const current = new Set(currentIds);
+  for (const id of nextIds) {
+    if (!current.has(id)) {
+      throw badRequest("Order must include every item once.");
+    }
+  }
+}
+
+function compactSectionOrders(sections: TemplateSection[]): TemplateSection[] {
+  return [...sections]
+    .sort((left, right) => left.order - right.order)
+    .map((section, index) => ({ ...section, order: index }));
+}
+
+function compactTaskOrders(
+  tasks: TemplateTask[],
+  sectionId: string,
+): TemplateTask[] {
+  const inSection = tasks
+    .filter((task) => task.sectionId === sectionId)
+    .sort((left, right) => left.order - right.order);
+  const nextOrder = new Map(
+    inSection.map((task, index) => [task.id, index]),
+  );
+  return tasks.map((task) => {
+    const order = nextOrder.get(task.id);
+    return order === undefined ? task : { ...task, order };
+  });
+}
+
 export async function listPublicTemplates(): Promise<CatalogTemplate[]> {
   const snapshot = await templates.where("status", "==", "published").get();
   const items = snapshot.docs
@@ -288,8 +328,9 @@ export async function updateSection(
   input: UpdateSectionInput,
 ): Promise<TemplateSection> {
   const current = await requireOwned(templateId, uid);
+  const { order: _order, ...fields } = input;
   const sections = current.sections.map((section) => {
-    return section.id === sectionId ? { ...section, ...input } : section;
+    return section.id === sectionId ? { ...section, ...fields } : section;
   });
   const updated = sections.find((section) => section.id === sectionId);
   if (!updated) {
@@ -306,11 +347,62 @@ export async function deleteSection(
   sectionId: string,
 ): Promise<void> {
   const current = await requireOwned(templateId, uid);
-  await saveTemplate({
-    ...current,
-    sections: current.sections.filter((section) => section.id !== sectionId),
-    tasks: current.tasks.filter((task) => task.sectionId !== sectionId),
+  const sections = compactSectionOrders(
+    current.sections.filter((section) => section.id !== sectionId),
+  );
+  const tasks = current.tasks.filter((task) => task.sectionId !== sectionId);
+  await saveTemplate({ ...current, sections, tasks });
+}
+
+export async function reorderSections(
+  uid: string,
+  templateId: string,
+  sectionIds: string[],
+): Promise<PurposeTemplateDetail> {
+  const current = await requireOwned(templateId, uid);
+  assertPermutation(
+    current.sections.map((section) => section.id),
+    sectionIds,
+  );
+  const byId = new Map(
+    current.sections.map((section) => [section.id, section]),
+  );
+  const sections = sectionIds.map((id, index) => {
+    const section = byId.get(id);
+    if (!section) {
+      throw badRequest("Order must include every item once.");
+    }
+    return { ...section, order: index };
   });
+  return saveTemplate({ ...current, sections });
+}
+
+export async function reorderTasks(
+  uid: string,
+  templateId: string,
+  sectionId: string,
+  taskIds: string[],
+): Promise<PurposeTemplateDetail> {
+  const current = await requireOwned(templateId, uid);
+  if (!current.sections.some((section) => section.id === sectionId)) {
+    throw notFound("Section not found.");
+  }
+
+  const inSection = current.tasks.filter((task) => task.sectionId === sectionId);
+  assertPermutation(
+    inSection.map((task) => task.id),
+    taskIds,
+  );
+  const byId = new Map(inSection.map((task) => [task.id, task]));
+  const reordered = taskIds.map((id, index) => {
+    const task = byId.get(id);
+    if (!task) {
+      throw badRequest("Order must include every item once.");
+    }
+    return { ...task, order: index };
+  });
+  const others = current.tasks.filter((task) => task.sectionId !== sectionId);
+  return saveTemplate({ ...current, tasks: [...others, ...reordered] });
 }
 
 export async function createTask(
@@ -347,16 +439,39 @@ export async function updateTask(
   input: UpdateTaskInput,
 ): Promise<TemplateTask> {
   const current = await requireOwned(templateId, uid);
-  const tasks = current.tasks.map((task) => {
-    return task.id === taskId ? { ...task, ...input } : task;
-  });
-  const updated = tasks.find((task) => task.id === taskId);
-  if (!updated) {
+  const existing = current.tasks.find((task) => task.id === taskId);
+  if (!existing) {
     throw notFound("Task not found.");
   }
 
+  const nextSectionId = input.sectionId ?? existing.sectionId;
+  if (!current.sections.some((section) => section.id === nextSectionId)) {
+    throw badRequest("Section not found.");
+  }
+
+  const moved = nextSectionId !== existing.sectionId;
+  const destCount = current.tasks.filter((task) => {
+    return task.sectionId === nextSectionId && task.id !== taskId;
+  }).length;
+
+  const { order: _order, sectionId: _sectionId, ...fields } = input;
+  const patched: TemplateTask = {
+    ...existing,
+    ...fields,
+    sectionId: nextSectionId,
+    order: moved ? destCount : existing.order,
+  };
+
+  let tasks = current.tasks.map((task) => {
+    return task.id === taskId ? patched : task;
+  });
+  if (moved) {
+    tasks = compactTaskOrders(tasks, existing.sectionId);
+    tasks = compactTaskOrders(tasks, nextSectionId);
+  }
+
   await saveTemplate({ ...current, tasks });
-  return updated;
+  return patched;
 }
 
 export async function deleteTask(
@@ -365,8 +480,10 @@ export async function deleteTask(
   taskId: string,
 ): Promise<void> {
   const current = await requireOwned(templateId, uid);
-  await saveTemplate({
-    ...current,
-    tasks: current.tasks.filter((task) => task.id !== taskId),
-  });
+  const existing = current.tasks.find((task) => task.id === taskId);
+  const remaining = current.tasks.filter((task) => task.id !== taskId);
+  const tasks = existing
+    ? compactTaskOrders(remaining, existing.sectionId)
+    : remaining;
+  await saveTemplate({ ...current, tasks });
 }

@@ -8,8 +8,10 @@ export const functionPaths = {
     publish: (templateId: string) => `/v1/templates/${templateId}/publish`,
     download: (templateId: string) => `/v1/templates/${templateId}/download`,
     sections: (templateId: string) => `/v1/templates/${templateId}/sections`,
+    reorderSections: (templateId: string) => `/v1/templates/${templateId}/sections/reorder`,
     section: (templateId: string, sectionId: string) => `/v1/templates/${templateId}/sections/${sectionId}`,
     tasks: (templateId: string) => `/v1/templates/${templateId}/tasks`,
+    reorderTasks: (templateId: string) => `/v1/templates/${templateId}/tasks/reorder`,
     task: (templateId: string, taskId: string) => `/v1/templates/${templateId}/tasks/${taskId}`,
   },
   profiles: {

@@ -78,3 +78,14 @@ export const updateTaskSchema = z
   .refine((value) => Object.keys(value).length > 0, {
     message: "No fields to update.",
   });
+
+const idListSchema = z.array(z.string().trim().min(1).max(64)).max(500);
+
+export const reorderSectionsSchema = z.object({
+  sectionIds: idListSchema,
+});
+
+export const reorderTasksSchema = z.object({
+  sectionId: z.string().trim().min(1).max(64),
+  taskIds: idListSchema,
+});
