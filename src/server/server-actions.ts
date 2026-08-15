@@ -1,7 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { getCookie, setCookie } from "@/server/cookies.server";
-
 import { DEFAULT_LOCALE, isAppLocale, LOCALE_STORAGE_KEY } from "@/lib/i18n/config";
 import {
   getPreferencePersistence,
@@ -11,9 +9,14 @@ import {
   parsePreference,
 } from "@/lib/preferences/preferences-config";
 
+async function readCookie(key: string) {
+  const { getCookie } = await import("@tanstack/react-start/server");
+  return getCookie(key);
+}
+
 const getValueFromCookieServer = createServerFn({ method: "GET" })
   .validator((key: string) => key)
-  .handler(({ data: key }) => getCookie(key));
+  .handler(async ({ data: key }) => readCookie(key));
 
 export async function getValueFromCookie(key: string): Promise<string | undefined> {
   return getValueFromCookieServer({ data: key });
@@ -30,7 +33,8 @@ type SetCookieInput = {
 
 const setValueToCookieServer = createServerFn({ method: "POST" })
   .validator((data: SetCookieInput) => data)
-  .handler(({ data }) => {
+  .handler(async ({ data }) => {
+    const { setCookie } = await import("@tanstack/react-start/server");
     setCookie(data.key, data.value, {
       path: data.options.path ?? "/",
       maxAge: data.options.maxAge ?? 60 * 60 * 24 * 7, // default: 7 days
@@ -48,7 +52,7 @@ export async function setValueToCookie(
 
 const getPreferenceServer = createServerFn({ method: "GET" })
   .validator((key: PreferenceKey) => key)
-  .handler(({ data: key }) => {
+  .handler(async ({ data: key }) => {
     const definition = PREFERENCE_REGISTRY[key];
     const persistence = getPreferencePersistence(key);
 
@@ -56,25 +60,25 @@ const getPreferenceServer = createServerFn({ method: "GET" })
       return definition.defaultValue;
     }
 
-    return parsePreference(key, getCookie(key)?.trim());
+    return parsePreference(key, (await readCookie(key))?.trim());
   });
 
 export async function getPreference<K extends PreferenceKey>(key: K): Promise<PreferenceValueMap[K]> {
   return getPreferenceServer({ data: key }) as Promise<PreferenceValueMap[K]>;
 }
 
-const getDashboardLayoutServer = createServerFn({ method: "GET" }).handler(() => ({
-  defaultOpen: getCookie("sidebar_state") !== "false",
-  variant: parsePreference("sidebar_variant", getCookie("sidebar_variant")?.trim()),
-  collapsible: parsePreference("sidebar_collapsible", getCookie("sidebar_collapsible")?.trim()),
+const getDashboardLayoutServer = createServerFn({ method: "GET" }).handler(async () => ({
+  defaultOpen: (await readCookie("sidebar_state")) !== "false",
+  variant: parsePreference("sidebar_variant", (await readCookie("sidebar_variant"))?.trim()),
+  collapsible: parsePreference("sidebar_collapsible", (await readCookie("sidebar_collapsible"))?.trim()),
 }));
 
 export async function getDashboardLayout() {
   return getDashboardLayoutServer();
 }
 
-const getInitialLocaleServer = createServerFn({ method: "GET" }).handler(() => {
-  const value = getCookie(LOCALE_STORAGE_KEY)?.trim() ?? "";
+const getInitialLocaleServer = createServerFn({ method: "GET" }).handler(async () => {
+  const value = (await readCookie(LOCALE_STORAGE_KEY))?.trim() ?? "";
   return isAppLocale(value) ? value : DEFAULT_LOCALE;
 });
 
