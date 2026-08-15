@@ -45,7 +45,7 @@ Dashboard routes require a signed-in session. Unauthenticated visits are sent to
 
 ### Prerequisites
 
-- Node.js 20+ (Cloud Functions use Node 24)
+- Node.js 24 (Active LTS). Cloud Functions and Vercel both use Node 24.
 - npm
 - [Firebase CLI](https://firebase.google.com/docs/cli) (`npm i -g firebase-tools`) for emulators and function deploy
 - Firebase web credentials for the shared Fitraat Focus project
@@ -95,7 +95,7 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 
 ### Web (Vercel)
 
-1. Import this GitHub repo in Vercel. Framework preset should be **TanStack Start**.
+1. Import this GitHub repo in Vercel. `vercel.json` sets the framework preset to **Other** (`null`) so Vercel does not apply the TanStack Start preset. Nitro still deploys to Vercel from `npm run build`. Set the Node.js version to **24.x** if the dashboard is not already on 24.
 2. Set the `VITE_FIREBASE_*` and `VITE_FUNCTIONS_REGION` values from `.env.example` in **Project Settings → Environment Variables** (Production). Leave `VITE_FUNCTIONS_URL` unset so the site calls the deployed `studio` function.
 3. Add the production domain (for example `studio.fitraatfocus.fitraat.com`) to **Firebase Authentication → Settings → Authorized domains**.
 4. Point the custom domain at Vercel.
