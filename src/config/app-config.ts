@@ -3,7 +3,7 @@ const currentYear = new Date().getFullYear();
 export const APP_LINKS = {
   site: "https://fitraatfocus.fitraat.com/",
   studio: "https://studio.fitraatfocus.fitraat.com",
-  webApp: "https://fitraat-focus.web.app",
+  webApp: "https://app.fitraatfocus.com/welcome",
   playStore: "https://play.google.com/store/apps/details?id=com.fitraatfocus",
   iPhoneGuide: "https://fitraatfocus.fitraat.com/#iphone",
   privacy: "https://fitraatfocus.fitraat.com/privacy",
@@ -16,8 +16,8 @@ export const APP_CONFIG = {
   version: "1.0.0",
   copyright: `© ${currentYear}, Fitraat Focus. Built for consistency, clarity, and meaningful work.`,
   meta: {
-    title: "Fitraat Focus — Purpose System Studio",
+    title: "Fitraat Focus — Know the work. Then sit down and do it.",
     description:
-      "Browse purpose-driven systems written by named creators. Take a copy into the Fitraat Focus app when you are ready to run the work.",
+      "Browse purpose systems here. Take a copy, then use them in the original Fitraat Focus app on your phone or on the web.",
   },
 };

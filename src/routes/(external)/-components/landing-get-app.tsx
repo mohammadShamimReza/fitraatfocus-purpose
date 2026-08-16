@@ -9,6 +9,7 @@ import { CREATE_SYSTEM_PATH } from "@/lib/auth/post-auth-path";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 
 import { LandingReveal } from "./landing-reveal";
+import { UseInAppNote } from "./use-in-app-note";
 
 export function LandingGetApp() {
   const { t } = useI18n();
@@ -32,22 +33,23 @@ export function LandingGetApp() {
             <div className="max-w-xl space-y-3">
               <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">{t("landing.cta.title")}</h2>
               <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">{t("landing.cta.body")}</p>
+              <UseInAppNote />
             </div>
             <div className="flex flex-wrap gap-2">
               <Button size="lg" nativeButton={false} render={<Link to="/systems" />}>
                 {t("landing.hero.browse")}
               </Button>
-              <Button size="lg" nativeButton={false} variant="outline" render={createLink}>
-                {t("landing.hero.create")}
-              </Button>
               <Button
                 size="lg"
                 nativeButton={false}
-                variant="ghost"
+                variant="outline"
                 render={<a href={APP_LINKS.webApp} target="_blank" rel="noreferrer" />}
               >
-                {t("landing.cta.web")}
+                {t("landing.hero.openApp")}
                 <ArrowUpRight data-icon="inline-end" />
+              </Button>
+              <Button size="lg" nativeButton={false} variant="ghost" render={createLink}>
+                {t("landing.hero.create")}
               </Button>
               <Button
                 size="lg"

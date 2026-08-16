@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
+import { APP_LINKS } from "@/config/app-config";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useI18n } from "@/lib/i18n/i18n-provider";
@@ -21,6 +22,8 @@ import { getInitials } from "@/lib/utils";
 import { useDownloadTemplateMutation, usePublicTemplateQuery } from "@/query/templates";
 import { EditorSections } from "@/routes/(main)/dashboard/systems/-components/editor-sections";
 import { EditorTasks } from "@/routes/(main)/dashboard/systems/-components/editor-tasks";
+
+import { UseInAppNote } from "../../-components/use-in-app-note";
 
 export function PublicTemplateView({ templateId }: { templateId: string }) {
   const { t } = useI18n();
@@ -125,15 +128,18 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
             </span>
           </div>
         </div>
-        <TemplateAction
-          templateId={templateId}
-          isOwner={isOwner}
-          hasDownloaded={hasDownloaded}
-          isReady={isReady}
-          isSignedIn={Boolean(user)}
-          isPending={download.isPending}
-          onDownload={onDownload}
-        />
+        <div className="flex max-w-xs flex-col gap-3">
+          <TemplateAction
+            templateId={templateId}
+            isOwner={isOwner}
+            hasDownloaded={hasDownloaded}
+            isReady={isReady}
+            isSignedIn={Boolean(user)}
+            isPending={download.isPending}
+            onDownload={onDownload}
+          />
+          {isOwner ? null : <UseInAppNote />}
+        </div>
       </div>
 
       <Card>
@@ -208,6 +214,8 @@ function TemplateAction({
   isPending: boolean;
   onDownload: () => Promise<void>;
 }) {
+  const { t } = useI18n();
+
   if (isOwner) {
     return (
       <Button nativeButton={false} render={<Link to="/dashboard/systems/$templateId" params={{ templateId }} />}>
@@ -217,7 +225,11 @@ function TemplateAction({
   }
 
   if (hasDownloaded) {
-    return <Button disabled>Downloaded</Button>;
+    return (
+      <Button nativeButton={false} render={<a href={APP_LINKS.webApp} target="_blank" rel="noreferrer" />}>
+        {t("landing.appNoteCta")}
+      </Button>
+    );
   }
 
   if (isReady && isSignedIn) {

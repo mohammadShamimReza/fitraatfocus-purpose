@@ -15,6 +15,14 @@ export function LandingFooter() {
         <div className="space-y-2 lg:col-span-1">
           <FitraatBrand markClassName="size-5" nameClassName="font-semibold text-sm" />
           <p className="max-w-xs text-muted-foreground text-sm leading-relaxed">{t("landing.footer.blurb")}</p>
+          <a
+            href={APP_LINKS.webApp}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex w-fit font-medium text-sm transition-colors hover:text-foreground"
+          >
+            {t("landing.appNoteCta")}
+          </a>
         </div>
         <FooterColumn title={t("landing.footer.product")}>
           <Link to="/" hash="how" className="transition-colors hover:text-foreground">

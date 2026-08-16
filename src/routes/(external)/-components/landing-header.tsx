@@ -4,6 +4,7 @@ import { FitraatBrand } from "@/components/brand/fitraat-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { APP_LINKS } from "@/config/app-config";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { CREATE_SYSTEM_PATH } from "@/lib/auth/post-auth-path";
 import { useI18n } from "@/lib/i18n/i18n-provider";
@@ -31,6 +32,14 @@ export function LandingHeader() {
           </Button>
           <Button nativeButton={false} size="sm" variant="ghost" render={<Link to="/" hash="faq" />}>
             {t("landing.nav.faq")}
+          </Button>
+          <Button
+            nativeButton={false}
+            size="sm"
+            variant="ghost"
+            render={<a href={APP_LINKS.webApp} target="_blank" rel="noreferrer" />}
+          >
+            {t("landing.nav.openApp")}
           </Button>
         </nav>
         <div className="flex items-center gap-1.5">

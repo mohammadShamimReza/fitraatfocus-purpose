@@ -4,7 +4,8 @@ import { useI18n } from "@/lib/i18n/i18n-provider";
 import type { MessageKey } from "@/lib/i18n/messages/en";
 import { cn } from "@/lib/utils";
 
-import { landingCardClass, LandingKicker, LandingReveal } from "./landing-reveal";
+import { LandingKicker, LandingReveal, landingCardClass } from "./landing-reveal";
+import { UseInAppNote } from "./use-in-app-note";
 
 export function LandingProblem() {
   const { t } = useI18n();
@@ -21,6 +22,7 @@ export function LandingProblem() {
           <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
             {t("landing.problem.body")}
           </p>
+          <UseInAppNote />
         </div>
         <StudioGif id="purpose-complete" alt={t("gif.complete")} size={140} className="self-start sm:self-center" />
       </LandingReveal>

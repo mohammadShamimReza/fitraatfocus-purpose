@@ -3,15 +3,20 @@ import { useI18n } from "@/lib/i18n/i18n-provider";
 import type { MessageKey } from "@/lib/i18n/messages/en";
 
 import { LandingKicker, LandingReveal } from "./landing-reveal";
+import { UseInAppNote } from "./use-in-app-note";
 
 export function LandingFaq() {
   const { t } = useI18n();
 
   return (
-    <section id="faq" className="mx-auto flex w-full max-w-6xl scroll-mt-20 flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20">
+    <section
+      id="faq"
+      className="mx-auto flex w-full max-w-6xl scroll-mt-20 flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20"
+    >
       <LandingReveal className="max-w-2xl space-y-3">
         <LandingKicker>{t("landing.faq.kicker")}</LandingKicker>
         <h2 className="font-semibold text-3xl tracking-tight sm:text-4xl">{t("landing.faq.title")}</h2>
+        <UseInAppNote />
       </LandingReveal>
       <LandingReveal>
         <Accordion className="max-w-3xl rounded-xl border bg-card px-4">

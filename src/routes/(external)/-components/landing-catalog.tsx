@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n/i18n-provider";
 
 import { LandingKicker, LandingReveal } from "./landing-reveal";
 import { LANDING_SAMPLES, LandingSampleCard } from "./landing-sample-card";
+import { UseInAppNote } from "./use-in-app-note";
 
 export function LandingCatalog() {
   const { t } = useI18n();
@@ -22,6 +23,7 @@ export function LandingCatalog() {
         <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
           {t("landing.showcase.body")}
         </p>
+        <UseInAppNote />
       </LandingReveal>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

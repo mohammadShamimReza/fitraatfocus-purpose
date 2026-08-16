@@ -14,6 +14,7 @@ import { matchesTemplateSearch } from "@/lib/templates/filter";
 import { usePublicTemplatesQuery } from "@/query/templates";
 
 import { TemplateCard } from "../../-components/template-card";
+import { UseInAppNote } from "../../-components/use-in-app-note";
 
 export function PublicCatalog() {
   const { t } = useI18n();
@@ -35,6 +36,7 @@ export function PublicCatalog() {
         <p className="max-w-xl text-muted-foreground text-sm leading-relaxed sm:text-base">
           {t("landing.catalog.body")}
         </p>
+        <UseInAppNote />
       </div>
 
       {query.isPending ? (
