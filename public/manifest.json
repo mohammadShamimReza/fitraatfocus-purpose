@@ -1,7 +1,7 @@
 {
   "short_name": "Fitraat Focus",
-  "name": "Fitraat Focus — Purpose System Studio",
-  "description": "Create and publish purpose-driven todo systems for Fitraat Focus.",
+  "name": "Fitraat Focus — Purpose systems",
+  "description": "Browse purpose systems, take a copy, and use them in Fitraat Focus.",
   "icons": [
     {
       "src": "/favicon.svg",

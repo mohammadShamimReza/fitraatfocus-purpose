@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 
 import { CircleAlert, Download, Layers, Plus } from "lucide-react";
 
+import { SystemsListSkeleton } from "@/components/page-skeletons";
 import { StudioGif } from "@/components/studio-gif";
 import { SystemCover } from "@/components/system-cover";
 import { TemplateFilters } from "@/components/template-filters";
@@ -12,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { Spinner } from "@/components/ui/spinner";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useI18n } from "@/lib/i18n/i18n-provider";
@@ -50,13 +50,6 @@ export function SystemsList() {
         </Button>
       </div>
 
-      {query.isPending ? (
-        <div className="flex min-h-72 items-center justify-center">
-          <Spinner className="size-6" />
-          <span className="sr-only">{t("systems.loading")}</span>
-        </div>
-      ) : null}
-
       {query.isError ? (
         <Alert variant="destructive">
           <CircleAlert />
@@ -87,7 +80,7 @@ export function SystemsList() {
         </Empty>
       ) : null}
 
-      {query.isSuccess && query.data.length > 0 ? (
+      {query.isPending || (query.isSuccess && query.data.length > 0) ? (
         <div className="flex flex-col gap-4">
           <TemplateFilters
             query={titleQuery}
@@ -97,27 +90,33 @@ export function SystemsList() {
             status={status}
             onStatusChange={setStatus}
           />
-          <div className="flex flex-wrap gap-2 text-muted-foreground text-xs">
-            <span>
-              {t(filtered.length === 1 ? "systems.countOne" : "systems.countMany", {
-                count: filtered.length,
-              })}
-            </span>
-            <span aria-hidden="true">·</span>
-            <span>{t("systems.publishedCount", { count: published })}</span>
-            <span aria-hidden="true">·</span>
-            <span>{t("systems.draftCount", { count: drafts })}</span>
-            <span aria-hidden="true">·</span>
-            <span>{t("systems.downloadCount", { count: formatCount(downloads, locale) })}</span>
-          </div>
-          {filtered.length === 0 ? (
-            <p className="text-muted-foreground text-sm">{t("search.empty")}</p>
+          {query.isPending ? (
+            <SystemsListSkeleton label={t("systems.loading")} />
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((template) => (
-                <SystemCard key={template.id} template={template} />
-              ))}
-            </div>
+            <>
+              <div className="flex flex-wrap gap-2 text-muted-foreground text-xs">
+                <span>
+                  {t(filtered.length === 1 ? "systems.countOne" : "systems.countMany", {
+                    count: filtered.length,
+                  })}
+                </span>
+                <span aria-hidden="true">·</span>
+                <span>{t("systems.publishedCount", { count: published })}</span>
+                <span aria-hidden="true">·</span>
+                <span>{t("systems.draftCount", { count: drafts })}</span>
+                <span aria-hidden="true">·</span>
+                <span>{t("systems.downloadCount", { count: formatCount(downloads, locale) })}</span>
+              </div>
+              {filtered.length === 0 ? (
+                <p className="text-muted-foreground text-sm">{t("search.empty")}</p>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {filtered.map((template) => (
+                    <SystemCard key={template.id} template={template} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       ) : null}

@@ -2,7 +2,7 @@ import { type ReactNode, useEffect } from "react";
 
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 
-import { Spinner } from "@/components/ui/spinner";
+import { DashboardSessionSkeleton } from "@/components/page-skeletons";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 
 import { useAuth } from "./auth-provider";
@@ -24,12 +24,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   }, [isReady, navigate, pathname, user]);
 
   if (!isReady) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Spinner className="size-6" />
-        <span className="sr-only">{t("auth.checkingSession")}</span>
-      </div>
-    );
+    return <DashboardSessionSkeleton label={t("auth.checkingSession")} />;
   }
 
   if (!user) {

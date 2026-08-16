@@ -2,12 +2,12 @@ import { useMemo, useState } from "react";
 
 import { CircleAlert } from "lucide-react";
 
+import { CatalogGridSkeleton } from "@/components/page-skeletons";
 import { StudioGif } from "@/components/studio-gif";
 import { TemplateFilters } from "@/components/template-filters";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { Spinner } from "@/components/ui/spinner";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { matchesTemplateSearch } from "@/lib/templates/filter";
@@ -39,13 +39,6 @@ export function PublicCatalog() {
         <UseInAppNote />
       </div>
 
-      {query.isPending ? (
-        <div className="flex min-h-64 items-center justify-center">
-          <Spinner className="size-6" />
-          <span className="sr-only">{t("landing.catalog.loading")}</span>
-        </div>
-      ) : null}
-
       {query.isError ? (
         <Alert variant="destructive">
           <CircleAlert />
@@ -71,7 +64,7 @@ export function PublicCatalog() {
         </Empty>
       ) : null}
 
-      {query.isSuccess && query.data.length > 0 ? (
+      {query.isPending || (query.isSuccess && query.data.length > 0) ? (
         <div className="flex flex-col gap-6">
           <TemplateFilters
             query={titleQuery}
@@ -79,15 +72,17 @@ export function PublicCatalog() {
             category={category}
             onCategoryChange={setCategory}
           />
-          {filtered.length === 0 ? (
+          {query.isPending ? <CatalogGridSkeleton label={t("landing.catalog.loading")} /> : null}
+          {!query.isPending && filtered.length === 0 ? (
             <p className="text-muted-foreground text-sm">{t("search.empty")}</p>
-          ) : (
+          ) : null}
+          {!query.isPending && filtered.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((template) => (
                 <TemplateCard key={template.id} template={template} />
               ))}
             </div>
-          )}
+          ) : null}
         </div>
       ) : null}
     </div>

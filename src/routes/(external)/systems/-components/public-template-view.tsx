@@ -4,20 +4,19 @@ import { Link } from "@tanstack/react-router";
 
 import { ArrowLeft, CircleAlert, Download, Layers, ListTodo } from "lucide-react";
 
+import { TemplatePageSkeleton } from "@/components/page-skeletons";
 import { SystemCover } from "@/components/system-cover";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { APP_LINKS } from "@/config/app-config";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useI18n } from "@/lib/i18n/i18n-provider";
-import { getExpertiseLabel } from "@/lib/profiles/options";
+import { categoryLabel, expertiseLabel } from "@/lib/i18n/labels";
 import { formatCount } from "@/lib/templates/format";
-import { getCategoryLabel } from "@/lib/templates/options";
 import { getInitials } from "@/lib/utils";
 import { useDownloadTemplateMutation, usePublicTemplateQuery } from "@/query/templates";
 import { EditorSections } from "@/routes/(main)/dashboard/systems/-components/editor-sections";
@@ -59,12 +58,12 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
     try {
       await download.mutateAsync();
       toast.add({
-        title: "Downloaded",
-        description: "This system is marked as downloaded for your account.",
+        title: t("template.copied"),
+        description: t("template.copiedBody"),
       });
     } catch (error) {
       toast.add({
-        title: "Could not download",
+        title: t("template.copyError"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -72,25 +71,31 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
 
   if (query.isPending) {
     return (
-      <div className="flex min-h-72 items-center justify-center">
-        <Spinner className="size-6" />
-        <span className="sr-only">Loading the system</span>
+      <div className="flex flex-col gap-8">
+        <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
+          <ArrowLeft data-icon="inline-start" />
+          {t("catalog.back")}
+        </Button>
+        <TemplatePageSkeleton label={t("loading.template")} />
       </div>
     );
   }
 
   if (query.isError || !query.data) {
     return (
-      <Alert variant="destructive">
-        <CircleAlert />
-        <AlertTitle>Could not load this system</AlertTitle>
-        <AlertDescription className="flex flex-col gap-3">
-          <p>{query.error ? getFunctionsErrorMessage(query.error) : "The system was not found."}</p>
-          <Button nativeButton={false} variant="ghost" size="sm" render={<Link to="/systems" />}>
-            {t("catalog.back")}
-          </Button>
-        </AlertDescription>
-      </Alert>
+      <div className="flex flex-col gap-8">
+        <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
+          <ArrowLeft data-icon="inline-start" />
+          {t("catalog.back")}
+        </Button>
+        <Alert variant="destructive">
+          <CircleAlert />
+          <AlertTitle>{t("template.loadError")}</AlertTitle>
+          <AlertDescription>
+            {query.error ? getFunctionsErrorMessage(query.error) : t("template.notFound")}
+          </AlertDescription>
+        </Alert>
+      </div>
     );
   }
 
@@ -110,21 +115,21 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-3">
           <SystemCover src={template.imageUrl} alt={template.title} className="max-w-xl rounded-xl border" />
-          <Badge variant="outline">{getCategoryLabel(template.category)}</Badge>
+          <Badge variant="outline">{categoryLabel(t, template.category)}</Badge>
           <h1 className="text-3xl tracking-tight sm:text-4xl">{template.title}</h1>
           <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{template.purpose}</p>
           <div className="flex flex-wrap items-center gap-3 text-muted-foreground text-xs">
             <span className="inline-flex items-center gap-1.5">
               <Layers className="size-3.5" />
-              {template.sectionCount} sections
+              {t("common.sectionsCount", { count: template.sectionCount })}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <ListTodo className="size-3.5" />
-              {template.taskCount} tasks
+              {t("common.tasksCount", { count: template.taskCount })}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Download className="size-3.5" />
-              {formatCount(template.downloadCount)} downloads
+              {t("common.copiesCount", { count: formatCount(template.downloadCount) })}
             </span>
           </div>
         </div>
@@ -144,8 +149,8 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Creator</CardTitle>
-          <CardDescription>Why this library is worth trusting.</CardDescription>
+          <CardTitle className="text-base">{t("common.creator")}</CardTitle>
+          <CardDescription>{t("template.creatorHelp")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Link
@@ -165,7 +170,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
                 <span className="flex flex-wrap gap-1 pt-1">
                   {template.creator.expertise.map((item) => (
                     <Badge key={item} variant="secondary">
-                      {getExpertiseLabel(item)}
+                      {expertiseLabel(t, item)}
                     </Badge>
                   ))}
                 </span>
@@ -219,7 +224,7 @@ function TemplateAction({
   if (isOwner) {
     return (
       <Button nativeButton={false} render={<Link to="/dashboard/systems/$templateId" params={{ templateId }} />}>
-        Edit in studio
+        {t("template.editStudio")}
       </Button>
     );
   }
@@ -235,14 +240,14 @@ function TemplateAction({
   if (isReady && isSignedIn) {
     return (
       <Button disabled={isPending} onClick={() => void onDownload()}>
-        {isPending ? "Downloading…" : "Download"}
+        {isPending ? t("template.copying") : t("landing.play.takeCopy")}
       </Button>
     );
   }
 
   return (
     <Button nativeButton={false} render={<Link to="/auth/v1/login" search={{ redirect: `/systems/${templateId}` }} />}>
-      Sign in to download
+      {t("template.signInToCopy")}
     </Button>
   );
 }

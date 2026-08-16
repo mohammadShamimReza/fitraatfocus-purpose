@@ -8,10 +8,8 @@ export function RootError({ error, reset }: ErrorComponentProps) {
     <main className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center">
       <FitraatMark className="size-8 text-foreground" />
       <div className="flex max-w-md flex-col gap-2">
-        <h1 className="font-semibold text-2xl">Something went wrong.</h1>
-        <p className="text-muted-foreground">
-          An unexpected error occurred while loading this page. Try again or return home.
-        </p>
+        <h1 className="font-semibold text-2xl">Something went wrong</h1>
+        <p className="text-muted-foreground">Try again, or go home.</p>
         {import.meta.env.DEV ? <p className="text-destructive text-sm">{error.message}</p> : null}
       </div>
       <div className="flex flex-wrap justify-center gap-2">

@@ -4,10 +4,10 @@ import { Link } from "@tanstack/react-router";
 
 import { ArrowLeft, CircleAlert } from "lucide-react";
 
+import { EditorSkeleton } from "@/components/page-skeletons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
@@ -80,32 +80,43 @@ export function SystemEditor({ templateId }: { templateId: string }) {
     }
   };
 
+  const backLink = (
+    <Button
+      nativeButton={false}
+      variant="ghost"
+      size="sm"
+      className="-ml-2 w-fit"
+      render={<Link to="/dashboard/systems" />}
+    >
+      <ArrowLeft data-icon="inline-start" />
+      {t("systems.title")}
+    </Button>
+  );
+
   if (query.isPending) {
     return (
-      <div className="flex min-h-72 items-center justify-center">
-        <Spinner className="size-6" />
-        <span className="sr-only">{t("editor.loading")}</span>
+      <div className="flex flex-col gap-5">
+        {backLink}
+        <EditorSkeleton label={t("editor.loading")} />
       </div>
     );
   }
 
   if (query.isError || !query.data) {
     return (
-      <Alert variant="destructive">
-        <CircleAlert />
-        <AlertTitle>{t("editor.loadError")}</AlertTitle>
-        <AlertDescription className="flex flex-col gap-3">
-          <p>{query.error ? getFunctionsErrorMessage(query.error) : t("editor.notFound")}</p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => void query.refetch()}>
+      <div className="flex flex-col gap-5">
+        {backLink}
+        <Alert variant="destructive">
+          <CircleAlert />
+          <AlertTitle>{t("editor.loadError")}</AlertTitle>
+          <AlertDescription className="flex flex-col gap-3">
+            <p>{query.error ? getFunctionsErrorMessage(query.error) : t("editor.notFound")}</p>
+            <Button variant="outline" size="sm" className="w-fit" onClick={() => void query.refetch()}>
               {t("common.tryAgain")}
             </Button>
-            <Button nativeButton={false} variant="ghost" size="sm" render={<Link to="/dashboard/systems" />}>
-              {t("editor.back")}
-            </Button>
-          </div>
-        </AlertDescription>
-      </Alert>
+          </AlertDescription>
+        </Alert>
+      </div>
     );
   }
 

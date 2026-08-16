@@ -5,13 +5,14 @@ import { Download, Layers } from "lucide-react";
 import { SystemCover } from "@/components/system-cover";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getExpertiseLabel } from "@/lib/profiles/options";
+import { useI18n } from "@/lib/i18n/i18n-provider";
+import { categoryLabel, expertiseLabel } from "@/lib/i18n/labels";
 import { formatCount } from "@/lib/templates/format";
-import { getCategoryLabel } from "@/lib/templates/options";
 import { getInitials } from "@/lib/utils";
 import type { CatalogTemplate } from "@/types/template";
 
 export function TemplateCard({ template }: { template: CatalogTemplate }) {
+  const { t } = useI18n();
   const expertise = template.creator.expertise.slice(0, 2);
 
   return (
@@ -19,7 +20,7 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
       <SystemCover src={template.imageUrl} alt="" className="rounded-t-xl" />
       <CardHeader className="gap-3">
         <div className="flex items-center justify-between gap-2">
-          <Badge variant="outline">{getCategoryLabel(template.category)}</Badge>
+          <Badge variant="outline">{categoryLabel(t, template.category)}</Badge>
           <span className="inline-flex items-center gap-1 text-muted-foreground text-xs">
             <Download className="size-3" />
             {formatCount(template.downloadCount)}
@@ -42,7 +43,7 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
         <div className="flex items-center justify-between gap-3 text-muted-foreground text-xs">
           <span className="inline-flex items-center gap-1.5">
             <Layers className="size-3.5" />
-            {template.sectionCount} sections · {template.taskCount} tasks
+            {t("systems.libraryMeta", { sections: template.sectionCount, tasks: template.taskCount })}
           </span>
         </div>
         <Link
@@ -56,7 +57,9 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
           <span className="min-w-0">
             <span className="block truncate font-medium text-foreground text-sm">{template.creator.displayName}</span>
             <span className="block truncate text-muted-foreground text-xs">
-              {template.creator.headline || expertise.map(getExpertiseLabel).join(" · ") || "Creator"}
+              {template.creator.headline ||
+                expertise.map((item) => expertiseLabel(t, item)).join(" · ") ||
+                t("common.creator")}
             </span>
           </span>
         </Link>

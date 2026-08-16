@@ -194,6 +194,20 @@
   .landing-rise {
     animation: landing-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+
+  .skeleton-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--background) 70%, transparent),
+      transparent
+    );
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
 }
 
 @keyframes landing-rise {
@@ -205,5 +219,11 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }

@@ -14,10 +14,10 @@ export const APP_LINKS = {
 export const APP_CONFIG = {
   name: "Fitraat Focus",
   version: "1.0.0",
-  copyright: `© ${currentYear}, Fitraat Focus. Built for consistency, clarity, and meaningful work.`,
+  copyright: `© ${currentYear} Fitraat Focus.`,
   meta: {
     title: "Fitraat Focus — Know the work. Then sit down and do it.",
     description:
-      "Browse purpose systems here. Take a copy, then use them in the original Fitraat Focus app on your phone or on the web.",
+      "Browse purpose systems here. Take a copy, then use them in Fitraat Focus on your phone or on the web.",
   },
 };
