@@ -58,6 +58,10 @@ export async function publishTemplate(templateId: string): Promise<PurposeTempla
   return unwrapData(await functionsRequest(functionPaths.templates.publish(templateId), { method: "POST" }));
 }
 
+export async function deleteTemplate(templateId: string): Promise<void> {
+  await functionsRequest(functionPaths.templates.detail(templateId), { method: "DELETE" });
+}
+
 export async function downloadTemplate(templateId: string): Promise<PurposeTemplate> {
   return unwrapData(await functionsRequest(functionPaths.templates.download(templateId), { method: "POST" }));
 }

@@ -18,6 +18,7 @@ import type { TranslateFn } from "@/lib/i18n/translate";
 import { usePublishTemplateMutation, useTemplateQuery } from "@/query/templates";
 import type { TemplateStatus } from "@/types/template";
 
+import { DeleteSystemButton } from "./delete-system-button";
 import { EditorMetadataForm } from "./editor-metadata-form";
 import { EditorOverview } from "./editor-overview";
 import { EditorSections } from "./editor-sections";
@@ -162,15 +163,21 @@ export function SystemEditor({ templateId }: { templateId: string }) {
             ) : null}
           </div>
           {canEdit ? (
-            <Button
-              className="shrink-0"
-              disabled={template.status === "published" || publish.isPending}
-              onClick={() => {
-                void onPublish();
-              }}
-            >
-              {getPublishLabel(template.status, publish.isPending, t)}
-            </Button>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <DeleteSystemButton
+                templateId={template.id}
+                title={template.title}
+                storagePath={template.storagePath}
+              />
+              <Button
+                disabled={template.status === "published" || publish.isPending}
+                onClick={() => {
+                  void onPublish();
+                }}
+              >
+                {getPublishLabel(template.status, publish.isPending, t)}
+              </Button>
+            </div>
           ) : null}
         </div>
       </div>

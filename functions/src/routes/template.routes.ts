@@ -11,6 +11,7 @@ templateRouter.post("/", requireAuth, templateController.create);
 templateRouter.get("/:templateId/public", optionalAuth, templateController.getPublic);
 templateRouter.get("/:templateId", optionalAuth, templateController.getOne);
 templateRouter.patch("/:templateId", requireAuth, templateController.update);
+templateRouter.delete("/:templateId", requireAuth, templateController.remove);
 templateRouter.post("/:templateId/publish", requireAuth, templateController.publish);
 templateRouter.post("/:templateId/download", requireAuth, templateController.download);
 templateRouter.post("/:templateId/sections", requireAuth, templateController.createSection);

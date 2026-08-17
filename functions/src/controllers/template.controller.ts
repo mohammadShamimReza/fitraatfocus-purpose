@@ -77,6 +77,15 @@ export const publish = asyncHandler(async (req: Request, res: Response) => {
   );
 });
 
+export const remove = asyncHandler(async (req: Request, res: Response) => {
+  const templateId = paramValue(req, "templateId");
+  if (!templateId) {
+    throw badRequest("templateId is required.");
+  }
+  await templateService.deleteTemplate(requireUser(req).uid, templateId);
+  sendEmpty(res);
+});
+
 export const download = asyncHandler(async (req: Request, res: Response) => {
   const templateId = paramValue(req, "templateId");
   if (!templateId) {

@@ -169,6 +169,15 @@ export const en = {
   "editor.saveError": "Could not save",
   "editor.noStory": "No story written yet.",
   "editor.noDescription": "No description written yet.",
+  "editor.delete": "Delete system",
+  "editor.deleting": "Deleting…",
+  "editor.deleteAria": "Delete {title}",
+  "editor.deleteConfirmTitle": "Delete this system?",
+  "editor.deleteConfirmBody":
+    "This removes {title} and its cover image from Studio and the catalog. People who already took a copy keep theirs.",
+  "editor.deleteError": "Could not delete this system",
+  "editor.deleted": "System deleted",
+  "editor.deletedBody": "{title} and its cover image were removed.",
 
   "insights.downloads": "Copies",
   "insights.downloadsHint": "People who took a copy",

@@ -170,6 +170,15 @@ export const bn: Record<MessageKey, string> = {
   "editor.saveError": "সংরক্ষণ করা যায়নি",
   "editor.noStory": "এখনো কোনো গল্প লেখা হয়নি।",
   "editor.noDescription": "এখনো কোনো বর্ণনা লেখা হয়নি।",
+  "editor.delete": "সিস্টেম মুছুন",
+  "editor.deleting": "মুছে ফেলা হচ্ছে…",
+  "editor.deleteAria": "{title} মুছুন",
+  "editor.deleteConfirmTitle": "এই সিস্টেম মুছবেন?",
+  "editor.deleteConfirmBody":
+    "{title} এবং এর কভার ছবি Studio ও ক্যাটালগ থেকে মুছে যাবে। যারা আগে কপি নিয়েছেন, তাদের কপি থাকবে।",
+  "editor.deleteError": "সিস্টেম মুছে ফেলা যায়নি",
+  "editor.deleted": "সিস্টেম মুছে ফেলা হয়েছে",
+  "editor.deletedBody": "{title} এবং এর কভার ছবি সরানো হয়েছে।",
 
   "insights.downloads": "কপি",
   "insights.downloadsHint": "যারা একটি কপি নিয়েছে",

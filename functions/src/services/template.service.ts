@@ -1,6 +1,7 @@
 import { collections, db } from "../config/admin";
 import { badRequest, notFound } from "../lib/http-error";
 import { newId, nowIso } from "../lib/ids";
+import { deleteTemplateCoverFiles } from "../lib/storage";
 import type { AuthUser } from "../middleware/auth.middleware";
 import {
   type CatalogTemplate,
@@ -276,6 +277,28 @@ export async function publishTemplate(
     throw badRequest("Add at least one task before publishing.");
   }
   return toSummary(await saveTemplate({ ...current, status: "published" }));
+}
+
+export async function deleteTemplate(
+  uid: string,
+  templateId: string,
+): Promise<void> {
+  const current = await requireOwned(templateId, uid);
+  await templates.doc(templateId).delete();
+  try {
+    await deleteTemplateCoverFiles(
+      current.creatorUid,
+      templateId,
+      current.storagePath,
+    );
+  } catch {
+    // Cover files are removed best-effort after the system document is gone.
+  }
+  try {
+    await syncTrackCovers(templateId, "");
+  } catch {
+    // Downloaded copies keep their tasks even if cover URLs cannot be cleared.
+  }
 }
 
 export async function downloadTemplate(

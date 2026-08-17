@@ -17,6 +17,7 @@ app.get("/", (_req, res) => {
       templates:
         "GET /v1/templates, GET /v1/templates/me, POST /v1/templates, " +
         "GET /v1/templates/:templateId, PATCH /v1/templates/:templateId, " +
+        "DELETE /v1/templates/:templateId, " +
         "POST /v1/templates/:templateId/publish, POST /v1/templates/:templateId/download",
       sections:
         "POST /v1/templates/:templateId/sections, " +

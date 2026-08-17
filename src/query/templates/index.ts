@@ -4,6 +4,7 @@ export { useCreateTemplateMutation } from "./use-create-template";
 export { useCreatorTemplatesQuery } from "./use-creator-templates";
 export { useDeleteSectionMutation } from "./use-delete-section";
 export { useDeleteTaskMutation } from "./use-delete-task";
+export { useDeleteTemplateMutation } from "./use-delete-template";
 export { useDownloadTemplateMutation } from "./use-download-template";
 export { useMyTemplatesQuery } from "./use-my-templates";
 export { usePublicTemplateQuery } from "./use-public-template";
