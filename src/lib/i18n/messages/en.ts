@@ -174,7 +174,7 @@ export const en = {
   "editor.deleteAria": "Delete {title}",
   "editor.deleteConfirmTitle": "Delete this system?",
   "editor.deleteConfirmBody":
-    "This removes {title} and its cover image from Studio and the catalog. People who already took a copy keep theirs.",
+    "This removes {title} and its cover image from Studio and the catalog. People who already took a copy keep theirs, including the cover.",
   "editor.deleteError": "Could not delete this system",
   "editor.deleted": "System deleted",
   "editor.deletedBody": "{title} and its cover image were removed.",

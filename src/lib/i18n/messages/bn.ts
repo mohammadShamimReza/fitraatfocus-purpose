@@ -175,7 +175,7 @@ export const bn: Record<MessageKey, string> = {
   "editor.deleteAria": "{title} মুছুন",
   "editor.deleteConfirmTitle": "এই সিস্টেম মুছবেন?",
   "editor.deleteConfirmBody":
-    "{title} এবং এর কভার ছবি Studio ও ক্যাটালগ থেকে মুছে যাবে। যারা আগে কপি নিয়েছেন, তাদের কপি থাকবে।",
+    "{title} এবং এর কভার ছবি Studio ও ক্যাটালগ থেকে মুছে যাবে। যারা আগে কপি নিয়েছেন, তাদের কপি ও কভার ছবি থাকবে।",
   "editor.deleteError": "সিস্টেম মুছে ফেলা যায়নি",
   "editor.deleted": "সিস্টেম মুছে ফেলা হয়েছে",
   "editor.deletedBody": "{title} এবং এর কভার ছবি সরানো হয়েছে।",

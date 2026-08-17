@@ -26,6 +26,7 @@ export type PurposeTrack = {
   pulledAt: string;
   updatedAt: string;
   imageUrl?: string;
+  storagePath?: string;
   sections: PurposeTrackSection[];
   tasks: PurposeTrackTask[];
   doneCount: number;

@@ -1,7 +1,10 @@
-import { FieldValue } from "firebase-admin/firestore";
-
 import { collections, db } from "../config/admin";
 import { nowIso, purposeTrackDocId } from "../lib/ids";
+import {
+  copyCoverForTrack,
+  isOwnTrackCover,
+  type CopiedCover,
+} from "../lib/storage";
 import {
   copyTasksFromTemplate,
   type PurposeTrack,
@@ -29,6 +32,9 @@ function asTrack(id: string, data: Record<string, unknown>): PurposeTrack {
     ...(typeof data.imageUrl === "string" && data.imageUrl.trim() ?
       { imageUrl: data.imageUrl.trim() } :
       {}),
+    ...(typeof data.storagePath === "string" && data.storagePath.trim() ?
+      { storagePath: data.storagePath.trim() } :
+      {}),
     sections: Array.isArray(data.sections) ?
       (data.sections as PurposeTrackSection[]) :
       [],
@@ -40,8 +46,20 @@ function asTrack(id: string, data: Record<string, unknown>): PurposeTrack {
   });
 }
 
-function buildTrack(ownerUid: string, template: PurposeTemplateDetail): PurposeTrack {
+function coverFields(cover?: CopiedCover): Pick<PurposeTrack, "imageUrl" | "storagePath"> {
+  if (!cover) {
+    return {};
+  }
+  return { imageUrl: cover.imageUrl, storagePath: cover.storagePath };
+}
+
+function buildTrack(
+  ownerUid: string,
+  template: PurposeTemplateDetail,
+  cover?: CopiedCover,
+): PurposeTrack {
   const pulledAt = nowIso();
+  const copied = coverFields(cover);
   return withTrackCounts({
     id: purposeTrackDocId(ownerUid, template.id),
     ownerUid,
@@ -54,7 +72,12 @@ function buildTrack(ownerUid: string, template: PurposeTemplateDetail): PurposeT
     creatorName: template.creatorName,
     pulledAt,
     updatedAt: pulledAt,
-    ...(template.imageUrl ? { imageUrl: template.imageUrl } : {}),
+    ...(copied.imageUrl ?
+      { imageUrl: copied.imageUrl } :
+      template.imageUrl ?
+        { imageUrl: template.imageUrl } :
+        {}),
+    ...(copied.storagePath ? { storagePath: copied.storagePath } : {}),
     sections: template.sections.map((section) => ({ ...section })),
     tasks: copyTasksFromTemplate(template.tasks),
     doneCount: 0,
@@ -67,6 +90,20 @@ export async function ensurePurposeTrack(
   template: PurposeTemplateDetail,
 ): Promise<PurposeTrack> {
   const ref = tracks.doc(purposeTrackDocId(ownerUid, template.id));
+  const existing = await ref.get();
+  if (existing.exists) {
+    return asTrack(
+      existing.id,
+      (existing.data() ?? {}) as Record<string, unknown>,
+    );
+  }
+
+  const copied = await copyCoverForTrack(
+    template,
+    ownerUid,
+    ref.id,
+  );
+
   return db.runTransaction(async (tx) => {
     const snapshot = await tx.get(ref);
     if (snapshot.exists) {
@@ -76,15 +113,19 @@ export async function ensurePurposeTrack(
       );
     }
 
-    const track = buildTrack(ownerUid, template);
+    const track = buildTrack(ownerUid, template, copied);
     tx.set(ref, track);
     return track;
   });
 }
 
-export async function syncTrackCovers(
+/**
+ * Give existing downloads their own cover file before the source image is
+ * replaced or deleted. Tracks that already have a copied cover are skipped.
+ */
+export async function detachSharedTrackCovers(
   sourceTemplateId: string,
-  imageUrl?: string,
+  source: { storagePath?: string; imageUrl?: string },
 ): Promise<void> {
   const snapshot = await tracks
     .where("sourceTemplateId", "==", sourceTemplateId)
@@ -93,17 +134,38 @@ export async function syncTrackCovers(
     return;
   }
 
-  const url = imageUrl?.trim() ?? "";
-  const docs = snapshot.docs;
-  for (let i = 0; i < docs.length; i += 450) {
+  const shared = snapshot.docs.filter((doc) => {
+    const track = asTrack(
+      doc.id,
+      (doc.data() ?? {}) as Record<string, unknown>,
+    );
+    return !isOwnTrackCover(track.ownerUid, track.storagePath);
+  });
+
+  for (let i = 0; i < shared.length; i += 8) {
+    const chunk = shared.slice(i, i + 8);
+    const updates = await Promise.all(chunk.map(async (doc) => {
+      const track = asTrack(
+        doc.id,
+        (doc.data() ?? {}) as Record<string, unknown>,
+      );
+      const copied = await copyCoverForTrack(source, track.ownerUid, track.id);
+      return copied ? { ref: doc.ref, copied } : undefined;
+    }));
     const batch = db.batch();
-    for (const doc of docs.slice(i, i + 450)) {
-      if (url) {
-        batch.update(doc.ref, { imageUrl: url });
-      } else {
-        batch.update(doc.ref, { imageUrl: FieldValue.delete() });
+    let writes = 0;
+    for (const update of updates) {
+      if (!update) {
+        continue;
       }
+      batch.update(update.ref, {
+        imageUrl: update.copied.imageUrl,
+        storagePath: update.copied.storagePath,
+      });
+      writes += 1;
     }
-    await batch.commit();
+    if (writes > 0) {
+      await batch.commit();
+    }
   }
 }

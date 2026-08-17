@@ -22,7 +22,7 @@ import {
   withCounts,
 } from "../models/template.model";
 import { getCatalogCreator, getOrCreateMyProfile } from "./profile.service";
-import { ensurePurposeTrack, syncTrackCovers } from "./purpose-track.service";
+import { detachSharedTrackCovers, ensurePurposeTrack } from "./purpose-track.service";
 
 const templates = db.collection(collections.templates);
 
@@ -254,6 +254,11 @@ export async function updateTemplate(
   input: UpdateTemplateInput,
 ): Promise<PurposeTemplate> {
   const current = await requireOwned(templateId, uid);
+  const coverChanging = input.imageUrl !== undefined ||
+    input.storagePath !== undefined;
+  if (coverChanging) {
+    await detachSharedTrackCovers(templateId, current);
+  }
   const next: PurposeTemplateDetail = { ...current, ...input };
   if (input.imageUrl !== undefined && !input.imageUrl.trim()) {
     delete next.imageUrl;
@@ -262,9 +267,6 @@ export async function updateTemplate(
     delete next.storagePath;
   }
   const saved = await saveTemplate(next);
-  if (input.imageUrl !== undefined) {
-    await syncTrackCovers(templateId, saved.imageUrl);
-  }
   return toSummary(saved);
 }
 
@@ -284,6 +286,11 @@ export async function deleteTemplate(
   templateId: string,
 ): Promise<void> {
   const current = await requireOwned(templateId, uid);
+  try {
+    await detachSharedTrackCovers(templateId, current);
+  } catch {
+    // Existing copies should keep a cover even if one file copy fails.
+  }
   await templates.doc(templateId).delete();
   try {
     await deleteTemplateCoverFiles(
@@ -293,11 +300,6 @@ export async function deleteTemplate(
     );
   } catch {
     // Cover files are removed best-effort after the system document is gone.
-  }
-  try {
-    await syncTrackCovers(templateId, "");
-  } catch {
-    // Downloaded copies keep their tasks even if cover URLs cannot be cleared.
   }
 }
 
