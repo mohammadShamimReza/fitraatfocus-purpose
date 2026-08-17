@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-01
+ * Documentation: docs/screens/STUDIO-01-landing.md
+ */
 import { createFileRoute } from "@tanstack/react-router";
 
 import { LandingApp } from "./-components/landing-app";

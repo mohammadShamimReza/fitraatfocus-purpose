@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-08
+ * Documentation: docs/screens/STUDIO-08-editor.md
+ */
 import { createFileRoute } from "@tanstack/react-router";
 
 import { SystemEditor } from "./-components/system-editor";

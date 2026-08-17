@@ -1,0 +1,343 @@
+openapi: 3.0.3
+info:
+  title: Fitraat Focus Studio API
+  version: v1
+servers:
+  - url: https://us-central1-fitraat-focus.cloudfunctions.net/studio
+paths:
+  /:
+    get:
+      operationId: api_sys_001
+      summary: API root docs
+      responses:
+        '200':
+          description: API root docs
+        '500':
+          description: API root docs
+  /v1/health:
+    get:
+      operationId: api_sys_002
+      summary: Health check
+      responses:
+        '200':
+          description: Health check
+        '500':
+          description: Health check
+  /v1/profiles/:uid:
+    get:
+      operationId: api_profile_003
+      summary: Get public creator profile
+      responses:
+        '200':
+          description: Get public creator profile
+        '400':
+          description: Get public creator profile
+        '401':
+          description: Get public creator profile
+        '404':
+          description: Get public creator profile
+        '500':
+          description: Get public creator profile
+  /v1/profiles/me:
+    get:
+      operationId: api_profile_001
+      summary: Get or create my creator profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Get or create my creator profile
+        '401':
+          description: Get or create my creator profile
+        '404':
+          description: Get or create my creator profile
+        '500':
+          description: Get or create my creator profile
+    patch:
+      operationId: api_profile_002
+      summary: Update my creator profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Update my creator profile
+        '400':
+          description: Update my creator profile
+        '401':
+          description: Update my creator profile
+        '404':
+          description: Update my creator profile
+        '500':
+          description: Update my creator profile
+  /v1/templates:
+    get:
+      operationId: api_template_001
+      summary: List public templates
+      responses:
+        '200':
+          description: List public templates
+        '401':
+          description: List public templates
+        '500':
+          description: List public templates
+    post:
+      operationId: api_template_003
+      summary: Create template
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Create template
+        '400':
+          description: Create template
+        '401':
+          description: Create template
+        '500':
+          description: Create template
+  /v1/templates/:templateId:
+    delete:
+      operationId: api_template_007
+      summary: Delete template
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Delete template
+        '400':
+          description: Delete template
+        '401':
+          description: Delete template
+        '404':
+          description: Delete template
+        '500':
+          description: Delete template
+    get:
+      operationId: api_template_005
+      summary: Get template detail (owner or public)
+      responses:
+        '200':
+          description: Get template detail (owner or public)
+        '400':
+          description: Get template detail (owner or public)
+        '401':
+          description: Get template detail (owner or public)
+        '404':
+          description: Get template detail (owner or public)
+        '500':
+          description: Get template detail (owner or public)
+    patch:
+      operationId: api_template_006
+      summary: Update template
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Update template
+        '400':
+          description: Update template
+        '401':
+          description: Update template
+        '404':
+          description: Update template
+        '500':
+          description: Update template
+  /v1/templates/:templateId/download:
+    post:
+      operationId: api_template_009
+      summary: Download template to track
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Download template to track
+        '400':
+          description: Download template to track
+        '401':
+          description: Download template to track
+        '404':
+          description: Download template to track
+        '500':
+          description: Download template to track
+  /v1/templates/:templateId/public:
+    get:
+      operationId: api_template_004
+      summary: Get public template detail
+      responses:
+        '200':
+          description: Get public template detail
+        '400':
+          description: Get public template detail
+        '404':
+          description: Get public template detail
+        '500':
+          description: Get public template detail
+  /v1/templates/:templateId/publish:
+    post:
+      operationId: api_template_008
+      summary: Publish template
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Publish template
+        '400':
+          description: Publish template
+        '401':
+          description: Publish template
+        '404':
+          description: Publish template
+        '500':
+          description: Publish template
+  /v1/templates/:templateId/sections:
+    post:
+      operationId: api_template_010
+      summary: Create section
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Create section
+        '400':
+          description: Create section
+        '401':
+          description: Create section
+        '404':
+          description: Create section
+        '500':
+          description: Create section
+  /v1/templates/:templateId/sections/:sectionId:
+    delete:
+      operationId: api_template_012
+      summary: Delete section
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Delete section
+        '400':
+          description: Delete section
+        '401':
+          description: Delete section
+        '404':
+          description: Delete section
+        '500':
+          description: Delete section
+    patch:
+      operationId: api_template_011
+      summary: Update section
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Update section
+        '400':
+          description: Update section
+        '401':
+          description: Update section
+        '404':
+          description: Update section
+        '500':
+          description: Update section
+  /v1/templates/:templateId/sections/reorder:
+    post:
+      operationId: api_template_013
+      summary: Reorder sections
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Reorder sections
+        '400':
+          description: Reorder sections
+        '401':
+          description: Reorder sections
+        '404':
+          description: Reorder sections
+        '500':
+          description: Reorder sections
+  /v1/templates/:templateId/tasks:
+    post:
+      operationId: api_template_014
+      summary: Create task
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Create task
+        '400':
+          description: Create task
+        '401':
+          description: Create task
+        '404':
+          description: Create task
+        '500':
+          description: Create task
+  /v1/templates/:templateId/tasks/:taskId:
+    delete:
+      operationId: api_template_016
+      summary: Delete task
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Delete task
+        '400':
+          description: Delete task
+        '401':
+          description: Delete task
+        '404':
+          description: Delete task
+        '500':
+          description: Delete task
+    patch:
+      operationId: api_template_015
+      summary: Update task
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Update task
+        '400':
+          description: Update task
+        '401':
+          description: Update task
+        '404':
+          description: Update task
+        '500':
+          description: Update task
+  /v1/templates/:templateId/tasks/reorder:
+    post:
+      operationId: api_template_017
+      summary: Reorder tasks
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Reorder tasks
+        '400':
+          description: Reorder tasks
+        '401':
+          description: Reorder tasks
+        '404':
+          description: Reorder tasks
+        '500':
+          description: Reorder tasks
+  /v1/templates/me:
+    get:
+      operationId: api_template_002
+      summary: List my templates
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List my templates
+        '401':
+          description: List my templates
+        '500':
+          description: List my templates
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

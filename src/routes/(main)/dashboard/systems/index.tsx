@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-06
+ * Documentation: docs/screens/STUDIO-06-my-systems.md
+ */
 import { createFileRoute } from "@tanstack/react-router";
 
 import { SystemsList } from "./-components/systems-list";

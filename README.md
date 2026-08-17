@@ -1,5 +1,7 @@
 # Fitraat Focus — Purpose System Studio
 
+> Screen and feature mapping system: see `docs/README.md`, `docs/screens/screen-map.md`, and `docs/cross-repo-map.md`.
+
 Creator studio for **Fitraat Focus**. Authors write purpose-driven todo systems (libraries of sections and tasks). People in the Fitraat Focus app take a copy and run the work.
 
 The UI is built on [TanStack Start](https://tanstack.com/start) (shadcn/ui, Tailwind CSS v4). Production hosting is **Vercel**. The API is the Firebase HTTPS function `studio`.

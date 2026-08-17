@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-05
+ * Documentation: docs/screens/STUDIO-05-login.md
+ */
 import { createFileRoute } from "@tanstack/react-router";
 
 import { FitraatAppIcon } from "@/components/brand/fitraat-mark";

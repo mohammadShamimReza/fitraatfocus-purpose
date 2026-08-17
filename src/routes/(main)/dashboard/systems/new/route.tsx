@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-07
+ * Documentation: docs/screens/STUDIO-07-new-system.md
+ */
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { ArrowLeft } from "lucide-react";

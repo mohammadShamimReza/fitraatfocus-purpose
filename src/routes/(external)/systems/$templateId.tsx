@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-03
+ * Documentation: docs/screens/STUDIO-03-public-system.md
+ */
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PublicTemplateView } from "./-components/public-template-view";

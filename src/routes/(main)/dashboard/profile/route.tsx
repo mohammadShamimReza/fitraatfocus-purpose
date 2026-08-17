@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-09
+ * Documentation: docs/screens/STUDIO-09-creator-profile.md
+ */
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { CircleAlert } from "lucide-react";

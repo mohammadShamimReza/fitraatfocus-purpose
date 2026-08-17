@@ -1,3 +1,7 @@
+/**
+ * Screen: STUDIO-04
+ * Documentation: docs/screens/STUDIO-04-public-creator.md
+ */
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PublicCreatorView } from "./-components/public-creator-view";
