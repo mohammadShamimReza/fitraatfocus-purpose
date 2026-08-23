@@ -19,7 +19,6 @@ export type PurposeTrack = {
   sourceTemplateId: string;
   title: string;
   purpose: string;
-  story: string;
   category: string;
   creatorUid: string;
   creatorName: string;

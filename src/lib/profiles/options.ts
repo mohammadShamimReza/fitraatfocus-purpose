@@ -1,7 +1,7 @@
 export const EXPERTISE_ITEMS = [
   { value: "exam", label: "Exam prep" },
   { value: "career", label: "Career" },
-  { value: "study", label: "Study systems" },
+  { value: "study", label: "Study" },
   { value: "craft", label: "Craft" },
   { value: "health", label: "Health" },
   { value: "teaching", label: "Teaching" },

@@ -34,10 +34,6 @@ function createFormSchema(t: TranslateFn) {
       .string()
       .trim()
       .min(8, { message: t("newSystem.purposeError") }),
-    story: z
-      .string()
-      .trim()
-      .min(8, { message: t("newSystem.storyError") }),
     description: z
       .string()
       .trim()
@@ -61,7 +57,6 @@ export function CreateSystemForm() {
     defaultValues: {
       title: "",
       purpose: "",
-      story: "",
       description: "",
       category: "exam",
     },
@@ -175,18 +170,6 @@ export function CreateSystemForm() {
                   <FieldLabel htmlFor="system-purpose">{t("newSystem.purpose")}</FieldLabel>
                   <Textarea {...field} id="system-purpose" placeholder={t("newSystem.purposePlaceholder")} />
                   <FieldDescription>{t("newSystem.purposeHelp")}</FieldDescription>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="story"
-              render={({ field, fieldState }) => (
-                <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="system-story">{t("newSystem.story")}</FieldLabel>
-                  <Textarea {...field} id="system-story" placeholder={t("newSystem.storyPlaceholder")} />
-                  <FieldDescription>{t("newSystem.storyHelp")}</FieldDescription>
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}

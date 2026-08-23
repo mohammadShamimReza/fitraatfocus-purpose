@@ -1,7 +1,7 @@
 {
   "short_name": "Fitraat Focus",
-  "name": "Fitraat Focus — Purpose systems",
-  "description": "Browse purpose systems, take a copy, and use them in Fitraat Focus.",
+  "name": "Fitraat Focus — Purposes",
+  "description": "Find a purpose, add it to Fitraat Focus, and follow the steps to the target.",
   "icons": [
     {
       "src": "/favicon.svg",

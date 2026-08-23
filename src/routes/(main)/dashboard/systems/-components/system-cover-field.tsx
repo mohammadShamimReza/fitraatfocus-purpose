@@ -21,6 +21,12 @@ export function SystemCoverField({
 }) {
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
+  let coverCtaLabel = t("cover.add");
+  if (busy) {
+    coverCtaLabel = t("cover.uploading");
+  } else if (imageUrl) {
+    coverCtaLabel = t("cover.replace");
+  }
 
   return (
     <Field className="gap-1.5">
@@ -29,10 +35,10 @@ export function SystemCoverField({
         <img
           src={imageUrl}
           alt={t("cover.alt")}
-          className="aspect-[16/9] w-full max-w-xl rounded-xl border object-cover"
+          className="aspect-[16/9] w-full self-start rounded-xl border object-cover"
         />
       ) : (
-        <div className="flex aspect-[16/9] w-full max-w-xl items-center justify-center rounded-xl border border-dashed bg-muted/40">
+        <div className="flex aspect-[16/9] w-full items-center justify-center self-start rounded-xl border border-dashed bg-muted/40">
           <ImageIcon className="size-8 text-muted-foreground" />
         </div>
       )}
@@ -53,14 +59,8 @@ export function SystemCoverField({
               }
             }}
           />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={busy}
-            onClick={() => inputRef.current?.click()}
-          >
-            {busy ? t("cover.uploading") : imageUrl ? t("cover.replace") : t("cover.add")}
+          <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => inputRef.current?.click()}>
+            {coverCtaLabel}
           </Button>
           {imageUrl && onRemove ? (
             <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={onRemove}>

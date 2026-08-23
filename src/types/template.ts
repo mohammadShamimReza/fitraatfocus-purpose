@@ -30,7 +30,6 @@ export type PurposeTemplate = {
   id: string;
   title: string;
   purpose: string;
-  story: string;
   description: string;
   category: string;
   tags: string[];
@@ -74,7 +73,6 @@ export type PublicTemplateDetail = PurposeTemplateDetail & {
 export type CreateTemplateInput = {
   title: string;
   purpose: string;
-  story: string;
   description: string;
   category: string;
   tags?: string[];
@@ -85,7 +83,7 @@ export type CreateTemplateInput = {
 export type UpdateTemplateInput = Partial<
   Pick<
     PurposeTemplate,
-    "title" | "purpose" | "story" | "description" | "category" | "tags" | "visibility" | "imageUrl" | "storagePath"
+    "title" | "purpose" | "description" | "category" | "tags" | "visibility" | "imageUrl" | "storagePath"
   >
 >;
 

@@ -17,7 +17,6 @@ const tagsSchema = z.array(tagSchema).max(12);
 export const createTemplateSchema = z.object({
   title: z.string().trim().min(2).max(120),
   purpose: z.string().trim().min(8).max(4000),
-  story: z.string().trim().min(8).max(4000),
   description: z.string().trim().min(8).max(4000),
   category: z.string().trim().min(1).max(32),
   tags: tagsSchema.optional(),
@@ -29,7 +28,6 @@ export const updateTemplateSchema = z
   .object({
     title: z.string().trim().min(2).max(120).optional(),
     purpose: z.string().trim().min(8).max(4000).optional(),
-    story: z.string().trim().min(8).max(4000).optional(),
     description: z.string().trim().min(8).max(4000).optional(),
     category: z.string().trim().min(1).max(32).optional(),
     tags: tagsSchema.optional(),

@@ -16,8 +16,8 @@ export const APP_CONFIG = {
   version: "1.0.0",
   copyright: `© ${currentYear} Fitraat Focus.`,
   meta: {
-    title: "Fitraat Focus — Know the work. Then sit down and do it.",
+    title: "Fitraat Focus — A target. Then the steps to get there.",
     description:
-      "Browse purpose systems here. Take a copy, then use them in Fitraat Focus on your phone or on the web.",
+      "Find a purpose: a target and the steps to reach it. Add it to Fitraat Focus and follow them one by one.",
   },
 };

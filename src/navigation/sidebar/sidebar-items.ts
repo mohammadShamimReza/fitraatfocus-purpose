@@ -48,13 +48,13 @@ export const sidebarItems: NavGroup[] = [
     items: [
       {
         id: "systems",
-        title: "My systems",
+        title: "My purposes",
         url: "/dashboard/systems",
         icon: ListTodo,
       },
       {
         id: "new-system",
-        title: "New system",
+        title: "Write a purpose",
         url: "/dashboard/systems/new",
         icon: Plus,
       },

@@ -30,7 +30,6 @@ export type PurposeTemplate = {
   id: string;
   title: string;
   purpose: string;
-  story: string;
   description: string;
   category: string;
   tags: string[];
@@ -74,7 +73,6 @@ export type PublicTemplateDetail = PurposeTemplateDetail & {
 export type CreateTemplateInput = {
   title: string;
   purpose: string;
-  story: string;
   description: string;
   category: string;
   tags?: string[];
@@ -87,7 +85,6 @@ export type UpdateTemplateInput = Partial<
     PurposeTemplate,
     | "title"
     | "purpose"
-    | "story"
     | "description"
     | "category"
     | "tags"
@@ -127,7 +124,6 @@ export function toSummary(template: PurposeTemplateDetail): PurposeTemplate {
     id: template.id,
     title: template.title,
     purpose: template.purpose,
-    story: template.story,
     description: template.description,
     category: template.category,
     tags: template.tags,

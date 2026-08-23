@@ -21,10 +21,6 @@ function createFormSchema(t: TranslateFn) {
       .string()
       .trim()
       .min(8, { message: t("newSystem.purposeError") }),
-    story: z
-      .string()
-      .trim()
-      .min(8, { message: t("newSystem.storyError") }),
     description: z
       .string()
       .trim()
@@ -40,7 +36,6 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
     resolver: (values, context, options) => zodResolver(formSchema)(values, context, options),
     values: {
       purpose: template.purpose,
-      story: template.story,
       description: template.description,
     },
   });
@@ -64,8 +59,8 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("editor.purposeStory")}</CardTitle>
-          <CardDescription>{t("editor.purposeStoryHelp")}</CardDescription>
+          <CardTitle>{t("editor.purposeOverview")}</CardTitle>
+          <CardDescription>{t("editor.purposeOverviewHelp")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-5">
           <div className="space-y-1.5">
@@ -73,10 +68,6 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
             <p className="text-muted-foreground text-sm leading-relaxed">
               {template.purpose || t("systems.noPurpose")}
             </p>
-          </div>
-          <div className="space-y-1.5">
-            <h2 className="font-medium text-sm">{t("newSystem.story")}</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed">{template.story || t("editor.noStory")}</p>
           </div>
           <div className="space-y-1.5">
             <h2 className="font-medium text-sm">{t("newSystem.inside")}</h2>
@@ -92,8 +83,8 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("editor.purposeStory")}</CardTitle>
-        <CardDescription>{t("editor.purposeStoryHelp")}</CardDescription>
+        <CardTitle>{t("editor.purposeOverview")}</CardTitle>
+        <CardDescription>{t("editor.purposeOverviewHelp")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -106,17 +97,6 @@ export function EditorMetadataForm({ template, canEdit }: { template: PurposeTem
                   <FieldLabel htmlFor="editor-purpose">{t("newSystem.purpose")}</FieldLabel>
                   <Textarea {...field} id="editor-purpose" />
                   <FieldDescription>{t("editor.outcomeHelp")}</FieldDescription>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              control={form.control}
-              name="story"
-              render={({ field, fieldState }) => (
-                <Field className="gap-1.5" data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="editor-story">{t("newSystem.story")}</FieldLabel>
-                  <Textarea {...field} id="editor-story" />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}

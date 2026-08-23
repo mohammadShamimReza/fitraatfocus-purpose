@@ -31,7 +31,6 @@ function asTemplate(id: string, data: Record<string, unknown>): PurposeTemplateD
     id,
     title: String(data.title ?? ""),
     purpose: String(data.purpose ?? ""),
-    story: String(data.story ?? ""),
     description: String(data.description ?? ""),
     category: String(data.category ?? "other"),
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
@@ -99,7 +98,7 @@ async function requireVisible(
 ): Promise<PurposeTemplateDetail> {
   const template = await readTemplate(templateId);
   if (!template || !canViewTemplate(template, uid)) {
-    throw notFound("System not found.");
+    throw notFound("Purpose not found.");
   }
 
   return template;
@@ -111,7 +110,7 @@ async function requireOwned(
 ): Promise<PurposeTemplateDetail> {
   const template = await readTemplate(templateId);
   if (!template || template.creatorUid !== uid) {
-    throw notFound("System not found.");
+    throw notFound("Purpose not found.");
   }
 
   return template;
@@ -198,7 +197,7 @@ export async function getPublicTemplate(
 ): Promise<PublicTemplateDetail> {
   const template = await readTemplate(templateId);
   if (!template || !isPublicTemplate(template)) {
-    throw notFound("System not found.");
+    throw notFound("Purpose not found.");
   }
 
   const catalog = await toCatalog(template);
@@ -225,7 +224,6 @@ export async function createTemplate(
     id: newId(),
     title: input.title,
     purpose: input.purpose,
-    story: input.story,
     description: input.description,
     category: input.category,
     tags: input.tags ?? [],
@@ -309,11 +307,11 @@ export async function downloadTemplate(
 ): Promise<PurposeTemplate> {
   const current = await readTemplate(templateId);
   if (!current || !isPublicTemplate(current)) {
-    throw notFound("System not found.");
+    throw notFound("Purpose not found.");
   }
 
   if (current.creatorUid === uid) {
-    throw badRequest("You already own this system.");
+    throw badRequest("You already own this purpose.");
   }
 
   if (current.downloaderUids.includes(uid)) {
