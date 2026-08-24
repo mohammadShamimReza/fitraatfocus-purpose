@@ -24,4 +24,5 @@ export const collections = {
   users: "users",
   templates: "templates",
   purposeTracks: "purposeTracks",
+  purposeCompletionReviews: "purposeCompletionReviews",
 } as const;

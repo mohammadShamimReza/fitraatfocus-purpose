@@ -5,6 +5,8 @@ export const functionPaths = {
     byCreator: "/v1/templates",
     detail: (templateId: string) => `/v1/templates/${templateId}`,
     publicDetail: (templateId: string) => `/v1/templates/${templateId}/public`,
+    publicReviews: (templateId: string) =>
+      `/v1/templates/${templateId}/public/reviews`,
     publish: (templateId: string) => `/v1/templates/${templateId}/publish`,
     download: (templateId: string) => `/v1/templates/${templateId}/download`,
     sections: (templateId: string) => `/v1/templates/${templateId}/sections`,

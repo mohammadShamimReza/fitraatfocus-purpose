@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { Download, Layers } from "lucide-react";
+import { CheckCircle2, Download, Layers, Star } from "lucide-react";
 
 import { SystemCover } from "@/components/system-cover";
 import { Badge } from "@/components/ui/badge";
@@ -11,8 +11,10 @@ import { formatCount } from "@/lib/templates/format";
 import { getInitials } from "@/lib/utils";
 import type { CatalogTemplate } from "@/types/template";
 
+import { TemplateShareActions } from "./template-share-actions";
+
 export function TemplateCard({ template }: { template: CatalogTemplate }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const expertise = template.creator.expertise.slice(0, 2);
 
   return (
@@ -31,7 +33,7 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
             <Link
               to="/systems/$templateId"
               params={{ templateId: template.id }}
-              className="rounded-sm outline-none transition-colors hover:underline group-hover/card:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="rounded-sm outline-none transition-colors hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 group-hover/card:underline"
             >
               {template.title}
             </Link>
@@ -44,6 +46,16 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
           <span className="inline-flex items-center gap-1.5">
             <Layers className="size-3.5" />
             {t("systems.libraryMeta", { sections: template.sectionCount, tasks: template.taskCount })}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <CheckCircle2 className="size-3.5" />
+            {t("systems.completedCount", { count: formatCount(template.completedCount, locale) })}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-3 text-muted-foreground text-xs">
+          <span className="inline-flex items-center gap-1.5">
+            <Star className="size-3.5" />
+            {t("systems.reviewsCount", { count: formatCount(template.completionReviewCount, locale) })}
           </span>
         </div>
         <Link
@@ -63,6 +75,14 @@ export function TemplateCard({ template }: { template: CatalogTemplate }) {
             </span>
           </span>
         </Link>
+        <div className="border-t pt-2">
+          <TemplateShareActions
+            templateId={template.id}
+            title={template.title}
+            purpose={template.purpose}
+            compact
+          />
+        </div>
       </CardContent>
     </Card>
   );

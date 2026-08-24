@@ -15,7 +15,7 @@ function walk(dir, out = []) {
   return out;
 }
 
-function parseCreateFileRoute(path, text) {
+function parseCreateFileRoute(_path, text) {
   const m = text.match(/createFileRoute\(\s*["'`]([^"'`]+)["'`]\s*\)/);
   if (!m) return null;
   return m[1];
@@ -44,8 +44,11 @@ function parseApiEndpoints(path) {
   const txt = readFileSync(path, "utf8");
   const out = [];
   const rg = /\.(get|post|put|patch|delete)\(\s*["'`]([^"'`]+)["'`]/g;
-  let m;
-  while ((m = rg.exec(txt))) out.push(`${m[1].toUpperCase()} ${m[2]}`);
+  let m = rg.exec(txt);
+  while (m) {
+    out.push(`${m[1].toUpperCase()} ${m[2]}`);
+    m = rg.exec(txt);
+  }
   return out;
 }
 

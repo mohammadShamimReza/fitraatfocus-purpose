@@ -2,7 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { ArrowLeft, CircleAlert, Download, Layers, ListTodo } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  CircleAlert,
+  Download,
+  Layers,
+  ListTodo,
+  Star,
+} from "lucide-react";
 
 import { TemplatePageSkeleton } from "@/components/page-skeletons";
 import { SystemCover } from "@/components/system-cover";
@@ -16,12 +24,13 @@ import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categoryLabel, expertiseLabel } from "@/lib/i18n/labels";
-import { formatCount } from "@/lib/templates/format";
+import { formatCount, formatUpdatedAt } from "@/lib/templates/format";
 import { getInitials } from "@/lib/utils";
 import { useDownloadTemplateMutation, usePublicTemplateQuery } from "@/query/templates";
 import { EditorSections } from "@/routes/(main)/dashboard/systems/-components/editor-sections";
 import { EditorTasks } from "@/routes/(main)/dashboard/systems/-components/editor-tasks";
 
+import { TemplateShareActions } from "../../-components/template-share-actions";
 import { UseInAppNote } from "../../-components/use-in-app-note";
 
 export function PublicTemplateView({ templateId }: { templateId: string }) {
@@ -131,6 +140,19 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
               <Download className="size-3.5" />
               {t("common.copiesCount", { count: formatCount(template.downloadCount) })}
             </span>
+            <span className="inline-flex items-center gap-1.5">
+              <CheckCircle2 className="size-3.5" />
+              {t("common.completedCount", {
+                count: formatCount(template.completedCount),
+              })}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Star className="size-3.5" />
+              {t("common.ratingSummary", {
+                rating: template.completionRatingAverage.toFixed(1),
+                count: formatCount(template.completionReviewCount),
+              })}
+            </span>
           </div>
         </div>
         <div className="flex max-w-xs flex-col gap-3">
@@ -143,6 +165,18 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
             isPending={download.isPending}
             onDownload={onDownload}
           />
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">{t("template.shareTitle")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TemplateShareActions
+                templateId={template.id}
+                title={template.title}
+                purpose={template.purpose}
+              />
+            </CardContent>
+          </Card>
           {isOwner ? null : <UseInAppNote />}
         </div>
       </div>
@@ -198,6 +232,34 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
           onSelectSection={setSelectedSectionId}
         />
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("template.reviewsTitle")}</CardTitle>
+          <CardDescription>{t("template.reviewsDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {template.completionReviews.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              {t("template.reviewsEmpty")}
+            </p>
+          ) : (
+            template.completionReviews.map((review) => (
+              <div key={review.id} className="rounded-lg border p-3">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1 font-medium text-sm">
+                    <Star className="size-3.5" />
+                    {review.rating.toFixed(1)}
+                  </span>
+                  <span className="text-muted-foreground text-xs">
+                    {formatUpdatedAt(review.createdAt)}
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed">{review.comment}</p>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

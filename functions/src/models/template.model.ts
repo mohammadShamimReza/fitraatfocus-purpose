@@ -42,6 +42,9 @@ export type PurposeTemplate = {
   taskCount: number;
   forkCount: number;
   downloadCount: number;
+  completedCount: number;
+  completionReviewCount: number;
+  completionRatingSum: number;
   downloaderUids: string[];
   createdAt: string;
   updatedAt: string;
@@ -68,6 +71,18 @@ export type CatalogTemplate = PurposeTemplate & {
 
 export type PublicTemplateDetail = PurposeTemplateDetail & {
   creator: CatalogCreator;
+  completionRatingAverage: number;
+  completionReviews: PurposeCompletionReview[];
+};
+
+export type PurposeCompletionReview = {
+  id: string;
+  trackId: string;
+  sourceTemplateId: string;
+  rating: number;
+  comment: string;
+  isAnonymous: true;
+  createdAt: string;
 };
 
 export type CreateTemplateInput = {
@@ -136,6 +151,9 @@ export function toSummary(template: PurposeTemplateDetail): PurposeTemplate {
     taskCount: template.tasks.length,
     forkCount: template.downloadCount,
     downloadCount: template.downloadCount,
+    completedCount: template.completedCount,
+    completionReviewCount: template.completionReviewCount,
+    completionRatingSum: template.completionRatingSum,
     downloaderUids: template.downloaderUids,
     createdAt: template.createdAt,
     updatedAt: template.updatedAt,

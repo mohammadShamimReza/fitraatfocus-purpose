@@ -1,4 +1,4 @@
-import { Download, Layers, ListTodo, Users } from "lucide-react";
+import { CheckCircle2, Download, Layers, ListTodo, Star, Users } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n/i18n-provider";
@@ -10,7 +10,7 @@ export function OwnerInsights({ template }: { template: PurposeTemplateDetail })
   const uniquePeople = template.downloaderUids.length;
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
       <InsightCard
         icon={Download}
         label={t("insights.downloads")}
@@ -28,6 +28,18 @@ export function OwnerInsights({ template }: { template: PurposeTemplateDetail })
         label={t("insights.library")}
         value={t("insights.libraryValue", { sections: template.sectionCount, tasks: template.taskCount })}
         hint={t("insights.libraryHint")}
+      />
+      <InsightCard
+        icon={CheckCircle2}
+        label={t("insights.completed")}
+        value={formatCount(template.completedCount, locale)}
+        hint={t("insights.completedHint")}
+      />
+      <InsightCard
+        icon={Star}
+        label={t("insights.reviews")}
+        value={formatCount(template.completionReviewCount, locale)}
+        hint={t("insights.reviewsHint")}
       />
       <InsightCard
         icon={ListTodo}

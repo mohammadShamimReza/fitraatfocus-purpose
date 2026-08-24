@@ -4,6 +4,7 @@ import { newId, nowIso } from "../lib/ids";
 import { deleteTemplateCoverFiles } from "../lib/storage";
 import type { AuthUser } from "../middleware/auth.middleware";
 import {
+  type PurposeCompletionReview,
   type CatalogTemplate,
   type CreateSectionInput,
   type CreateTaskInput,
@@ -25,6 +26,45 @@ import { getCatalogCreator, getOrCreateMyProfile } from "./profile.service";
 import { detachSharedTrackCovers, ensurePurposeTrack } from "./purpose-track.service";
 
 const templates = db.collection(collections.templates);
+const completionReviews = db.collection(collections.purposeCompletionReviews);
+
+function clampCount(value: unknown): number {
+  const n = Number(value ?? 0);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.floor(n));
+}
+
+function asCompletionReview(
+  id: string,
+  data: Record<string, unknown>,
+): PurposeCompletionReview {
+  return {
+    id,
+    trackId: String(data.trackId ?? ""),
+    sourceTemplateId: String(data.sourceTemplateId ?? ""),
+    rating: Math.min(5, Math.max(1, clampCount(data.rating) || 1)),
+    comment: String(data.comment ?? ""),
+    isAnonymous: true,
+    createdAt: String(data.createdAt ?? nowIso()),
+  };
+}
+
+async function listTemplateCompletionReviews(
+  templateId: string,
+  limit = 20,
+  beforeCreatedAt?: string,
+): Promise<PurposeCompletionReview[]> {
+  let query = completionReviews
+    .where("sourceTemplateId", "==", templateId)
+    .orderBy("createdAt", "desc");
+  if (beforeCreatedAt) {
+    query = query.startAfter(beforeCreatedAt);
+  }
+  const snapshot = await query.limit(limit).get();
+  return snapshot.docs.map((doc) =>
+    asCompletionReview(doc.id, doc.data() as Record<string, unknown>),
+  );
+}
 
 function asTemplate(id: string, data: Record<string, unknown>): PurposeTemplateDetail {
   return {
@@ -46,6 +86,9 @@ function asTemplate(id: string, data: Record<string, unknown>): PurposeTemplateD
     taskCount: Number(data.taskCount ?? 0),
     forkCount: Number(data.forkCount ?? data.downloadCount ?? 0),
     downloadCount: Number(data.downloadCount ?? 0),
+    completedCount: Number(data.completedCount ?? 0),
+    completionReviewCount: Number(data.completionReviewCount ?? 0),
+    completionRatingSum: Number(data.completionRatingSum ?? 0),
     downloaderUids: Array.isArray(data.downloaderUids) ?
       data.downloaderUids.map(String) :
       [],
@@ -201,12 +244,41 @@ export async function getPublicTemplate(
   }
 
   const catalog = await toCatalog(template);
+  const completionReviews = await listTemplateCompletionReviews(template.id);
+  const completionRatingAverage = template.completionReviewCount
+    ? Number(
+      (
+        template.completionRatingSum / template.completionReviewCount
+      ).toFixed(2),
+    )
+    : 0;
   return {
     ...template,
     ...catalog,
     sections: template.sections,
     tasks: template.tasks,
+    completionRatingAverage,
+    completionReviews,
   };
+}
+
+export async function listPublicTemplateReviews(
+  templateId: string,
+  options?: { limit?: number; beforeCreatedAt?: string },
+): Promise<{ reviews: PurposeCompletionReview[]; nextCursor?: string }> {
+  const template = await readTemplate(templateId);
+  if (!template || !isPublicTemplate(template)) {
+    throw notFound("Purpose not found.");
+  }
+  const limit = Math.max(1, Math.min(options?.limit ?? 20, 50));
+  const reviews = await listTemplateCompletionReviews(
+    templateId,
+    limit,
+    options?.beforeCreatedAt,
+  );
+  const nextCursor =
+    reviews.length === limit ? reviews[reviews.length - 1]?.createdAt : undefined;
+  return { reviews, ...(nextCursor ? { nextCursor } : {}) };
 }
 
 export async function createTemplate(
@@ -236,6 +308,9 @@ export async function createTemplate(
     taskCount: 0,
     forkCount: 0,
     downloadCount: 0,
+    completedCount: 0,
+    completionReviewCount: 0,
+    completionRatingSum: 0,
     downloaderUids: [],
     createdAt,
     updatedAt: createdAt,

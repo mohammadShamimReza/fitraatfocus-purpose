@@ -38,5 +38,9 @@ export async function uploadTemplateCover(path: string, file: File): Promise<str
 }
 
 export async function deleteStorageFile(path: string): Promise<void> {
-  await deleteObject(ref(getFirebaseStorage(), path)).catch(() => {});
+  try {
+    await deleteObject(ref(getFirebaseStorage(), path));
+  } catch {
+    // Best-effort cleanup.
+  }
 }

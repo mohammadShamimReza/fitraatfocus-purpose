@@ -9,6 +9,11 @@ templateRouter.get("/", optionalAuth, templateController.listPublic);
 templateRouter.get("/me", requireAuth, templateController.listMine);
 templateRouter.post("/", requireAuth, templateController.create);
 templateRouter.get("/:templateId/public", optionalAuth, templateController.getPublic);
+templateRouter.get(
+  "/:templateId/public/reviews",
+  optionalAuth,
+  templateController.listPublicReviews,
+);
 templateRouter.get("/:templateId", optionalAuth, templateController.getOne);
 templateRouter.patch("/:templateId", requireAuth, templateController.update);
 templateRouter.delete("/:templateId", requireAuth, templateController.remove);

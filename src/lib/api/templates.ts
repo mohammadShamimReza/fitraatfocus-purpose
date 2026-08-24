@@ -4,6 +4,7 @@ import type {
   CreateTaskInput,
   CreateTemplateInput,
   PublicTemplateDetail,
+  PurposeCompletionReview,
   PurposeTemplate,
   PurposeTemplateDetail,
   ReorderSectionsInput,
@@ -47,6 +48,21 @@ export async function getTemplate(templateId: string): Promise<PurposeTemplateDe
 /** API: API-TEMPLATE-004 */
 export async function getPublicTemplate(templateId: string): Promise<PublicTemplateDetail> {
   return unwrapData(await functionsRequest(functionPaths.templates.publicDetail(templateId), { auth: false }));
+}
+
+export async function listPublicTemplateReviews(
+  templateId: string,
+  options?: { limit?: number; before?: string },
+): Promise<{ reviews: PurposeCompletionReview[]; nextCursor?: string }> {
+  return unwrapData(
+    await functionsRequest(functionPaths.templates.publicReviews(templateId), {
+      auth: false,
+      searchParams: {
+        ...(options?.limit ? { limit: String(options.limit) } : {}),
+        ...(options?.before ? { before: options.before } : {}),
+      },
+    }),
+  );
 }
 
 /** API: API-TEMPLATE-003 */

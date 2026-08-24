@@ -49,6 +49,26 @@ export const getPublic = asyncHandler(async (req: Request, res: Response) => {
   sendData(res, await templateService.getPublicTemplate(templateId));
 });
 
+export const listPublicReviews = asyncHandler(
+  async (req: Request, res: Response) => {
+    const templateId = paramValue(req, "templateId");
+    if (!templateId) {
+      throw badRequest("templateId is required.");
+    }
+    const limit =
+      typeof req.query.limit === "string" ? Number(req.query.limit) : undefined;
+    const beforeCreatedAt =
+      typeof req.query.before === "string" ? req.query.before : undefined;
+    sendData(
+      res,
+      await templateService.listPublicTemplateReviews(templateId, {
+        limit: Number.isFinite(limit) ? limit : undefined,
+        beforeCreatedAt,
+      }),
+    );
+  },
+);
+
 export const create = asyncHandler(async (req: Request, res: Response) => {
   const input = createTemplateSchema.parse(req.body);
   sendData(res, await templateService.createTemplate(requireUser(req), input), 201);
