@@ -33,6 +33,10 @@ import { EditorTasks } from "@/routes/(main)/dashboard/systems/-components/edito
 import { TemplateShareActions } from "../../-components/template-share-actions";
 import { UseInAppNote } from "../../-components/use-in-app-note";
 
+function safeNumber(value: unknown, fallback = 0): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
 export function PublicTemplateView({ templateId }: { templateId: string }) {
   const { t } = useI18n();
   const { user, isReady } = useAuth();
@@ -109,6 +113,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
   }
 
   const template = query.data;
+  const averageRating = safeNumber(template.completionRatingAverage);
   const isOwner = Boolean(user && user.uid === template.creatorUid);
   const hasDownloaded = Boolean(user && template.downloaderUids.includes(user.uid));
   const selectedSection = sections.find((section) => section.id === selectedSectionId) ?? null;
@@ -149,7 +154,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
             <span className="inline-flex items-center gap-1.5">
               <Star className="size-3.5" />
               {t("common.ratingSummary", {
-                rating: template.completionRatingAverage.toFixed(1),
+                rating: averageRating.toFixed(1),
                 count: formatCount(template.completionReviewCount),
               })}
             </span>
@@ -248,7 +253,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1 font-medium text-sm">
                     <Star className="size-3.5" />
-                    {review.rating.toFixed(1)}
+                    {safeNumber(review.rating).toFixed(1)}
                   </span>
                   <span className="text-muted-foreground text-xs">
                     {formatUpdatedAt(review.createdAt)}
