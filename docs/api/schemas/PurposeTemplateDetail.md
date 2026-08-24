@@ -14,7 +14,7 @@ API-TEMPLATE-005,013,017
 
 ## Fields
 
-PurposeTemplate + sections + tasks
+PurposeTemplate + sections + tasks. `addedToApp` is true when the signed-in viewer already has a purpose track for this template.
 
 ## Validation
 

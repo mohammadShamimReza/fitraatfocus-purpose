@@ -14,7 +14,7 @@ API-TEMPLATE-*
 
 ## Fields
 
-template summary fields
+template summary fields, including viewer-specific `addedToApp` when authenticated.
 
 ## Validation
 

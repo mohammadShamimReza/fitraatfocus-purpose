@@ -46,7 +46,13 @@ export const getPublic = asyncHandler(async (req: Request, res: Response) => {
   if (!templateId) {
     throw badRequest("templateId is required.");
   }
-  sendData(res, await templateService.getPublicTemplate(templateId));
+  sendData(
+    res,
+    await templateService.getPublicTemplate(
+      templateId,
+      (req as AuthedRequest).user?.uid,
+    ),
+  );
 });
 
 export const listPublicReviews = asyncHandler(

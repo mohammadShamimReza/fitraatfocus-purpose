@@ -95,6 +95,10 @@ export function CreateSystemForm() {
         }
       }
 
+      toast.add({
+        title: t("newSystem.created"),
+        description: t("newSystem.createdHint"),
+      });
       await navigate({ to: "/dashboard/systems/$templateId", params: { templateId: created.id } });
     } catch (error) {
       toast.add({

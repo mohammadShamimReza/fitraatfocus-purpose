@@ -11,11 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/toast";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
+import { openTemplateInAppWithFallback } from "@/lib/app-handoff";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categoryLabel, statusLabel, visibilityLabel } from "@/lib/i18n/labels";
 import type { TranslateFn } from "@/lib/i18n/translate";
-import { usePublishTemplateMutation, useTemplateQuery } from "@/query/templates";
+import {
+  useDownloadTemplateMutation,
+  usePublishTemplateMutation,
+  useTemplateQuery,
+} from "@/query/templates";
 import type { TemplateStatus } from "@/types/template";
 
 import { DeleteSystemButton } from "./delete-system-button";
@@ -41,7 +46,9 @@ export function SystemEditor({ templateId }: { templateId: string }) {
   const { t } = useI18n();
   const query = useTemplateQuery(templateId, isReady);
   const publish = usePublishTemplateMutation(templateId);
+  const downloadToApp = useDownloadTemplateMutation(templateId);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [ownerAddedToApp, setOwnerAddedToApp] = useState(false);
 
   const sections = useMemo(() => {
     return [...(query.data?.sections ?? [])].sort((left, right) => left.order - right.order);
@@ -76,6 +83,30 @@ export function SystemEditor({ templateId }: { templateId: string }) {
     } catch (error) {
       toast.add({
         title: t("editor.publishError"),
+        description: getFunctionsErrorMessage(error),
+      });
+    }
+  };
+
+  const onAddToApp = async () => {
+    if (
+      ownerAddedToApp ||
+      query.data?.addedToApp ||
+      (user?.uid && query.data?.downloaderUids.includes(user.uid))
+    ) {
+      openTemplateInAppWithFallback(templateId);
+      return;
+    }
+    try {
+      await downloadToApp.mutateAsync();
+      setOwnerAddedToApp(true);
+      toast.add({
+        title: t("editor.addToAppReady"),
+        description: t("editor.addToAppReadyBody"),
+      });
+    } catch (error) {
+      toast.add({
+        title: t("editor.addToAppError"),
         description: getFunctionsErrorMessage(error),
       });
     }
@@ -123,6 +154,11 @@ export function SystemEditor({ templateId }: { templateId: string }) {
 
   const template = query.data;
   const canEdit = Boolean(user && user.uid === template.creatorUid);
+  const addedToApp = Boolean(
+    ownerAddedToApp ||
+      template.addedToApp ||
+      (user?.uid && template.downloaderUids.includes(user.uid)),
+  );
   const selectedSection = sections.find((section) => section.id === selectedSectionId) ?? null;
   const sectionTasks = selectedSection ? tasks.filter((task) => task.sectionId === selectedSection.id) : [];
 
@@ -164,6 +200,19 @@ export function SystemEditor({ templateId }: { templateId: string }) {
           </div>
           {canEdit ? (
             <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <Button
+                variant={addedToApp ? "outline" : "default"}
+                disabled={downloadToApp.isPending}
+                onClick={() => {
+                  void onAddToApp();
+                }}
+              >
+                {downloadToApp.isPending ?
+                  t("editor.addingToApp") :
+                  addedToApp ?
+                    t("editor.openInApp") :
+                    t("editor.addToApp")}
+              </Button>
               <DeleteSystemButton
                 templateId={template.id}
                 title={template.title}

@@ -23,7 +23,11 @@ import {
   withCounts,
 } from "../models/template.model";
 import { getCatalogCreator, getOrCreateMyProfile } from "./profile.service";
-import { detachSharedTrackCovers, ensurePurposeTrack } from "./purpose-track.service";
+import {
+  detachSharedTrackCovers,
+  ensurePurposeTrack,
+  hasPurposeTrack,
+} from "./purpose-track.service";
 
 const templates = db.collection(collections.templates);
 const completionReviews = db.collection(collections.purposeCompletionReviews);
@@ -104,6 +108,7 @@ function asTemplate(id: string, data: Record<string, unknown>): PurposeTemplateD
     downloaderUids: Array.isArray(data.downloaderUids) ?
       data.downloaderUids.map(String) :
       [],
+    addedToApp: false,
     createdAt: String(data.createdAt ?? nowIso()),
     updatedAt: String(data.updatedAt ?? nowIso()),
     ...(typeof data.imageUrl === "string" && data.imageUrl.trim() ?
@@ -134,9 +139,22 @@ async function readTemplate(templateId: string): Promise<PurposeTemplateDetail |
 }
 
 async function saveTemplate(template: PurposeTemplateDetail): Promise<PurposeTemplateDetail> {
-  const next = withCounts({ ...template, updatedAt: nowIso() });
-  await templates.doc(next.id).set(next);
+  const next = withCounts({ ...template, updatedAt: nowIso(), addedToApp: false });
+  const { addedToApp: _addedToApp, ...stored } = next;
+  await templates.doc(next.id).set(stored);
   return next;
+}
+
+async function withViewerState<T extends { id: string }>(
+  template: T,
+  uid?: string,
+  addedToApp?: boolean,
+): Promise<T & { addedToApp: boolean }> {
+  return {
+    ...template,
+    addedToApp:
+      addedToApp ?? (uid ? await hasPurposeTrack(uid, template.id) : false),
+  };
 }
 
 async function toCatalog(template: PurposeTemplateDetail): Promise<CatalogTemplate> {
@@ -244,11 +262,13 @@ export async function getTemplate(
   templateId: string,
   uid?: string,
 ): Promise<PurposeTemplateDetail> {
-  return requireVisible(templateId, uid);
+  const template = await requireVisible(templateId, uid);
+  return withViewerState(template, uid);
 }
 
 export async function getPublicTemplate(
   templateId: string,
+  uid?: string,
 ): Promise<PublicTemplateDetail> {
   const template = await readTemplate(templateId);
   if (!template || !isPublicTemplate(template)) {
@@ -271,14 +291,17 @@ export async function getPublicTemplate(
       ).toFixed(2),
     )
     : 0;
-  return {
-    ...template,
-    ...catalog,
-    sections: template.sections,
-    tasks: template.tasks,
-    completionRatingAverage,
-    completionReviews,
-  };
+  return withViewerState(
+    {
+      ...template,
+      ...catalog,
+      sections: template.sections,
+      tasks: template.tasks,
+      completionRatingAverage,
+      completionReviews,
+    },
+    uid,
+  );
 }
 
 export async function listPublicTemplateReviews(
@@ -338,6 +361,7 @@ export async function createTemplate(
     completionReviewCount: 0,
     completionRatingSum: 0,
     downloaderUids: [],
+    addedToApp: false,
     createdAt,
     updatedAt: createdAt,
     sections: [],
@@ -407,17 +431,30 @@ export async function downloadTemplate(
   templateId: string,
 ): Promise<PurposeTemplate> {
   const current = await readTemplate(templateId);
-  if (!current || !isPublicTemplate(current)) {
+  if (!current) {
     throw notFound("Purpose not found.");
   }
 
   if (current.creatorUid === uid) {
-    throw badRequest("You already own this purpose.");
+    const ownerMarkedTemplate =
+      current.downloaderUids.includes(uid) ?
+        current :
+        await saveTemplate({
+          ...current,
+          // Marker for website UX state only; do not bump download count for owner.
+          downloaderUids: [...current.downloaderUids, uid],
+        });
+    await ensurePurposeTrack(uid, ownerMarkedTemplate);
+    return toSummary(ownerMarkedTemplate, true);
+  }
+
+  if (!isPublicTemplate(current)) {
+    throw notFound("Purpose not found.");
   }
 
   if (current.downloaderUids.includes(uid)) {
     await ensurePurposeTrack(uid, current);
-    return toSummary(current);
+    return toSummary(current, true);
   }
 
   const next = await saveTemplate({
@@ -426,7 +463,7 @@ export async function downloadTemplate(
     downloadCount: current.downloadCount + 1,
   });
   await ensurePurposeTrack(uid, next);
-  return toSummary(next);
+  return toSummary(next, true);
 }
 
 export async function createSection(

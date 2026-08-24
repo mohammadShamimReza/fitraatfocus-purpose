@@ -46,6 +46,8 @@ export type PurposeTemplate = {
   completionReviewCount: number;
   completionRatingSum: number;
   downloaderUids: string[];
+  /** True when the signed-in viewer already has this purpose in Fitraat Focus. */
+  addedToApp: boolean;
   createdAt: string;
   updatedAt: string;
   imageUrl?: string;
@@ -134,7 +136,10 @@ export type UpdateTaskInput = Partial<
   >
 >;
 
-export function toSummary(template: PurposeTemplateDetail): PurposeTemplate {
+export function toSummary(
+  template: PurposeTemplateDetail,
+  addedToApp = false,
+): PurposeTemplate {
   return {
     id: template.id,
     title: template.title,
@@ -155,6 +160,7 @@ export function toSummary(template: PurposeTemplateDetail): PurposeTemplate {
     completionReviewCount: template.completionReviewCount,
     completionRatingSum: template.completionRatingSum,
     downloaderUids: template.downloaderUids,
+    addedToApp,
     createdAt: template.createdAt,
     updatedAt: template.updatedAt,
     ...(template.imageUrl ? { imageUrl: template.imageUrl } : {}),

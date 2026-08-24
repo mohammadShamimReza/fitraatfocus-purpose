@@ -83,6 +83,27 @@ function buildTrack(
   });
 }
 
+export async function hasPurposeTrack(
+  ownerUid: string,
+  templateId: string,
+): Promise<boolean> {
+  const direct = await tracks.doc(purposeTrackDocId(ownerUid, templateId)).get();
+  if (direct.exists) {
+    return String(direct.data()?.ownerUid ?? "") === ownerUid;
+  }
+
+  try {
+    const snapshot = await tracks
+      .where("ownerUid", "==", ownerUid)
+      .where("sourceTemplateId", "==", templateId)
+      .limit(1)
+      .get();
+    return !snapshot.empty;
+  } catch {
+    return false;
+  }
+}
+
 export async function ensurePurposeTrack(
   ownerUid: string,
   template: PurposeTemplateDetail,

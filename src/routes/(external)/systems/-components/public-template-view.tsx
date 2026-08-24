@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
+import { QRCodeSVG } from "qrcode.react";
 
 import {
   ArrowLeft,
@@ -21,6 +22,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "@/components/ui/toast";
 import { APP_LINKS } from "@/config/app-config";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
+import { openTemplateInAppWithFallback } from "@/lib/app-handoff";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { categoryLabel, expertiseLabel } from "@/lib/i18n/labels";
@@ -48,9 +50,11 @@ function formatRating(value: unknown): string {
 export function PublicTemplateView({ templateId }: { templateId: string }) {
   const { t } = useI18n();
   const { user, isReady } = useAuth();
-  const query = usePublicTemplateQuery(templateId, true);
+  const query = usePublicTemplateQuery(templateId, true, user?.uid);
   const download = useDownloadTemplateMutation(templateId);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const appOpenUrl = query.data ? APP_LINKS.appTemplateOpen(query.data.id) : "";
+  const appWebUrl = query.data ? APP_LINKS.appTemplateOpenWeb(query.data.id) : "";
 
   const sections = useMemo(() => {
     return [...(query.data?.sections ?? [])].sort((left, right) => left.order - right.order);
@@ -123,11 +127,13 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
   const template = query.data;
   const averageRatingLabel = formatRating(template.completionRatingAverage);
   const isOwner = Boolean(user && user.uid === template.creatorUid);
-  const hasDownloaded = Boolean(user && template.downloaderUids.includes(user.uid));
+  const hasDownloaded = Boolean(
+    template.addedToApp ||
+      (user && template.downloaderUids.includes(user.uid)),
+  );
   const selectedSection = sections.find((section) => section.id === selectedSectionId) ?? null;
   const sectionTasks = selectedSection ? tasks.filter((task) => task.sectionId === selectedSection.id) : [];
   const safeCompletionReviews = (template.completionReviews ?? []).filter(Boolean);
-
   return (
     <div className="flex flex-col gap-8">
       <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
@@ -189,6 +195,53 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
                 title={template.title}
                 purpose={template.purpose}
               />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">{t("template.openInAppTitle")}</CardTitle>
+              <CardDescription>{t("template.openInAppLead")}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-1.5">
+                <Button
+                  className="w-full"
+                  onClick={() => openTemplateInAppWithFallback(template.id)}
+                >
+                  {t("template.openInAppCta")}
+                </Button>
+                <p className="text-center text-muted-foreground text-xs">
+                  {t("template.openInAppCtaHint")}
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Button
+                  nativeButton={false}
+                  variant="outline"
+                  className="w-full"
+                  render={<a href={appWebUrl} target="_blank" rel="noreferrer" />}
+                >
+                  {t("template.openWebAppDirect")}
+                </Button>
+                <p className="text-center text-muted-foreground text-xs">
+                  {t("template.openWebAppDirectHint")}
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-2 rounded-lg border p-3">
+                {appOpenUrl ? (
+                  <QRCodeSVG
+                    value={appOpenUrl}
+                    size={150}
+                    level="M"
+                    marginSize={1}
+                    title={t("template.openInAppQrAlt")}
+                    className="rounded-md border bg-white p-1"
+                  />
+                ) : null}
+                <p className="text-center text-muted-foreground text-xs">
+                  {t("template.openInAppQrHint")}
+                </p>
+              </div>
             </CardContent>
           </Card>
           {isOwner ? null : <UseInAppNote />}
@@ -307,7 +360,7 @@ function TemplateAction({
 
   if (hasDownloaded) {
     return (
-      <Button nativeButton={false} render={<a href={APP_LINKS.webApp} target="_blank" rel="noreferrer" />}>
+      <Button onClick={() => openTemplateInAppWithFallback(templateId)}>
         {t("landing.appNoteCta")}
       </Button>
     );

@@ -47,7 +47,7 @@ export async function getTemplate(templateId: string): Promise<PurposeTemplateDe
 
 /** API: API-TEMPLATE-004 */
 export async function getPublicTemplate(templateId: string): Promise<PublicTemplateDetail> {
-  return unwrapData(await functionsRequest(functionPaths.templates.publicDetail(templateId), { auth: false }));
+  return unwrapData(await functionsRequest(functionPaths.templates.publicDetail(templateId), { auth: "optional" }));
 }
 
 export async function listPublicTemplateReviews(

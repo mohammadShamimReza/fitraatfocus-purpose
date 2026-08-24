@@ -46,6 +46,7 @@ export type PurposeTemplate = {
   completionReviewCount: number;
   completionRatingSum: number;
   downloaderUids: string[];
+  addedToApp: boolean;
   createdAt: string;
   updatedAt: string;
   imageUrl?: string;
