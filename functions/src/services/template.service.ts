@@ -4,12 +4,12 @@ import { newId, nowIso } from "../lib/ids";
 import { deleteTemplateCoverFiles } from "../lib/storage";
 import type { AuthUser } from "../middleware/auth.middleware";
 import {
-  type PurposeCompletionReview,
   type CatalogTemplate,
   type CreateSectionInput,
   type CreateTaskInput,
   type CreateTemplateInput,
   type PublicTemplateDetail,
+  type PurposeCompletionReview,
   type PurposeTemplate,
   type PurposeTemplateDetail,
   type TemplateSection,
@@ -27,6 +27,18 @@ import { detachSharedTrackCovers, ensurePurposeTrack } from "./purpose-track.ser
 
 const templates = db.collection(collections.templates);
 const completionReviews = db.collection(collections.purposeCompletionReviews);
+
+function isMissingFirestoreIndexError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const maybe = error as {
+    code?: unknown;
+    details?: unknown;
+    message?: unknown;
+  };
+  if (maybe.code === 9) return true;
+  const text = [maybe.details, maybe.message].filter(Boolean).join(" ");
+  return typeof text === "string" && /requires an index/i.test(text);
+}
 
 function clampCount(value: unknown): number {
   const n = Number(value ?? 0);
@@ -244,7 +256,14 @@ export async function getPublicTemplate(
   }
 
   const catalog = await toCatalog(template);
-  const completionReviews = await listTemplateCompletionReviews(template.id);
+  let completionReviews: PurposeCompletionReview[] = [];
+  try {
+    completionReviews = await listTemplateCompletionReviews(template.id);
+  } catch (error) {
+    if (!isMissingFirestoreIndexError(error)) throw error;
+    // Keep template public page available while index creation catches up.
+    completionReviews = [];
+  }
   const completionRatingAverage = template.completionReviewCount
     ? Number(
       (
@@ -271,11 +290,18 @@ export async function listPublicTemplateReviews(
     throw notFound("Purpose not found.");
   }
   const limit = Math.max(1, Math.min(options?.limit ?? 20, 50));
-  const reviews = await listTemplateCompletionReviews(
-    templateId,
-    limit,
-    options?.beforeCreatedAt,
-  );
+  let reviews: PurposeCompletionReview[] = [];
+  try {
+    reviews = await listTemplateCompletionReviews(
+      templateId,
+      limit,
+      options?.beforeCreatedAt,
+    );
+  } catch (error) {
+    if (!isMissingFirestoreIndexError(error)) throw error;
+    // Degrade gracefully if the composite index is missing in a new environment.
+    reviews = [];
+  }
   const nextCursor =
     reviews.length === limit ? reviews[reviews.length - 1]?.createdAt : undefined;
   return { reviews, ...(nextCursor ? { nextCursor } : {}) };

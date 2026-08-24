@@ -34,7 +34,15 @@ import { TemplateShareActions } from "../../-components/template-share-actions";
 import { UseInAppNote } from "../../-components/use-in-app-note";
 
 function safeNumber(value: unknown, fallback = 0): number {
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function formatRating(value: unknown): string {
+  return safeNumber(value).toFixed(1);
 }
 
 export function PublicTemplateView({ templateId }: { templateId: string }) {
@@ -113,11 +121,12 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
   }
 
   const template = query.data;
-  const averageRating = safeNumber(template.completionRatingAverage);
+  const averageRatingLabel = formatRating(template.completionRatingAverage);
   const isOwner = Boolean(user && user.uid === template.creatorUid);
   const hasDownloaded = Boolean(user && template.downloaderUids.includes(user.uid));
   const selectedSection = sections.find((section) => section.id === selectedSectionId) ?? null;
   const sectionTasks = selectedSection ? tasks.filter((task) => task.sectionId === selectedSection.id) : [];
+  const safeCompletionReviews = (template.completionReviews ?? []).filter(Boolean);
 
   return (
     <div className="flex flex-col gap-8">
@@ -154,8 +163,8 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
             <span className="inline-flex items-center gap-1.5">
               <Star className="size-3.5" />
               {t("common.ratingSummary", {
-                rating: averageRating.toFixed(1),
-                count: formatCount(template.completionReviewCount),
+                rating: averageRatingLabel,
+                count: formatCount(safeNumber(template.completionReviewCount)),
               })}
             </span>
           </div>
@@ -243,17 +252,17 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
           <CardDescription>{t("template.reviewsDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {template.completionReviews.length === 0 ? (
+          {safeCompletionReviews.length === 0 ? (
             <p className="text-muted-foreground text-sm">
               {t("template.reviewsEmpty")}
             </p>
           ) : (
-            template.completionReviews.map((review) => (
+            safeCompletionReviews.map((review) => (
               <div key={review.id} className="rounded-lg border p-3">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1 font-medium text-sm">
                     <Star className="size-3.5" />
-                    {safeNumber(review.rating).toFixed(1)}
+                    {formatRating(review.rating)}
                   </span>
                   <span className="text-muted-foreground text-xs">
                     {formatUpdatedAt(review.createdAt)}
