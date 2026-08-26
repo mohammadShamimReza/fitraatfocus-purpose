@@ -4,6 +4,8 @@ This repository is the **Fitraat Focus Purpose System Studio**: creators author 
 
 Sibling products: [cross-repo-map.md](./cross-repo-map.md).
 
+Production QA (manual test + code review of all three apps): [../../qa/README.md](../../qa/README.md).
+
 ## Product architecture (this repo)
 
 ```
