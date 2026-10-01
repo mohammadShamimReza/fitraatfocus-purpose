@@ -1,6 +1,4 @@
-import { Link } from "@tanstack/react-router";
-
-import { ArrowLeft, CircleAlert, Globe, MapPin } from "lucide-react";
+import { CircleAlert, Globe, MapPin } from "lucide-react";
 
 import { CreatorPageSkeleton, CreatorSystemsSkeleton } from "@/components/page-skeletons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -15,16 +13,8 @@ import { useProfileQuery } from "@/query/profiles";
 import { useCreatorTemplatesQuery } from "@/query/templates";
 import type { CreatorProfile } from "@/types/profile";
 
+import { PublicBreadcrumbs } from "../../-components/public-breadcrumbs";
 import { TemplateCard } from "../../-components/template-card";
-
-function CatalogBackLink({ label }: { label: string }) {
-  return (
-    <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
-      <ArrowLeft data-icon="inline-start" />
-      {label}
-    </Button>
-  );
-}
 
 export function PublicCreatorView({ creatorId }: { creatorId: string }) {
   const { t } = useI18n();
@@ -34,7 +24,7 @@ export function PublicCreatorView({ creatorId }: { creatorId: string }) {
   if (profileQuery.isPending) {
     return (
       <div className="flex flex-col gap-8">
-        <CatalogBackLink label={t("catalog.back")} />
+        <PublicBreadcrumbs page="detail" />
         <CreatorPageSkeleton label={t("loading.creator")} />
       </div>
     );
@@ -43,7 +33,7 @@ export function PublicCreatorView({ creatorId }: { creatorId: string }) {
   if (profileQuery.isError || !profileQuery.data) {
     return (
       <div className="flex flex-col gap-8">
-        <CatalogBackLink label={t("catalog.back")} />
+        <PublicBreadcrumbs page="detail" />
         <Alert variant="destructive">
           <CircleAlert />
           <AlertTitle>{t("creator.loadError")}</AlertTitle>
@@ -57,7 +47,7 @@ export function PublicCreatorView({ creatorId }: { creatorId: string }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <CatalogBackLink label={t("catalog.back")} />
+      <PublicBreadcrumbs page="detail" current={profileQuery.data.displayName} />
       <CreatorHeader profile={profileQuery.data} />
       <div className="space-y-4">
         <h2 className="text-xl tracking-tight">{t("landing.catalog.title")}</h2>

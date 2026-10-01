@@ -1,0 +1,22 @@
+# Fitraat Focus
+
+> Find a purpose: a target and the steps to reach it. Add it to Fitraat Focus and follow those steps one by one.
+
+This site (purpose.fitraatfocus.com) is where people find a shared purpose or write one. The steps are done in the Fitraat Focus app, on a phone or on the web.
+
+## Public pages
+
+- [Home](https://purpose.fitraatfocus.com/): What a purpose is, how following one works, and common questions.
+- [Shared purposes](https://purpose.fitraatfocus.com/systems): Public purposes, each with a target and ordered steps.
+- [A purpose](https://purpose.fitraatfocus.com/systems/{id}): The target, who wrote it, the sections, and the todos.
+- [A creator](https://purpose.fitraatfocus.com/creators/{id}): Who wrote the steps, and the purposes they have shared.
+
+## Private
+
+- /dashboard and /auth are the creator studio and sign-in. They are not public content.
+
+## Product
+
+- [Web app](https://app.fitraatfocus.com/welcome)
+- [Google Play](https://play.google.com/store/apps/details?id=com.fitraatfocus)
+- [Fitraat Focus site](https://fitraatfocus.com/)

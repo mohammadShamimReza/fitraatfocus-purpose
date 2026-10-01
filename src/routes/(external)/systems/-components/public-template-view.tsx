@@ -1,17 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
-import { QRCodeSVG } from "qrcode.react";
 
-import {
-  ArrowLeft,
-  CheckCircle2,
-  CircleAlert,
-  Download,
-  Layers,
-  ListTodo,
-  Star,
-} from "lucide-react";
+import { CheckCircle2, CircleAlert, Download, Layers, ListTodo, Star } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 import { TemplatePageSkeleton } from "@/components/page-skeletons";
 import { SystemCover } from "@/components/system-cover";
@@ -32,6 +24,7 @@ import { useDownloadTemplateMutation, usePublicTemplateQuery } from "@/query/tem
 import { EditorSections } from "@/routes/(main)/dashboard/systems/-components/editor-sections";
 import { EditorTasks } from "@/routes/(main)/dashboard/systems/-components/editor-tasks";
 
+import { PublicBreadcrumbs } from "../../-components/public-breadcrumbs";
 import { TemplateShareActions } from "../../-components/template-share-actions";
 import { UseInAppNote } from "../../-components/use-in-app-note";
 
@@ -97,10 +90,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
   if (query.isPending) {
     return (
       <div className="flex flex-col gap-8">
-        <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
-          <ArrowLeft data-icon="inline-start" />
-          {t("catalog.back")}
-        </Button>
+        <PublicBreadcrumbs page="detail" />
         <TemplatePageSkeleton label={t("loading.template")} />
       </div>
     );
@@ -109,10 +99,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
   if (query.isError || !query.data) {
     return (
       <div className="flex flex-col gap-8">
-        <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
-          <ArrowLeft data-icon="inline-start" />
-          {t("catalog.back")}
-        </Button>
+        <PublicBreadcrumbs page="detail" />
         <Alert variant="destructive">
           <CircleAlert />
           <AlertTitle>{t("template.loadError")}</AlertTitle>
@@ -127,19 +114,13 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
   const template = query.data;
   const averageRatingLabel = formatRating(template.completionRatingAverage);
   const isOwner = Boolean(user && user.uid === template.creatorUid);
-  const hasDownloaded = Boolean(
-    template.addedToApp ||
-      (user && template.downloaderUids.includes(user.uid)),
-  );
+  const hasDownloaded = Boolean(template.addedToApp || (user && template.downloaderUids.includes(user.uid)));
   const selectedSection = sections.find((section) => section.id === selectedSectionId) ?? null;
   const sectionTasks = selectedSection ? tasks.filter((task) => task.sectionId === selectedSection.id) : [];
   const safeCompletionReviews = (template.completionReviews ?? []).filter(Boolean);
   return (
     <div className="flex flex-col gap-8">
-      <Button nativeButton={false} variant="ghost" size="sm" className="-ml-2 w-fit" render={<Link to="/systems" />}>
-        <ArrowLeft data-icon="inline-start" />
-        {t("catalog.back")}
-      </Button>
+      <PublicBreadcrumbs page="detail" current={template.title} />
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-3">
@@ -190,11 +171,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
               <CardTitle className="text-base">{t("template.shareTitle")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <TemplateShareActions
-                templateId={template.id}
-                title={template.title}
-                purpose={template.purpose}
-              />
+              <TemplateShareActions templateId={template.id} title={template.title} purpose={template.purpose} />
             </CardContent>
           </Card>
           <Card>
@@ -204,15 +181,10 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-1.5">
-                <Button
-                  className="w-full"
-                  onClick={() => openTemplateInAppWithFallback(template.id)}
-                >
+                <Button className="w-full" onClick={() => openTemplateInAppWithFallback(template.id)}>
                   {t("template.openInAppCta")}
                 </Button>
-                <p className="text-center text-muted-foreground text-xs">
-                  {t("template.openInAppCtaHint")}
-                </p>
+                <p className="text-center text-muted-foreground text-xs">{t("template.openInAppCtaHint")}</p>
               </div>
               <div className="space-y-1.5">
                 <Button
@@ -223,9 +195,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
                 >
                   {t("template.openWebAppDirect")}
                 </Button>
-                <p className="text-center text-muted-foreground text-xs">
-                  {t("template.openWebAppDirectHint")}
-                </p>
+                <p className="text-center text-muted-foreground text-xs">{t("template.openWebAppDirectHint")}</p>
               </div>
               <div className="flex flex-col items-center gap-2 rounded-lg border p-3">
                 {appOpenUrl ? (
@@ -238,9 +208,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
                     className="rounded-md border bg-white p-1"
                   />
                 ) : null}
-                <p className="text-center text-muted-foreground text-xs">
-                  {t("template.openInAppQrHint")}
-                </p>
+                <p className="text-center text-muted-foreground text-xs">{t("template.openInAppQrHint")}</p>
               </div>
             </CardContent>
           </Card>
@@ -306,9 +274,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
         </CardHeader>
         <CardContent className="space-y-3">
           {safeCompletionReviews.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              {t("template.reviewsEmpty")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("template.reviewsEmpty")}</p>
           ) : (
             safeCompletionReviews.map((review) => (
               <div key={review.id} className="rounded-lg border p-3">
@@ -317,9 +283,7 @@ export function PublicTemplateView({ templateId }: { templateId: string }) {
                     <Star className="size-3.5" />
                     {formatRating(review.rating)}
                   </span>
-                  <span className="text-muted-foreground text-xs">
-                    {formatUpdatedAt(review.createdAt)}
-                  </span>
+                  <span className="text-muted-foreground text-xs">{formatUpdatedAt(review.createdAt)}</span>
                 </div>
                 <p className="text-sm leading-relaxed">{review.comment}</p>
               </div>
@@ -359,11 +323,7 @@ function TemplateAction({
   }
 
   if (hasDownloaded) {
-    return (
-      <Button onClick={() => openTemplateInAppWithFallback(templateId)}>
-        {t("landing.appNoteCta")}
-      </Button>
-    );
+    return <Button onClick={() => openTemplateInAppWithFallback(templateId)}>{t("landing.appNoteCta")}</Button>;
   }
 
   if (isReady && isSignedIn) {

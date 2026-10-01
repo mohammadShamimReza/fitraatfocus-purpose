@@ -467,7 +467,8 @@ export const bn: Record<MessageKey, string> = {
   "template.openWebAppDirect": "ওয়েব ব্রাউজারে খুলুন",
   "template.openWebAppDirectHint": "অ্যাপ না থাকলে app.fitraatfocus.com-এ খুলবে।",
   "template.openInAppQrAlt": "Fitraat Focus অ্যাপে এই উদ্দেশ্য খোলার QR কোড",
-  "template.openInAppQrHint": "ফোন ক্যামেরা দিয়ে স্ক্যান করুন। Android app.fitraatfocus.com খুলবে, তারপর Fitraat Focus অ্যাপ ইনস্টল থাকলে সেখানে নিয়ে যাবে।",
+  "template.openInAppQrHint":
+    "ফোন ক্যামেরা দিয়ে স্ক্যান করুন। Android app.fitraatfocus.com খুলবে, তারপর Fitraat Focus অ্যাপ ইনস্টল থাকলে সেখানে নিয়ে যাবে।",
   "creator.loadError": "এই ক্রিয়েটর লোড করা যায়নি",
   "creator.notFound": "ক্রিয়েটর পাওয়া যায়নি।",
 
@@ -506,4 +507,6 @@ export const bn: Record<MessageKey, string> = {
   "landing.footer.terms": "শর্তাবলি",
   "landing.footer.donate": "ডোনেশন",
   "landing.footer.blurb": "একটি উদ্দেশ্য লিখুন, অথবা একটি অনুসরণ করুন। ধাপগুলো করুন Fitraat Focus-এ।",
+
+  "seo.breadcrumb": "ব্রেডক্রাম্ব",
 };

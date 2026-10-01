@@ -3,12 +3,16 @@
  * Documentation: docs/screens/STUDIO-05-login.md
  */
 import { createFileRoute } from "@tanstack/react-router";
+
 import { Compass, Sparkles, Target, Users } from "lucide-react";
 
 import { FitraatAppIcon } from "@/components/brand/fitraat-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { APP_CONFIG } from "@/config/app-config";
 import { parseAuthRedirectSearch } from "@/lib/auth/post-auth-path";
 import { useI18n } from "@/lib/i18n/i18n-provider";
+import { en } from "@/lib/i18n/messages/en";
+import { privatePageHead } from "@/lib/seo/head";
 
 import { FirebaseConfigAlert } from "../../-components/firebase-config-alert";
 import { GoogleSignInButton } from "../../-components/google-sign-in-button";
@@ -16,6 +20,7 @@ import { RedirectIfSignedIn } from "../../-components/redirect-if-signed-in";
 
 export const Route = createFileRoute("/(main)/auth/v1/login")({
   validateSearch: parseAuthRedirectSearch,
+  head: () => privatePageHead(en["auth.signIn"]),
   component: LoginV1,
 });
 
@@ -52,7 +57,7 @@ function LoginV1() {
             <div className="space-y-6">
               <FitraatAppIcon className="mx-auto size-16 bg-primary-foreground text-primary ring-0" />
               <div className="space-y-2">
-                <h1 className="font-light text-5xl text-primary-foreground">Fitraat Focus</h1>
+                <h1 className="font-light text-5xl text-primary-foreground">{APP_CONFIG.logo}</h1>
                 <p className="text-primary-foreground/80 text-xl">{t("auth.signInStudio")}</p>
               </div>
             </div>

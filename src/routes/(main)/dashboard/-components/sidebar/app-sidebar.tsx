@@ -38,7 +38,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton render={<Link to="/dashboard/systems" />}>
               <FitraatMark className="size-4" />
-              <span className="font-semibold text-base">{APP_CONFIG.name}</span>
+              <span className="font-semibold text-base">{APP_CONFIG.logo}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

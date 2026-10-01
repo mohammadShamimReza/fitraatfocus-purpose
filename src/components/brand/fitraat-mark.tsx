@@ -43,7 +43,7 @@ export function FitraatBrand({
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
       <FitraatMark className={cn("size-5", markClassName)} />
-      <span className={cn("font-semibold tracking-tight", nameClassName)}>{APP_CONFIG.name}</span>
+      <span className={cn("font-semibold tracking-tight", nameClassName)}>{APP_CONFIG.logo}</span>
     </span>
   );
 }

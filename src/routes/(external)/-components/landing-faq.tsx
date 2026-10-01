@@ -20,7 +20,7 @@ export function LandingFaq() {
       </LandingReveal>
       <LandingReveal>
         <Accordion className="max-w-3xl rounded-xl border bg-card px-4">
-          {FAQS.map((item) => (
+          {LANDING_FAQS.map((item) => (
             <AccordionItem key={item.question} value={item.question}>
               <AccordionTrigger>{t(item.question)}</AccordionTrigger>
               <AccordionContent>
@@ -34,7 +34,7 @@ export function LandingFaq() {
   );
 }
 
-const FAQS: { question: MessageKey; answer: MessageKey }[] = [
+export const LANDING_FAQS: { question: MessageKey; answer: MessageKey }[] = [
   { question: "landing.faq.q1", answer: "landing.faq.a1" },
   { question: "landing.faq.q2", answer: "landing.faq.a2" },
   { question: "landing.faq.q3", answer: "landing.faq.a3" },

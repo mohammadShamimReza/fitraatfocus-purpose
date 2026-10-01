@@ -12,11 +12,14 @@ import { Button } from "@/components/ui/button";
 import { getFunctionsErrorMessage } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/auth-provider";
 import { useI18n } from "@/lib/i18n/i18n-provider";
+import { en } from "@/lib/i18n/messages/en";
+import { privatePageHead } from "@/lib/seo/head";
 import { useMyProfileQuery } from "@/query/profiles";
 
 import { CreatorProfileForm } from "./-components/creator-profile-form";
 
 export const Route = createFileRoute("/(main)/dashboard/profile")({
+  head: () => privatePageHead(en["profile.title"]),
   component: CreatorProfilePage,
 });
 

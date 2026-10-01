@@ -6,6 +6,8 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { RequireAuth } from "@/lib/auth/require-auth";
+import { en } from "@/lib/i18n/messages/en";
+import { privatePageHead } from "@/lib/seo/head";
 import { cn } from "@/lib/utils";
 import { getDashboardLayout } from "@/server/server-actions";
 
@@ -17,6 +19,7 @@ import { AppSidebar } from "./-components/sidebar/app-sidebar";
 
 export const Route = createFileRoute("/(main)/dashboard")({
   loader: () => getDashboardLayout(),
+  head: () => privatePageHead(en["nav.studio"]),
   component: DashboardLayout,
 });
 

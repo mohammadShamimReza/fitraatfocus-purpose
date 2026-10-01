@@ -4,9 +4,12 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 
+import { privatePageHead } from "@/lib/seo/head";
+
 import { SystemEditor } from "./-components/system-editor";
 
 export const Route = createFileRoute("/(main)/dashboard/systems/$templateId")({
+  head: () => privatePageHead("Edit purpose"),
   component: SystemEditorPage,
 });
 

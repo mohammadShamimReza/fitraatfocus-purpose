@@ -11,6 +11,7 @@ import { fontRegistry } from "@/lib/fonts/registry";
 import { type AppLocale, DEFAULT_LOCALE } from "@/lib/i18n/config";
 import { I18nProvider } from "@/lib/i18n/i18n-provider";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
+import { ROBOTS_INDEX } from "@/lib/seo/site";
 import { LocaleBootScript } from "@/scripts/locale-boot";
 import { ThemeBootScript } from "@/scripts/theme-boot";
 import { getInitialLocale } from "@/server/server-actions";
@@ -41,6 +42,54 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         name: "description",
+        content: APP_CONFIG.meta.description,
+      },
+      {
+        name: "application-name",
+        content: APP_CONFIG.name,
+      },
+      {
+        name: "apple-mobile-web-app-title",
+        content: APP_CONFIG.name,
+      },
+      {
+        name: "theme-color",
+        content: APP_CONFIG.meta.themeColor,
+      },
+      {
+        name: "robots",
+        content: ROBOTS_INDEX,
+      },
+      {
+        property: "og:site_name",
+        content: APP_CONFIG.name,
+      },
+      {
+        property: "og:locale",
+        content: "en_US",
+      },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        property: "og:title",
+        content: APP_CONFIG.meta.title,
+      },
+      {
+        property: "og:description",
+        content: APP_CONFIG.meta.description,
+      },
+      {
+        name: "twitter:card",
+        content: "summary",
+      },
+      {
+        name: "twitter:title",
+        content: APP_CONFIG.meta.title,
+      },
+      {
+        name: "twitter:description",
         content: APP_CONFIG.meta.description,
       },
     ],
@@ -79,6 +128,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "apple-touch-icon",
         href: "/apple-touch-icon.png",
+      },
+      {
+        rel: "sitemap",
+        type: "application/xml",
+        title: "Sitemap",
+        href: "/sitemap.xml",
       },
     ],
   }),

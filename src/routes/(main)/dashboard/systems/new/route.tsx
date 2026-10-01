@@ -8,10 +8,13 @@ import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n/i18n-provider";
+import { en } from "@/lib/i18n/messages/en";
+import { privatePageHead } from "@/lib/seo/head";
 
 import { CreateSystemForm } from "../-components/create-system-form";
 
 export const Route = createFileRoute("/(main)/dashboard/systems/new")({
+  head: () => privatePageHead(en["newSystem.title"]),
   component: NewSystemPage,
 });
 

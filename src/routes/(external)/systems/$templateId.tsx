@@ -4,7 +4,12 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 
-import { APP_CONFIG, APP_LINKS } from "@/config/app-config";
+import { APP_CONFIG } from "@/config/app-config";
+import { isFunctionsApiError } from "@/lib/api/errors";
+import { en } from "@/lib/i18n/messages/en";
+import { buildPageHead, notFoundPageHead } from "@/lib/seo/head";
+import { isoDateTime } from "@/lib/seo/site";
+import { breadcrumbJsonLd, purposeJsonLd } from "@/lib/seo/structured-data";
 import { publicTemplateQueryOptions } from "@/query/templates/use-public-template";
 
 import { PublicTemplateView } from "./-components/public-template-view";
@@ -12,39 +17,38 @@ import { PublicTemplateView } from "./-components/public-template-view";
 export const Route = createFileRoute("/(external)/systems/$templateId")({
   loader: async ({ context, params }) => {
     try {
-      return await context.queryClient.ensureQueryData(
-        publicTemplateQueryOptions(params.templateId),
-      );
-    } catch {
-      return null;
+      const template = await context.queryClient.ensureQueryData(publicTemplateQueryOptions(params.templateId));
+      return { template, missing: false };
+    } catch (error) {
+      return { template: null, missing: isFunctionsApiError(error) && error.status === 404 };
     }
   },
   head: ({ loaderData, params }) => {
-    const canonicalUrl = `${APP_LINKS.studio}/systems/${params.templateId}`;
-    const title = loaderData?.title
-      ? `${loaderData.title} | ${APP_CONFIG.name}`
-      : APP_CONFIG.meta.title;
-    const description =
-      loaderData?.purpose?.trim() || APP_CONFIG.meta.description;
-    const imageUrl = loaderData?.imageUrl;
+    const path = `/systems/${encodeURIComponent(params.templateId)}`;
+    const template = loaderData?.template;
 
-    return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:type", content: "article" },
-        { property: "og:site_name", content: APP_CONFIG.name },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:url", content: canonicalUrl },
-        ...(imageUrl ? [{ property: "og:image", content: imageUrl }] : []),
-        { name: "twitter:card", content: imageUrl ? "summary_large_image" : "summary" },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: description },
-        ...(imageUrl ? [{ name: "twitter:image", content: imageUrl }] : []),
+    if (!template) {
+      return loaderData?.missing ? notFoundPageHead() : buildPageHead({ title: en["template.loadError"], path });
+    }
+
+    return buildPageHead({
+      title: template.title,
+      description: template.purpose || template.description,
+      path,
+      imageUrl: template.imageUrl,
+      imageAlt: template.title,
+      type: "article",
+      publishedTime: isoDateTime(template.createdAt),
+      modifiedTime: isoDateTime(template.updatedAt),
+      jsonLd: [
+        purposeJsonLd(template),
+        breadcrumbJsonLd([
+          { name: APP_CONFIG.logo, path: "/" },
+          { name: en["landing.nav.systems"], path: "/systems" },
+          { name: template.title, path },
+        ]),
       ],
-      links: [{ rel: "canonical", href: canonicalUrl }],
-    };
+    });
   },
   component: PublicTemplatePage,
 });

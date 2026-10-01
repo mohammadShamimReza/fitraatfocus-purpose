@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as externalRouteRouteImport } from './routes/(external)/route'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as externalIndexRouteImport } from './routes/(external)/index'
 import { Route as mainDashboardRouteRouteImport } from './routes/(main)/dashboard/route'
 import { Route as externalCreatorsCreatorIdRouteImport } from './routes/(external)/creators/$creatorId'
@@ -23,8 +25,18 @@ import { Route as mainDashboardSystemsIndexRouteImport } from './routes/(main)/d
 import { Route as mainDashboardSystemsTemplateIdRouteImport } from './routes/(main)/dashboard/systems/$templateId'
 import { Route as mainDashboardSystemsNewRouteRouteImport } from './routes/(main)/dashboard/systems/new/route'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const externalRouteRoute = externalRouteRouteImport.update({
   id: '/(external)',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const externalIndexRoute = externalIndexRouteImport.update({
@@ -95,6 +107,8 @@ const mainDashboardSystemsNewRouteRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/$': typeof SplatRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof mainDashboardRouteRouteWithChildren
   '/': typeof externalIndexRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
@@ -109,6 +123,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/systems/': typeof mainDashboardSystemsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/$': typeof SplatRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/': typeof externalIndexRoute
   '/dashboard/profile': typeof mainDashboardProfileRouteRoute
   '/creators/$creatorId': typeof externalCreatorsCreatorIdRoute
@@ -124,6 +140,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(external)': typeof externalRouteRouteWithChildren
+  '/$': typeof SplatRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/(main)/dashboard': typeof mainDashboardRouteRouteWithChildren
   '/(external)/': typeof externalIndexRoute
   '/(main)/dashboard/profile': typeof mainDashboardProfileRouteRoute
@@ -140,6 +158,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/$'
+    | '/sitemap.xml'
     | '/dashboard'
     | '/'
     | '/dashboard/profile'
@@ -154,6 +174,8 @@ export interface FileRouteTypes {
     | '/dashboard/systems/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/$'
+    | '/sitemap.xml'
     | '/'
     | '/dashboard/profile'
     | '/creators/$creatorId'
@@ -168,6 +190,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/(external)'
+    | '/$'
+    | '/sitemap.xml'
     | '/(main)/dashboard'
     | '/(external)/'
     | '/(main)/dashboard/profile'
@@ -184,17 +208,33 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   externalRouteRoute: typeof externalRouteRouteWithChildren
+  SplatRoute: typeof SplatRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   mainDashboardRouteRoute: typeof mainDashboardRouteRouteWithChildren
   mainAuthV1LoginRouteRoute: typeof mainAuthV1LoginRouteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(external)': {
       id: '/(external)'
       path: ''
       fullPath: ''
       preLoaderRoute: typeof externalRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(external)/': {
@@ -325,6 +365,8 @@ const mainDashboardRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   externalRouteRoute: externalRouteRouteWithChildren,
+  SplatRoute: SplatRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   mainDashboardRouteRoute: mainDashboardRouteRouteWithChildren,
   mainAuthV1LoginRouteRoute: mainAuthV1LoginRouteRoute,
 }

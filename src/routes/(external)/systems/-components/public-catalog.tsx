@@ -13,6 +13,7 @@ import { useI18n } from "@/lib/i18n/i18n-provider";
 import { matchesTemplateSearch } from "@/lib/templates/filter";
 import { usePublicTemplatesQuery } from "@/query/templates";
 
+import { PublicBreadcrumbs } from "../../-components/public-breadcrumbs";
 import { TemplateCard } from "../../-components/template-card";
 import { UseInAppNote } from "../../-components/use-in-app-note";
 
@@ -29,6 +30,7 @@ export function PublicCatalog() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-12 sm:px-6 sm:py-16">
       <div className="max-w-2xl space-y-3">
+        <PublicBreadcrumbs page="catalog" />
         <p className="font-medium text-muted-foreground text-xs uppercase tracking-[0.18em]">
           {t("landing.catalog.kicker")}
         </p>

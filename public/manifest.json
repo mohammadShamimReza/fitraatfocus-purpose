@@ -25,6 +25,7 @@
       "purpose": "any maskable"
     }
   ],
+  "lang": "en",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

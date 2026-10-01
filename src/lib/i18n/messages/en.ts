@@ -475,7 +475,8 @@ export const en = {
   "template.openWebAppDirect": "Open in web browser",
   "template.openWebAppDirectHint": "Opens app.fitraatfocus.com if the phone app is not installed.",
   "template.openInAppQrAlt": "QR code to open this purpose in the Fitraat Focus app",
-  "template.openInAppQrHint": "Scan with the phone camera. Android opens this purpose on app.fitraatfocus.com, then jumps into the Fitraat Focus app if it is installed.",
+  "template.openInAppQrHint":
+    "Scan with the phone camera. Android opens this purpose on app.fitraatfocus.com, then jumps into the Fitraat Focus app if it is installed.",
   "creator.loadError": "Could not load this creator",
   "creator.notFound": "Creator not found.",
 
@@ -516,6 +517,8 @@ export const en = {
   "landing.footer.terms": "Terms",
   "landing.footer.donate": "Donate",
   "landing.footer.blurb": "Write a purpose, or follow one. Do the steps in Fitraat Focus.",
+
+  "seo.breadcrumb": "Breadcrumb",
 } as const;
 
 export type MessageKey = keyof typeof en;

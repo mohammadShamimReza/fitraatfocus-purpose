@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { privatePageHead } from "@/lib/seo/head";
+
 export const Route = createFileRoute("/(main)/dashboard/$")({
+  head: () => privatePageHead("Page not found"),
   component: DashboardNotFound,
 });
 

@@ -59,7 +59,9 @@ Prefixes:
 | Donate | SETTINGS-08 Donate | — | MKT-07 Donate |
 | Account deletion | SUPPORT-04 Data Deletion (in-app ticket) | — | MKT-06 Delete Account (public lookup; does not delete) |
 | Focus practice | FOCUS-01 + SESSION-* | — | MKT-01 landing describes it; blog `how-to-use-focus-sessions` is content |
+| Focus learn program | FOCUS-07 / FOCUS-08 | — | — |
 | Todo planner | TODO-01 | — | blog `how-to-use-todo` is content |
+| Todo learn program | TODO-03 / TODO-04 | — | — |
 
 ## Data bridge (verified)
 
